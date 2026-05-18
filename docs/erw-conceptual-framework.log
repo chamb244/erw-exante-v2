@@ -1,11 +1,11 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=latex 2026.5.14)  14 MAY 2026 17:09
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (MiKTeX 22.1) (preloaded format=pdflatex 2025.4.14)  14 MAY 2026 18:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
 **./erw-conceptual-framework.tex
 (erw-conceptual-framework.tex
-LaTeX2e <2025-06-01> patch level 1
-L3 programming layer <2025-06-09>
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/standalone/standa
 lone.cls
@@ -37,11 +37,11 @@ s.tex
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/xkeyval/keyval.
 tex))
-\XKV@depth=\count275
+\XKV@depth=\count196
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
 ))
-\sa@internal=\count276
-\c@sapage=\count277
+\sa@internal=\count197
+\c@sapage=\count198
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/standalone/standa
 lone.cfg
@@ -49,21 +49,21 @@ File: standalone.cfg 2025/02/22 v1.5a Default configuration file for 'standalon
 e' class
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/base/article.cls
-Document Class: article 2025/01/22 v1.4n Standard LaTeX document class
+Document Class: article 2024/06/29 v1.4n Standard LaTeX document class
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/base/size10.clo
-File: size10.clo 2025/01/22 v1.4n Standard LaTeX file (size option)
+File: size10.clo 2024/06/29 v1.4n Standard LaTeX file (size option)
 )
-\c@part=\count278
-\c@section=\count279
-\c@subsection=\count280
-\c@subsubsection=\count281
-\c@paragraph=\count282
-\c@subparagraph=\count283
-\c@figure=\count284
-\c@table=\count285
+\c@part=\count199
+\c@section=\count266
+\c@subsection=\count267
+\c@subsubsection=\count268
+\c@paragraph=\count269
+\c@subparagraph=\count270
+\c@figure=\count271
+\c@table=\count272
 \abovecaptionskip=\skip49
 \belowcaptionskip=\skip50
-\bibindent=\dimen148
+\bibindent=\dimen141
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/pgf/frontendlayer
 /tikz.sty
@@ -74,12 +74,12 @@ rcs.sty
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/utilities/p
 gfutil-common.tex
 \pgfutil@everybye=\toks19
-\pgfutil@tempdima=\dimen149
-\pgfutil@tempdimb=\dimen150
+\pgfutil@tempdima=\dimen142
+\pgfutil@tempdimb=\dimen143
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/utilities/p
 gfutil-latex.def
-\pgfutil@abb=\box53
+\pgfutil@abb=\box52
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/utilities/p
 gfrcs.code.tex
@@ -93,7 +93,7 @@ Package: pgf 2023-01-15 v3.1.10 (3.1.10)
 fcore.sty
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/graphics/graphicx
 .sty
-Package: graphicx 2024/12/31 v1.2e Enhanced LaTeX Graphics (DPC,SPQR)
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/graphics/graphics
 .sty
@@ -106,14 +106,14 @@ Package: trig 2023/12/02 v1.11 sin cos tan (DPC)
 hics.cfg
 File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
 )
-Package graphics Info: Driver file: dvips.def on input line 106.
+Package graphics Info: Driver file: pdftex.def on input line 106.
 
-(/Library/Application Support/MiKTeX/texmfs/install/tex/latex/graphics-def/dvip
-s.def
-File: dvips.def 2022/09/22 v3.1e Graphics/color driver for dvips
+(/Library/Application Support/MiKTeX/texmfs/install/tex/latex/graphics-def/pdft
+ex.def
+File: pdftex.def 2024/04/13 v1.2c Graphics/color driver for pdftex
 ))
-\Gin@req@height=\dimen151
-\Gin@req@width=\dimen152
+\Gin@req@height=\dimen144
+\Gin@req@width=\dimen145
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/pgf/systemlayer/p
 gfsys.sty
@@ -130,47 +130,46 @@ gfkeys.code.tex
 gfkeyslibraryfiltered.code.tex
 \pgfkeys@tmptoks=\toks22
 ))
-\pgf@x=\dimen153
-\pgf@y=\dimen154
-\pgf@xa=\dimen155
-\pgf@ya=\dimen156
-\pgf@xb=\dimen157
-\pgf@yb=\dimen158
-\pgf@xc=\dimen159
-\pgf@yc=\dimen160
-\pgf@xd=\dimen161
-\pgf@yd=\dimen162
+\pgf@x=\dimen146
+\pgf@y=\dimen147
+\pgf@xa=\dimen148
+\pgf@ya=\dimen149
+\pgf@xb=\dimen150
+\pgf@yb=\dimen151
+\pgf@xc=\dimen152
+\pgf@yc=\dimen153
+\pgf@xd=\dimen154
+\pgf@yd=\dimen155
 \w@pgf@writea=\write3
 \r@pgf@reada=\read2
-\c@pgf@counta=\count286
-\c@pgf@countb=\count287
-\c@pgf@countc=\count288
-\c@pgf@countd=\count289
+\c@pgf@counta=\count273
+\c@pgf@countb=\count274
+\c@pgf@countc=\count275
+\c@pgf@countd=\count276
 \t@pgf@toka=\toks23
 \t@pgf@tokb=\toks24
 \t@pgf@tokc=\toks25
-\pgf@sys@id@count=\count290
+\pgf@sys@id@count=\count277
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/systemlayer
 /pgf.cfg
 File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
 )
-Driver file for pgf: pgfsys-dvips.def
+Driver file for pgf: pgfsys-pdftex.def
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/systemlayer
-/pgfsys-dvips.def
-File: pgfsys-dvips.def 2023-01-15 v3.1.10 (3.1.10)
+/pgfsys-pdftex.def
+File: pgfsys-pdftex.def 2023-01-15 v3.1.10 (3.1.10)
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/systemlayer
-/pgfsys-common-postscript.def
-File: pgfsys-common-postscript.def 2023-01-15 v3.1.10 (3.1.10)
-\pgf@objectcount=\count291
+/pgfsys-common-pdf.def
+File: pgfsys-common-pdf.def 2023-01-15 v3.1.10 (3.1.10)
 )))
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/systemlayer
 /pgfsyssoftpath.code.tex
 File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfsyssoftpath@smallbuffer@items=\count292
-\pgfsyssoftpath@bigbuffer@items=\count293
+\pgfsyssoftpath@smallbuffer@items=\count278
+\pgfsyssoftpath@bigbuffer@items=\count279
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/systemlayer
 /pgfsysprotocol.code.tex
@@ -183,11 +182,12 @@ Package: xcolor 2024/09/29 v3.02 LaTeX color extensions (UK)
 r.cfg
 File: color.cfg 2016/01/02 v1.6 sample color configuration
 )
-Package xcolor Info: Driver file: dvips.def on input line 274.
+Package xcolor Info: Driver file: pdftex.def on input line 274.
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/graphics/mathcolo
 r.ltx)
 Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1349.
+Package xcolor Info: Model `hsb' substituted by `rgb' on input line 1353.
 Package xcolor Info: Model `RGB' extended on input line 1365.
 Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1367.
 Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1368.
@@ -206,9 +206,9 @@ h.code.tex
 hutil.code.tex)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/math/pgfmat
 hparser.code.tex
-\pgfmath@dimen=\dimen163
-\pgfmath@count=\count294
-\pgfmath@box=\box54
+\pgfmath@dimen=\dimen156
+\pgfmath@count=\count280
+\pgfmath@box=\box53
 \pgfmath@toks=\toks26
 \pgfmath@stack@operand=\toks27
 \pgfmath@stack@operation=\toks28
@@ -235,59 +235,59 @@ hfunctions.integerarithmetics.code.tex)
 hcalc.code.tex)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/math/pgfmat
 hfloat.code.tex
-\c@pgfmathroundto@lastzeros=\count295
+\c@pgfmathroundto@lastzeros=\count281
 ))
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/math/pgfint
 .code.tex)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorepoints.code.tex
 File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@picminx=\dimen164
-\pgf@picmaxx=\dimen165
-\pgf@picminy=\dimen166
-\pgf@picmaxy=\dimen167
-\pgf@pathminx=\dimen168
-\pgf@pathmaxx=\dimen169
-\pgf@pathminy=\dimen170
-\pgf@pathmaxy=\dimen171
-\pgf@xx=\dimen172
-\pgf@xy=\dimen173
-\pgf@yx=\dimen174
-\pgf@yy=\dimen175
-\pgf@zx=\dimen176
-\pgf@zy=\dimen177
+\pgf@picminx=\dimen157
+\pgf@picmaxx=\dimen158
+\pgf@picminy=\dimen159
+\pgf@picmaxy=\dimen160
+\pgf@pathminx=\dimen161
+\pgf@pathmaxx=\dimen162
+\pgf@pathminy=\dimen163
+\pgf@pathmaxy=\dimen164
+\pgf@xx=\dimen165
+\pgf@xy=\dimen166
+\pgf@yx=\dimen167
+\pgf@yy=\dimen168
+\pgf@zx=\dimen169
+\pgf@zy=\dimen170
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorepathconstruct.code.tex
 File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@path@lastx=\dimen178
-\pgf@path@lasty=\dimen179
+\pgf@path@lastx=\dimen171
+\pgf@path@lasty=\dimen172
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorepathusage.code.tex
 File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@shorten@end@additional=\dimen180
-\pgf@shorten@start@additional=\dimen181
+\pgf@shorten@end@additional=\dimen173
+\pgf@shorten@start@additional=\dimen174
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorescopes.code.tex
 File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfpic=\box55
-\pgf@hbox=\box56
-\pgf@layerbox@main=\box57
-\pgf@picture@serial@count=\count296
+\pgfpic=\box54
+\pgf@hbox=\box55
+\pgf@layerbox@main=\box56
+\pgf@picture@serial@count=\count282
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcoregraphicstate.code.tex
 File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgflinewidth=\dimen182
+\pgflinewidth=\dimen175
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcoretransformations.code.tex
 File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@pt@x=\dimen183
-\pgf@pt@y=\dimen184
-\pgf@pt@temp=\dimen185
+\pgf@pt@x=\dimen176
+\pgf@pt@y=\dimen177
+\pgf@pt@temp=\dimen178
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorequick.code.tex
@@ -304,14 +304,14 @@ File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorearrows.code.tex
 File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfarrowsep=\dimen186
+\pgfarrowsep=\dimen179
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcoreshade.code.tex
 File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@max=\dimen187
-\pgf@sys@shading@range@num=\count297
-\pgf@shadingcount=\count298
+\pgf@max=\dimen180
+\pgf@sys@shading@range@num=\count283
+\pgf@shadingcount=\count284
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcoreimage.code.tex
@@ -320,7 +320,7 @@ File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcoreexternal.code.tex
 File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfexternal@startupbox=\box58
+\pgfexternal@startupbox=\box57
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/basiclayer/
 pgfcorelayers.code.tex
@@ -341,7 +341,7 @@ File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/modules/pgf
 moduleshapes.code.tex
 File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfnodeparttextbox=\box59
+\pgfnodeparttextbox=\box58
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/modules/pgf
 moduleplot.code.tex
@@ -350,8 +350,8 @@ File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/pgf/compatibility
 /pgfcomp-version-0-65.sty
 Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
-\pgf@nodesepstart=\dimen188
-\pgf@nodesepend=\dimen189
+\pgf@nodesepstart=\dimen181
+\pgf@nodesepend=\dimen182
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/pgf/compatibility
 /pgfcomp-version-1-18.sty
@@ -370,8 +370,8 @@ h.code.tex))
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/utilities/p
 gffor.code.tex
 Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
-\pgffor@iter=\dimen190
-\pgffor@skip=\dimen191
+\pgffor@iter=\dimen183
+\pgffor@skip=\dimen184
 \pgffor@stack=\toks29
 \pgffor@toks=\toks30
 ))
@@ -382,49 +382,48 @@ Package: tikz 2023-01-15 v3.1.10 (3.1.10)
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/libraries/p
 gflibraryplothandlers.code.tex
 File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgf@plot@mark@count=\count299
-\pgfplotmarksize=\dimen192
+\pgf@plot@mark@count=\count285
+\pgfplotmarksize=\dimen185
 )
-\tikz@lastx=\dimen193
-\tikz@lasty=\dimen194
-\tikz@lastxsaved=\dimen195
-\tikz@lastysaved=\dimen196
-\tikz@lastmovetox=\dimen197
-\tikz@lastmovetoy=\dimen198
-\tikzleveldistance=\dimen199
-\tikzsiblingdistance=\dimen256
-\tikz@figbox=\box60
-\tikz@figbox@bg=\box61
-\tikz@tempbox=\box62
-\tikz@tempbox@bg=\box63
-\tikztreelevel=\count300
-\tikznumberofchildren=\count301
-\tikznumberofcurrentchild=\count302
-\tikz@fig@count=\count303
+\tikz@lastx=\dimen186
+\tikz@lasty=\dimen187
+\tikz@lastxsaved=\dimen188
+\tikz@lastysaved=\dimen189
+\tikz@lastmovetox=\dimen190
+\tikz@lastmovetoy=\dimen191
+\tikzleveldistance=\dimen192
+\tikzsiblingdistance=\dimen193
+\tikz@figbox=\box59
+\tikz@figbox@bg=\box60
+\tikz@tempbox=\box61
+\tikz@tempbox@bg=\box62
+\tikztreelevel=\count286
+\tikznumberofchildren=\count287
+\tikznumberofcurrentchild=\count288
+\tikz@fig@count=\count289
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/modules/pgf
 modulematrix.code.tex
 File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfmatrixcurrentrow=\count304
-\pgfmatrixcurrentcolumn=\count305
-\pgf@matrix@numberofcolumns=\count306
+\pgfmatrixcurrentrow=\count290
+\pgfmatrixcurrentcolumn=\count291
+\pgf@matrix@numberofcolumns=\count292
 )
-\tikz@expandcount=\count307
+\tikz@expandcount=\count293
 
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/frontendlay
 er/tikz/libraries/tikzlibrarytopaths.code.tex
 File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
 )))
-\sa@box=\box64
-\sa@yoffset=\skip51
+\sa@box=\box63
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/libraries/p
 gflibraryarrows.meta.code.tex
 File: pgflibraryarrows.meta.code.tex 2023-01-15 v3.1.10 (3.1.10)
-\pgfarrowinset=\dimen257
-\pgfarrowlength=\dimen258
-\pgfarrowwidth=\dimen259
-\pgfarrowlinewidth=\dimen260
+\pgfarrowinset=\dimen194
+\pgfarrowlength=\dimen195
+\pgfarrowwidth=\dimen196
+\pgfarrowlinewidth=\dimen197
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pgf/frontendlay
 er/tikz/libraries/tikzlibrarypositioning.code.tex
@@ -435,7 +434,7 @@ er/tikz/libraries/tikzlibrarycalc.code.tex
 File: tikzlibrarycalc.code.tex 2023-01-15 v3.1.10 (3.1.10)
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/base/fontenc.sty
-Package: fontenc 2024/12/21 v2.1c Standard LaTeX package
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
 )
 (/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/latex
 /psnfss/helvet.sty
@@ -449,13 +448,10 @@ LaTeX Font Info:    Trying to load font information for T1+phv on input line 7.
 File: t1phv.fd 2020/03/25 scalable font definitions for T1/phv.
 )
 (/Library/Application Support/MiKTeX/texmfs/install/tex/latex/l3backend/l3backe
-nd-dvips.def
-File: l3backend-dvips.def 2025-06-09 L3 backend support: dvips
-\l__pdfannot_backend_content_box=\box65
-\l__pdfannot_backend_model_box=\box66
-\g__pdfannot_backend_int=\count308
-\g__pdfannot_backend_link_int=\count309
-\g__pdfannot_backend_link_sf_int=\count310
+nd-pdftex.def
+File: l3backend-pdftex.def 2024-05-08 L3 backend support: PDF output (pdfTeX)
+\l__color_backend_stack_int=\count294
+\l__pdf_internal_box=\box64
 ) (erw-conceptual-framework.aux)
 \openout1 = `erw-conceptual-framework.aux'.
 
@@ -473,6 +469,69 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 7.
 LaTeX Font Info:    ... okay on input line 7.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 7.
 LaTeX Font Info:    ... okay on input line 7.
+
+(/Library/Application Support/MiKTeX/texmfs/install/tex/context/base/mkii/supp-
+pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count295
+\scratchdimen=\dimen198
+\scratchbox=\box65
+\nofMPsegments=\count296
+\nofMParguments=\count297
+\everyMPshowfont=\toks31
+\MPscratchCnt=\count298
+\MPscratchDim=\dimen199
+\MPnumerator=\count299
+\makeMPintoPDFobject=\count300
+\everyMPtoPDFconversion=\toks32
+)
+(/Library/Application Support/MiKTeX/texmfs/install/tex/latex/epstopdf-pkg/epst
+opdf-base.sty
+Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
+
+(/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/gener
+ic/infwarerr/infwarerr.sty
+Package: infwarerr 2019/12/03 v1.5 Providing info/warning/error messages (HO)
+)
+(/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/latex
+/grfext/grfext.sty
+Package: grfext 2019/12/03 v1.3 Manage graphics extensions (HO)
+
+(/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/gener
+ic/kvdefinekeys/kvdefinekeys.sty
+Package: kvdefinekeys 2019-12-19 v1.6 Define keys (HO)
+))
+(/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/latex
+/kvoptions/kvoptions.sty
+Package: kvoptions 2022-06-15 v3.15 Key value format for package options (HO)
+
+(/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/gener
+ic/ltxcmds/ltxcmds.sty
+Package: ltxcmds 2023-12-04 v1.26 LaTeX kernel commands for general use (HO)
+)
+(/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/install/tex/latex
+/kvsetkeys/kvsetkeys.sty
+Package: kvsetkeys 2022-10-05 v1.19 Key value parser (HO)
+))
+(/Library/Application Support/MiKTeX/texmfs/install/tex/generic/pdftexcmds/pdft
+excmds.sty
+Package: pdftexcmds 2020-06-27 v0.33 Utility functions of pdfTeX for LuaTeX (HO
+)
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 4
+85.
+Package grfext Info: Graphics extension search list:
+(grfext)             [.pdf,.png,.jpg,.mps,.jpeg,.jbig2,.jb2,.PDF,.PNG,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 504.
+
+(/Library/Application Support/MiKTeX/texmfs/install/tex/latex/00miktex/epstopdf
+-sys.cfg
+File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
+))
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <7> on input line 42.
 LaTeX Font Info:    External font `cmex10' loaded for size
@@ -487,19 +546,46 @@ LaTeX Font Info:    Font shape `T1/phv/m/it' in size <7> not available
 
 [1
 
-] (erw-conceptual-framework.aux)
+
+Non-PDF special ignored!
+<special> papersize=453.24117pt,376.8398pt
+{/Users/bisrathaile/Library/Application Support/MiKTeX/texmfs/data/fonts/map/pd
+ftex/pdftex.map}] (erw-conceptual-framework.aux)
  ***********
-LaTeX2e <2025-06-01> patch level 1
-L3 programming layer <2025-06-09>
+LaTeX2e <2024-11-01> patch level 2
+L3 programming layer <2025-01-18>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 12933 strings out of 468227
- 275412 string characters out of 5430102
- 718431 words of memory out of 5000000
- 41253 multiletter control sequences out of 15000+600000
- 644686 words of font info for 56 fonts, out of 8000000 for 9000
+ 13849 strings out of 473530
+ 292110 string characters out of 5711855
+ 686517 words of memory out of 5000000
+ 36817 multiletter control sequences out of 15000+600000
+ 584611 words of font info for 59 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 117i,8n,121p,458b,866s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 117i,8n,121p,458b,863s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{/Library/Application Support/MiKTeX/texmfs/install/fonts/enc/dvips/base/8r.e
+nc}</Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfo
+nts/cm/cmmi10.pfb></Library/Application Support/MiKTeX/texmfs/install/fonts/typ
+e1/public/amsfonts/cm/cmmi5.pfb></Library/Application Support/MiKTeX/texmfs/ins
+tall/fonts/type1/public/amsfonts/cm/cmmi7.pfb></Library/Application Support/MiK
+TeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr10.pfb></Library/Applicati
+on Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmr5.pfb></Libr
+ary/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cm
+r6.pfb></Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/a
+msfonts/cm/cmr7.pfb></Library/Application Support/MiKTeX/texmfs/install/fonts/t
+ype1/public/amsfonts/cm/cmsy10.pfb></Library/Application Support/MiKTeX/texmfs/
+install/fonts/type1/public/amsfonts/cm/cmsy5.pfb></Library/Application Support/
+MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy6.pfb></Library/Applic
+ation Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/cm/cmsy7.pfb></
+Library/Application Support/MiKTeX/texmfs/install/fonts/type1/public/amsfonts/c
+m/cmsy8.pfb></Library/Application Support/MiKTeX/texmfs/install/fonts/type1/urw
+/helvetic/uhvb8a.pfb></Library/Application Support/MiKTeX/texmfs/install/fonts/
+type1/urw/helvetic/uhvr8a.pfb></Library/Application Support/MiKTeX/texmfs/insta
+ll/fonts/type1/urw/helvetic/uhvro8a.pfb>
+Output written on erw-conceptual-framework.pdf (1 page, 154108 bytes).
+PDF statistics:
+ 85 PDF objects out of 1000 (max. 8388607)
+ 0 named destinations out of 1000 (max. 500000)
+ 13 words of extra memory for PDF output out of 10000 (max. 10000000)
 
-Output written on erw-conceptual-framework.dvi (1 page, 47100 bytes).

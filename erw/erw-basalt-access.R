@@ -26,10 +26,11 @@
 #   basalt_delivered_price_usd_t.tif ($/t delivered to farm gate)
 # ------------------------------------------------------------------------------
 
-# directories
-input_path   <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/input-data/'
-output_path  <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/output-data/'
-access_path  <- paste0(input_path, 'access/')   # holds the downloaded inputs
+# directories — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+library(here)
+input_path  <- paste0(here::here('data'), '/')
+access_path <- paste0(here::here('data', 'access'), '/')   # holds manually downloaded inputs
 dir.create(access_path, showWarnings=FALSE, recursive=TRUE)
 
 # ------------------------------------------------------------------------------
@@ -53,27 +54,43 @@ ref <- terra::aggregate(ref, 10, 'mean', na.rm=TRUE)   # match the working resol
 # ------------------------------------------------------------------------------
 # 1) basalt source mask
 #
-# Preferred source: Hartmann & Moosdorf (2012) GLiM v1.0 (Global Lithological Map).
-# Available from PANGAEA: https://doi.pangaea.de/10.1594/PANGAEA.788537
-# Place the shapefile (or geopackage) at access_path/glim/LiMW_GIS_2015.shp.
-#
-# Basalt is contained in the "Basic volcanic" (xx = vb) and (where present)
-# "Pyroclastics" (vp) lithology classes. Adjust the filter if using a richer
+# Preferred source: Hartmann & Moosdorf GLiM (Global Lithological Map),
+# https://doi.pangaea.de/10.1594/PANGAEA.788537. Two distributions are supported:
+#   - v1.1 file geodatabase  ->  input_path/'LiMW_GIS 2015.gdb'  (CRS: ESRI:54012)
+#   - v1.0 shapefile         ->  access_path/glim/LiMW_GIS_2015.shp
+# Basalt is the "Basic volcanic" (xx = vb) and "Pyroclastics" classes
+# (xx = py in v1.1, vp in v1.0). Adjust the filter if using a richer
 # lithology dataset (e.g. national geological surveys).
 
-glim_path <- paste0(access_path, 'glim/LiMW_GIS_2015.shp')
-if(file.exists(glim_path)) {
-  glim <- terra::vect(glim_path)
-  glim_ssa <- terra::crop(glim, ssa)
-  # GLiM v1.0 uses the 'xx' field for lithology code
-  basalt_classes <- c('vb', 'vp')   # basic volcanic + pyroclastics
+glim_gdb <- paste0(input_path, 'LiMW_GIS 2015.gdb')
+glim_shp <- paste0(access_path, 'glim/LiMW_GIS_2015.shp')
+
+glim <- NULL
+# Three mafic classes treated as basalt-equivalent feedstock: basic volcanic
+# (basalt s.s.), pyroclastics, basic plutonic (gabbro). Ultramafic classes
+# are intentionally excluded for cropland use because of Ni/Cr leaching risk
+# — see docs/erw-review.md section 3.
+if(dir.exists(glim_gdb)) {
+  glim <- terra::vect(glim_gdb, layer='GLiM_export')
+  basalt_classes <- c('vb', 'py', 'pb')
+} else if(file.exists(glim_shp)) {
+  glim <- terra::vect(glim_shp)
+  basalt_classes <- c('vb', 'vp', 'pb')
+}
+
+if(!is.null(glim)) {
+  # crop in GLiM's CRS — projecting all 1.2M global polygons first would be wasteful
+  ssa_glim <- terra::project(ssa, terra::crs(glim))
+  glim_ssa <- terra::crop(glim, ssa_glim)
   basalt_vec <- glim_ssa[glim_ssa$xx %in% basalt_classes, ]
+  basalt_vec <- terra::project(basalt_vec, terra::crs(ref))
   basalt_mask <- terra::rasterize(basalt_vec, ref, field=1, background=NA)
 } else {
-  warning('GLiM not found at ', glim_path, ' — falling back to a placeholder mask. ',
-          'Download GLiM v1.0 from https://doi.pangaea.de/10.1594/PANGAEA.788537 ',
+  warning('GLiM not found at ', glim_gdb, ' or ', glim_shp,
+          ' — falling back to a placeholder mask. ',
+          'Download GLiM from https://doi.pangaea.de/10.1594/PANGAEA.788537 ',
           'before running for real.')
-  basalt_mask <- ref * NA   # placeholder; downstream cost-distance will be uninformative
+  basalt_mask <- ref * NA
 }
 names(basalt_mask) <- 'basalt_source'
 terra::writeRaster(basalt_mask, paste0(input_path, 'basalt_source_mask.tif'), overwrite=TRUE)
@@ -111,7 +128,12 @@ names(friction) <- 'friction_min_per_m'
 # terra::costDist accumulates the friction surface from a set of source cells.
 # Result is minutes-of-travel from the nearest source.
 
-travel_min <- terra::costDist(friction, target=basalt_mask)
+# terra::costDist accumulates from cells whose value in `x` equals `target`.
+# We mark basalt-source cells in the friction surface with a sentinel value
+# (-1, which the friction surface never takes) and use that as the source.
+friction_src <- friction
+friction_src[!is.na(basalt_mask)] <- -1
+travel_min <- terra::costDist(friction_src, target=-1)
 names(travel_min) <- 'travel_min'
 
 # cap unreachable pixels (travel time implying > MAX_HAUL_KM at free-flow speed)

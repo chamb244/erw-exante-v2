@@ -268,9 +268,3 @@ From [`docs/erw-README.md`](docs/erw-README.md) §"What this pipeline still does
 - **Industrial by-products** (steel slag, cement-kiln dust, mine tailings) are *not* represented and would shift the supply geography materially.
 
 ---
-
-## 9. Citing / referencing
-
-Until the working paper is finalised, cite as:
-
-> Haile, B. (2026). *Ex-Ante ERW Pipeline: Geospatial Profitability Model for Enhanced Rock Weathering with Basalt in Sub-Saharan Africa.* Working model documentation, `docs/erw-model.pdf`.

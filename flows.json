@@ -1,5 +1,5 @@
 {
-  "title": "GAIA Ex-Ante ERW Pipeline",
+  "title": "Ex-Ante ERW Pipeline",
   "subtitle": "Geospatial profitability model for Enhanced Rock Weathering with basalt in Sub-Saharan Africa (erw/erw-*)",
   "scope": "Sub-Saharan Africa, 23 SPAM crops, SoilGrids soil properties, EcoCrop response curves, FAOSTAT 2016–2020 prices, basalt feedstock chemistry with grain-size lever",
   "layout": {
@@ -19,8 +19,13 @@
           "file": "erw/erw-0-install-packages.R",
           "name": "Install packages",
           "purpose": "Bootstrap R dependencies for the pipeline.",
-          "inputs": ["CRAN", "github:gaiafrica/limer"],
-          "outputs": ["installed: terra, geodata, limer, Recocrop, brms, malariaAtlas, readxl, reshape2, viridis"],
+          "inputs": [
+            "CRAN",
+            "github:gaiafrica/limer"
+          ],
+          "outputs": [
+            "installed: terra, geodata, limer, Recocrop, brms, malariaAtlas, readxl, reshape2, viridis"
+          ],
           "depends_on": []
         },
         {
@@ -28,35 +33,106 @@
           "file": "erw/erw-1-layers-soilgrids.R",
           "name": "SoilGrids layers",
           "purpose": "Build SSA mask, pull SoilGrids depth-weighted soil properties (pH, bulk density, exchangeable acidity, K/Ca/Mg/Na bases) and a QED cropland mask, derive ECEC and acidity saturation.",
-          "inputs": ["GADM world", "geodata::country_codes", "geodata::cropland (QED)", "geodata::soil_af BLKD/pH/acid-exch at 5,15,30 cm", "geodata::soil_af K/Ca/Mg/Na-exch at 20 cm"],
-          "outputs": ["gadm_ssa.gpkg", "geosurvey_processed.tif", "soilgrids_properties_all.tif", "soilgrids_properties_cropland.tif"],
-          "depends_on": ["erw-0"]
+          "inputs": [
+            "GADM world",
+            "geodata::country_codes",
+            "geodata::cropland (QED)",
+            "geodata::soil_af BLKD/pH/acid-exch at 5,15,30 cm",
+            "geodata::soil_af K/Ca/Mg/Na-exch at 20 cm"
+          ],
+          "outputs": [
+            "gadm_ssa.gpkg",
+            "geosurvey_processed.tif",
+            "soilgrids_properties_all.tif",
+            "soilgrids_properties_cropland.tif"
+          ],
+          "depends_on": [
+            "erw-0"
+          ]
         },
         {
           "id": "erw-2",
           "file": "erw/erw-2-layers-spam.R",
           "name": "SPAM crop layers",
           "purpose": "Pull SPAM harvested area, production, and yield for 23 crops, crop to SSA, resample to the SoilGrids grid aggregated 10x.",
-          "inputs": ["gadm_ssa.gpkg", "soilgrids_properties_all.tif (reference)", "geodata::crop_spam × 23 crops × 3 variables"],
-          "outputs": ["spam_harv_area_processed.tif", "spam_prod_processed.tif", "spam_yield_processed.tif"],
-          "depends_on": ["erw-1"]
+          "inputs": [
+            "gadm_ssa.gpkg",
+            "soilgrids_properties_all.tif (reference)",
+            "geodata::crop_spam × 23 crops × 3 variables"
+          ],
+          "outputs": [
+            "spam_harv_area_processed.tif",
+            "spam_prod_processed.tif",
+            "spam_yield_processed.tif"
+          ],
+          "depends_on": [
+            "erw-1"
+          ]
         },
         {
           "id": "erw-3",
           "file": "erw/erw-3-basalt-requirements.R",
           "name": "Basalt requirements",
           "purpose": "Compute lime-equivalent CaCO3 rates (Kamprath, Cochrane, Aramburu-Merlos LiTAS year-1 and maintenance) via limer::limeRate, then convert to t basalt/ha using user-set feedstock chemistry (10% CaO + 7% MgO by default), Lewis-2021-calibrated reactive fraction (0.20 of stoichiometric at reference grain × climate), and a grain-size lever. Produces both LiTAS-targeted rates and uniform-rate (10/20/50 t/ha) rasters.",
-          "inputs": ["soilgrids_properties_cropland.tif", "spam_harv_area_processed.tif"],
-          "outputs": ["caco3_kamprath.tif", "caco3_cochrane.tif", "caco3_merlos.tif", "caco3_merlos_maintenance.tif", "basalt_kamprath.tif", "basalt_cochrane.tif", "basalt_merlos.tif", "basalt_merlos_maintenance.tif", "basalt_uniform_{10,20,50}.tif", "basalt_feedstock_chemistry.csv", "cdr_const_targeted.tif", "cdr_const_targeted_maintenance.tif", "cdr_const_uniform_{10,20,50}.tif"],
-          "depends_on": ["erw-1", "erw-2"],
+          "inputs": [
+            "soilgrids_properties_cropland.tif",
+            "spam_harv_area_processed.tif"
+          ],
+          "outputs": [
+            "caco3_kamprath.tif",
+            "caco3_cochrane.tif",
+            "caco3_merlos.tif",
+            "caco3_merlos_maintenance.tif",
+            "basalt_kamprath.tif",
+            "basalt_cochrane.tif",
+            "basalt_merlos.tif",
+            "basalt_merlos_maintenance.tif",
+            "basalt_uniform_{10,20,50}.tif",
+            "basalt_feedstock_chemistry.csv",
+            "cdr_const_targeted.tif",
+            "cdr_const_targeted_maintenance.tif",
+            "cdr_const_uniform_{10,20,50}.tif"
+          ],
+          "depends_on": [
+            "erw-1",
+            "erw-2"
+          ],
           "key_constants": [
-            {"name": "CaO_frac", "value": "0.10", "notes": "Mass fraction of CaO in basalt feedstock (typical tropical basalt)."},
-            {"name": "MgO_frac", "value": "0.07", "notes": "Mass fraction of MgO in basalt feedstock."},
-            {"name": "grain_size_um", "value": "100 µm", "notes": "Decision variable. Sweeps 10–500 µm in erw-8."},
-            {"name": "reactive_fraction_ref", "value": "0.20", "notes": "Lewis 2021 calibration at reference grain × climate."},
-            {"name": "GRAIN_BETA", "value": "0.5", "notes": "Surface-area exponent for the grain-size reactivity factor."},
-            {"name": "GRIND_ALPHA", "value": "1.2", "notes": "Strefler 2018 grinding-energy exponent."},
-            {"name": "basalt_per_lime", "value": "~5 t/t (depends on grain)", "notes": "Derived: 1 / (CCE × reactive_fraction × grain_factor)."}
+            {
+              "name": "CaO_frac",
+              "value": "0.10",
+              "notes": "Mass fraction of CaO in basalt feedstock (typical tropical basalt)."
+            },
+            {
+              "name": "MgO_frac",
+              "value": "0.07",
+              "notes": "Mass fraction of MgO in basalt feedstock."
+            },
+            {
+              "name": "grain_size_um",
+              "value": "100 µm",
+              "notes": "Decision variable. Sweeps 10–500 µm in erw-8."
+            },
+            {
+              "name": "reactive_fraction_ref",
+              "value": "0.20",
+              "notes": "Lewis 2021 calibration at reference grain × climate."
+            },
+            {
+              "name": "GRAIN_BETA",
+              "value": "0.5",
+              "notes": "Surface-area exponent for the grain-size reactivity factor."
+            },
+            {
+              "name": "GRIND_ALPHA",
+              "value": "1.2",
+              "notes": "Strefler 2018 grinding-energy exponent."
+            },
+            {
+              "name": "basalt_per_lime",
+              "value": "~5 t/t (depends on grain)",
+              "notes": "Derived: 1 / (CCE × reactive_fraction × grain_factor)."
+            }
           ]
         },
         {
@@ -64,8 +140,15 @@
           "file": "erw/erw-4-crop-parameters.R",
           "name": "Crop parameters",
           "purpose": "Build per-crop EcoCrop pH and acidity-saturation tolerance tables for the 23 SPAM crops. Produces a crop-type lookup (cereal / legume / RTB / commodity) and response-curve figures.",
-          "inputs": ["ecocrop_parameters_hp_final.xlsx (external)"],
-          "outputs": ["crop_types.csv", "ecocrop_parameters_ph.csv", "ecocrop_parameters_hp.csv", "crop-parameters-1.png"],
+          "inputs": [
+            "ecocrop_parameters_hp_final.xlsx (external)"
+          ],
+          "outputs": [
+            "crop_types.csv",
+            "ecocrop_parameters_ph.csv",
+            "ecocrop_parameters_hp.csv",
+            "crop-parameters-1.png"
+          ],
           "depends_on": []
         },
         {
@@ -73,23 +156,66 @@
           "file": "erw/erw-5-crop-yield-loss-function.R",
           "name": "Yield-loss function",
           "purpose": "Run Recocrop::ecocrop per crop × response (pH and acidity saturation) on the cropland-masked soil stack to produce relative-yield rasters, clamped to [0.2, 1]. erw-7 falls back to these when erw-yield-predict outputs are absent.",
-          "inputs": ["soilgrids_properties_cropland.tif", "ecocrop_parameters_hp.csv", "ecocrop_parameters_ph.csv"],
-          "outputs": ["ecocrop_f/{hp,ph}_crop_suitability_{crop}_0.tif (23 × 2)"],
-          "depends_on": ["erw-1", "erw-4"]
+          "inputs": [
+            "soilgrids_properties_cropland.tif",
+            "ecocrop_parameters_hp.csv",
+            "ecocrop_parameters_ph.csv"
+          ],
+          "outputs": [
+            "ecocrop_f/{hp,ph}_crop_suitability_{crop}_0.tif (23 × 2)"
+          ],
+          "depends_on": [
+            "erw-1",
+            "erw-4"
+          ]
         },
         {
           "id": "erw-9",
           "file": "erw/erw-9-cdr-yield.R",
           "name": "CDR yield",
           "purpose": "Per-pixel CDR (t CO2/ha cumulative): climate-and-pH scaling on the per-tonne CDR potential, with an aridity-driven pedogenic-carbonate deduction that removes alkalinity precipitating locally rather than exporting to the ocean.",
-          "inputs": ["basalt_merlos.tif", "basalt_merlos_maintenance.tif", "basalt_uniform_{10,20,50}.tif", "basalt_feedstock_chemistry.csv", "soilgrids_properties_cropland.tif (pH layer)", "WorldClim MAT (geodata::worldclim_global tavg)", "WorldClim MAP (geodata::worldclim_global prec)"],
-          "outputs": ["cdr_climate_factor.tif", "cdr_pedogenic_fraction.tif", "cdr_per_t_basalt.tif", "cdr_yield_merlos.tif", "cdr_yield_merlos_maintenance.tif", "cdr_yield_uniform_{10,20,50}.tif"],
-          "depends_on": ["erw-3", "erw-1"],
+          "inputs": [
+            "basalt_merlos.tif",
+            "basalt_merlos_maintenance.tif",
+            "basalt_uniform_{10,20,50}.tif",
+            "basalt_feedstock_chemistry.csv",
+            "soilgrids_properties_cropland.tif (pH layer)",
+            "WorldClim MAT (geodata::worldclim_global tavg)",
+            "WorldClim MAP (geodata::worldclim_global prec)"
+          ],
+          "outputs": [
+            "cdr_climate_factor.tif",
+            "cdr_pedogenic_fraction.tif",
+            "cdr_per_t_basalt.tif",
+            "cdr_yield_merlos.tif",
+            "cdr_yield_merlos_maintenance.tif",
+            "cdr_yield_uniform_{10,20,50}.tif"
+          ],
+          "depends_on": [
+            "erw-3",
+            "erw-1"
+          ],
           "key_constants": [
-            {"name": "T_ref", "value": "11 °C", "notes": "Reference MAT anchor (US Corn Belt)."},
-            {"name": "P_ref", "value": "1000 mm", "notes": "Reference MAP anchor."},
-            {"name": "f_pH", "value": "triangular peak ~ pH 5.0", "notes": "Acid-catalysed dissolution scaling."},
-            {"name": "pedogenic_frac", "value": "MAP-binned 0–90%", "notes": "UNEP 1992 aridity bands using MAP as v1 proxy for AI=P/PET."}
+            {
+              "name": "T_ref",
+              "value": "11 °C",
+              "notes": "Reference MAT anchor (US Corn Belt)."
+            },
+            {
+              "name": "P_ref",
+              "value": "1000 mm",
+              "notes": "Reference MAP anchor."
+            },
+            {
+              "name": "f_pH",
+              "value": "triangular peak ~ pH 5.0",
+              "notes": "Acid-catalysed dissolution scaling."
+            },
+            {
+              "name": "pedogenic_frac",
+              "value": "MAP-binned 0–90%",
+              "notes": "UNEP 1992 aridity bands using MAP as v1 proxy for AI=P/PET."
+            }
           ]
         },
         {
@@ -97,14 +223,45 @@
           "file": "erw/erw-basalt-access.R",
           "name": "Basalt access",
           "purpose": "Per-pixel delivered basalt price ($/t) = quarry-gate price + cost-distance × $/min/t. Uses GLiM lithology (basic volcanic) for sources and the Malaria Atlas Project friction surface for cost-distance accumulation.",
-          "inputs": ["gadm_ssa.gpkg", "soilgrids_properties_all.tif (reference grid)", "spam_harv_area_processed.tif (cropland mask)", "GLiM v1.0 lithology shapefile (external, PANGAEA)", "MAP friction surface 2019 (external)"],
-          "outputs": ["basalt_source_mask.tif", "basalt_traveltime_min.tif", "basalt_transport_km.tif", "basalt_transport_cost_usd_t.tif", "basalt_delivered_price_usd_t.tif"],
-          "depends_on": ["erw-1", "erw-2"],
+          "inputs": [
+            "gadm_ssa.gpkg",
+            "soilgrids_properties_all.tif (reference grid)",
+            "spam_harv_area_processed.tif (cropland mask)",
+            "GLiM v1.0 lithology shapefile (external, PANGAEA)",
+            "MAP friction surface 2019 (external)"
+          ],
+          "outputs": [
+            "basalt_source_mask.tif",
+            "basalt_traveltime_min.tif",
+            "basalt_transport_km.tif",
+            "basalt_transport_cost_usd_t.tif",
+            "basalt_delivered_price_usd_t.tif"
+          ],
+          "depends_on": [
+            "erw-1",
+            "erw-2"
+          ],
           "key_constants": [
-            {"name": "QUARRY_GATE_PRICE", "value": "$10/t", "notes": "Basalt fines as quarry by-product. Range $5–40/t."},
-            {"name": "USD_PER_MIN_PER_T", "value": "$0.04/min/t", "notes": "30-t truck at $80/hr operating cost."},
-            {"name": "EFFECTIVE_KM_PER_MIN", "value": "0.5 (≈30 km/h)", "notes": "Avg effective speed for distance approximation."},
-            {"name": "MAX_HAUL_KM", "value": "1000 km", "notes": "Beyond cap, lifecycle emissions likely erase the credit."}
+            {
+              "name": "QUARRY_GATE_PRICE",
+              "value": "$10/t",
+              "notes": "Basalt fines as quarry by-product. Range $5–40/t."
+            },
+            {
+              "name": "USD_PER_MIN_PER_T",
+              "value": "$0.04/min/t",
+              "notes": "30-t truck at $80/hr operating cost."
+            },
+            {
+              "name": "EFFECTIVE_KM_PER_MIN",
+              "value": "0.5 (≈30 km/h)",
+              "notes": "Avg effective speed for distance approximation."
+            },
+            {
+              "name": "MAX_HAUL_KM",
+              "value": "1000 km",
+              "notes": "Beyond cap, lifecycle emissions likely erase the credit."
+            }
           ]
         },
         {
@@ -112,11 +269,24 @@
           "file": "erw/erw-energy-country.R",
           "name": "Country energy",
           "purpose": "Per-country electricity price ($/kWh, industrial tariff) and grid carbon intensity (kg CO2/kWh) rasters for SSA. Drives spatially-varying grinding economics and grinding LCA in erw-7.",
-          "inputs": ["gadm_ssa.gpkg", "soilgrids_properties_all.tif (reference grid)"],
-          "outputs": ["electricity_usd_kWh.tif", "grid_CI_kg_per_kWh.tif", "country_energy_table.csv"],
-          "depends_on": ["erw-1"],
+          "inputs": [
+            "gadm_ssa.gpkg",
+            "soilgrids_properties_all.tif (reference grid)"
+          ],
+          "outputs": [
+            "electricity_usd_kWh.tif",
+            "grid_CI_kg_per_kWh.tif",
+            "country_energy_table.csv"
+          ],
+          "depends_on": [
+            "erw-1"
+          ],
           "key_constants": [
-            {"name": "energy table", "value": "43 SSA countries", "notes": "Approximate values from IEA / Ember / GET.invest 2022–2024 — edit CSV in script and re-run."}
+            {
+              "name": "energy table",
+              "value": "43 SSA countries",
+              "notes": "Approximate values from IEA / Ember / GET.invest 2022–2024 — edit CSV in script and re-run."
+            }
           ]
         },
         {
@@ -124,11 +294,21 @@
           "file": "erw/erw-yield-fit.R",
           "name": "Yield fit (Bayesian)",
           "purpose": "Bayesian hierarchical regression of log(yield_with_basalt / yield_control) on rate, baseline pH, climate, grain size, and crop type. Fitted on the manually-compiled trial dataset (~14 rows; prior-dominated). Provides a measurement-error-aware framework that grows as new ERW field trials are appended.",
-          "inputs": ["erw/erw-trial-data.csv"],
-          "outputs": ["erw_yield_fit.rds", "erw_yield_fit_summary.txt", "erw_yield_fit_posterior.csv"],
+          "inputs": [
+            "erw/erw-trial-data.csv"
+          ],
+          "outputs": [
+            "erw_yield_fit.rds",
+            "erw_yield_fit_summary.txt",
+            "erw_yield_fit_posterior.csv"
+          ],
           "depends_on": [],
           "key_constants": [
-            {"name": "priors", "value": "weakly informative", "notes": "Intercept N(0.10, 0.20); log_rate N(0.05, 0.05); log_grain N(-0.05, 0.05); SDs Exponential(5)."}
+            {
+              "name": "priors",
+              "value": "weakly informative",
+              "notes": "Intercept N(0.10, 0.20); log_rate N(0.05, 0.05); log_grain N(-0.05, 0.05); SDs Exponential(5)."
+            }
           ]
         },
         {
@@ -136,30 +316,115 @@
           "file": "erw/erw-yield-predict.R",
           "name": "Yield predict",
           "purpose": "Apply the brmsfit posterior means to per-pixel covariates (pH, MAT, MAP, grain) and per-crop random intercepts to produce yield-uplift rasters. erw-7 consumes these in place of EcoCrop-derived yield response when present.",
-          "inputs": ["erw_yield_fit.rds", "soilgrids_properties_cropland.tif (pH)", "WorldClim MAT, MAP", "basalt_feedstock_chemistry.csv", "basalt_merlos.tif"],
-          "outputs": ["erw_yield_uplift_{crop}_median.tif (23)"],
-          "depends_on": ["erw-yield-fit", "erw-3", "erw-1"]
+          "inputs": [
+            "erw_yield_fit.rds",
+            "soilgrids_properties_cropland.tif (pH)",
+            "WorldClim MAT, MAP",
+            "basalt_feedstock_chemistry.csv",
+            "basalt_merlos.tif"
+          ],
+          "outputs": [
+            "erw_yield_uplift_{crop}_median.tif (23)"
+          ],
+          "depends_on": [
+            "erw-yield-fit",
+            "erw-3",
+            "erw-1"
+          ]
         },
         {
           "id": "erw-7",
           "file": "erw/erw-7-profitability-function.R",
           "name": "Profitability (ERW)",
           "purpose": "Decomposed cost (quarry + grinding + transport + spreading), derived per-pixel LCA from grinding × grid-CI + transport-km × truck-CO2 + spreading, MRV deduction from the carbon credit, time-resolved CDR (NPV regime), and four allocation rules (LiTAS-targeted + uniform 10/20/50 t/ha). Auto-detects basalt-access and country-energy rasters; falls back to flat constants when absent. Emits agronomic-only, CDR-only, and combined gross-margin layers.",
-          "inputs": ["spam_yield_processed.tif", "spam_harv_area_processed.tif", "ecocrop_parameters_hp.csv", "crop_types.csv", "FAOSTAT_data_en_4-24-2023.csv", "basalt_merlos.tif", "basalt_merlos_maintenance.tif", "basalt_uniform_{10,20,50}.tif", "cdr_yield_merlos.tif", "cdr_yield_merlos_maintenance.tif", "cdr_yield_uniform_{10,20,50}.tif", "basalt_feedstock_chemistry.csv", "soilgrids_properties_all.tif", "ecocrop_f/hp_crop_suitability_*_0.tif", "basalt_transport_cost_usd_t.tif (optional)", "basalt_transport_km.tif (optional)", "electricity_usd_kWh.tif (optional)", "grid_CI_kg_per_kWh.tif (optional)", "erw_yield_uplift_{crop}_median.tif (optional)"],
-          "outputs": ["economics_erw/{allocation_rule}/{crop}_{regime}.tif (4 × 23 × 3 = 276 rasters)"],
-          "depends_on": ["erw-1", "erw-2", "erw-4", "erw-5", "erw-3", "erw-9"],
-          "optional_depends_on": ["erw-basalt-access", "erw-energy-country", "erw-yield-predict"],
+          "inputs": [
+            "spam_yield_processed.tif",
+            "spam_harv_area_processed.tif",
+            "ecocrop_parameters_hp.csv",
+            "crop_types.csv",
+            "FAOSTAT_data_en_4-24-2023.csv",
+            "basalt_merlos.tif",
+            "basalt_merlos_maintenance.tif",
+            "basalt_uniform_{10,20,50}.tif",
+            "cdr_yield_merlos.tif",
+            "cdr_yield_merlos_maintenance.tif",
+            "cdr_yield_uniform_{10,20,50}.tif",
+            "basalt_feedstock_chemistry.csv",
+            "soilgrids_properties_all.tif",
+            "ecocrop_f/hp_crop_suitability_*_0.tif",
+            "basalt_transport_cost_usd_t.tif (optional)",
+            "basalt_transport_km.tif (optional)",
+            "electricity_usd_kWh.tif (optional)",
+            "grid_CI_kg_per_kWh.tif (optional)",
+            "erw_yield_uplift_{crop}_median.tif (optional)"
+          ],
+          "outputs": [
+            "economics_erw/{allocation_rule}/{crop}_{regime}.tif (4 × 23 × 3 = 276 rasters)"
+          ],
+          "depends_on": [
+            "erw-1",
+            "erw-2",
+            "erw-4",
+            "erw-5",
+            "erw-3",
+            "erw-9"
+          ],
+          "optional_depends_on": [
+            "erw-basalt-access",
+            "erw-energy-country",
+            "erw-yield-predict"
+          ],
           "key_constants": [
-            {"name": "QUARRY_GATE_USD_T", "value": "$10/t", "notes": "Ex-quarry feedstock price."},
-            {"name": "SPREADING_USD_T", "value": "$8/t", "notes": "On-farm spreading cost."},
-            {"name": "ELECTRICITY_USD_KWH_FB", "value": "$0.10/kWh", "notes": "Fallback when country raster missing."},
-            {"name": "GRID_CI_KG_PER_KWH_FB", "value": "0.60 kg/kWh", "notes": "Fallback when country raster missing."},
-            {"name": "TRUCK_KGCO2_PER_T_KM", "value": "0.12 kg/t·km", "notes": "Diesel heavy truck."},
-            {"name": "TRANSPORT_FLAT_USD_T", "value": "$20/t (100 km)", "notes": "Fallback when access raster missing."},
-            {"name": "CARBON_PRICE_USD_T", "value": "$150/tCO2", "notes": "Mid of 2024–25 ERW credit market."},
-            {"name": "MRV_COST_USD_T_CO2", "value": "$30/tCO2", "notes": "Sampling + lab + verification + registry."},
-            {"name": "DISCOUNT_RATE_PCT", "value": "10%", "notes": "For NPV regime."},
-            {"name": "CDR_PHASING", "value": "5-yr first-order: 30/25/20/15/10%", "notes": "Time-resolved CDR realisation; ~80% by year 5."}
+            {
+              "name": "QUARRY_GATE_USD_T",
+              "value": "$10/t",
+              "notes": "Ex-quarry feedstock price."
+            },
+            {
+              "name": "SPREADING_USD_T",
+              "value": "$8/t",
+              "notes": "On-farm spreading cost."
+            },
+            {
+              "name": "ELECTRICITY_USD_KWH_FB",
+              "value": "$0.10/kWh",
+              "notes": "Fallback when country raster missing."
+            },
+            {
+              "name": "GRID_CI_KG_PER_KWH_FB",
+              "value": "0.60 kg/kWh",
+              "notes": "Fallback when country raster missing."
+            },
+            {
+              "name": "TRUCK_KGCO2_PER_T_KM",
+              "value": "0.12 kg/t·km",
+              "notes": "Diesel heavy truck."
+            },
+            {
+              "name": "TRANSPORT_FLAT_USD_T",
+              "value": "$20/t (100 km)",
+              "notes": "Fallback when access raster missing."
+            },
+            {
+              "name": "CARBON_PRICE_USD_T",
+              "value": "$150/tCO2",
+              "notes": "Mid of 2024–25 ERW credit market."
+            },
+            {
+              "name": "MRV_COST_USD_T_CO2",
+              "value": "$30/tCO2",
+              "notes": "Sampling + lab + verification + registry."
+            },
+            {
+              "name": "DISCOUNT_RATE_PCT",
+              "value": "10%",
+              "notes": "For NPV regime."
+            },
+            {
+              "name": "CDR_PHASING",
+              "value": "5-yr first-order: 30/25/20/15/10%",
+              "notes": "Time-resolved CDR realisation; ~80% by year 5."
+            }
           ]
         },
         {
@@ -167,47 +432,177 @@
           "file": "erw/erw-8-sensitivity-analysis.R",
           "name": "Sensitivity (ERW)",
           "purpose": "Five sweeps: (1) crop-price × basalt-price × carbon-price grid; (2) yield-factor 1.0–2.5; (3) MRV cost 0–80 $/tCO2; (4) grain size 10/30/50/100/200/500 µm; (5) allocation rule (targeted + uniform_{10,20,50}). All sweeps run all three regimes (year1/npv/equilibrium) and 23 crops.",
-          "inputs": ["sources erw-7 in full"],
-          "outputs": ["output-erw-sensitivity-prices.csv", "output-erw-sensitivity-yields.csv", "output-erw-sensitivity-mrv.csv", "output-erw-sensitivity-grain.csv", "output-erw-sensitivity-allocation.csv"],
-          "depends_on": ["erw-7"]
+          "inputs": [
+            "sources erw-7 in full"
+          ],
+          "outputs": [
+            "output-erw-sensitivity-prices.csv",
+            "output-erw-sensitivity-yields.csv",
+            "output-erw-sensitivity-mrv.csv",
+            "output-erw-sensitivity-grain.csv",
+            "output-erw-sensitivity-allocation.csv"
+          ],
+          "depends_on": [
+            "erw-7"
+          ]
         },
         {
           "id": "erw-supply",
           "file": "erw/erw-supply.R",
           "name": "Supply ranking",
           "purpose": "Supply-constrained deployment frontier: ranks SSA cropland pixels descending by GM-per-tonne-basalt (the LP-dual on the basalt supply constraint), produces supply curves for 1–500 Mt/yr caps and deployment masks for selected caps.",
-          "inputs": ["economics_erw/targeted/{crop}_{regime}.tif", "cdr_per_t_basalt.tif"],
-          "outputs": ["gm_per_t_basalt_{regime}.tif", "supply_curve_{regime}.csv", "deployment_under_{10,50,250}_Mt_{regime}.tif"],
-          "depends_on": ["erw-7", "erw-9"],
+          "inputs": [
+            "economics_erw/targeted/{crop}_{regime}.tif",
+            "cdr_per_t_basalt.tif"
+          ],
+          "outputs": [
+            "gm_per_t_basalt_{regime}.tif",
+            "supply_curve_{regime}.csv",
+            "deployment_under_{10,50,250}_Mt_{regime}.tif"
+          ],
+          "depends_on": [
+            "erw-7",
+            "erw-9"
+          ],
           "key_constants": [
-            {"name": "SUPPLY_CAPS_MT", "value": "1, 5, 10, 25, 50, 100, 250, 500, ∞", "notes": "Annual basalt-supply caps evaluated."}
+            {
+              "name": "SUPPLY_CAPS_MT",
+              "value": "1, 5, 10, 25, 50, 100, 250, 500, ∞",
+              "notes": "Annual basalt-supply caps evaluated."
+            }
           ]
         }
       ]
     }
   ],
   "documents": [
-    {"file": "docs/erw-review.md", "purpose": "Evidence review on ERW: chemistry, feedstocks, application practice, CDR potential, agronomic co-benefits, SSA case, risks, economics."},
-    {"file": "docs/erw-README.md", "purpose": "Runbook: file inventory, run order, key constants, deferred work, output schema, and known portability issues."},
-    {"file": "docs/erw-parameters.md", "purpose": "Catalogue of every constant and assumption used by erw-*.R scripts, with citations, source URLs/DOIs, and units."}
+    {
+      "file": "docs/erw-review.md",
+      "purpose": "Evidence review on ERW: chemistry, feedstocks, application practice, CDR potential, agronomic co-benefits, SSA case, risks, economics."
+    },
+    {
+      "file": "docs/erw-README.md",
+      "purpose": "Runbook: file inventory, run order, key constants, deferred work, output schema, and known portability issues."
+    },
+    {
+      "file": "docs/erw-parameters.md",
+      "purpose": "Catalogue of every constant and assumption used by erw-*.R scripts, with citations, source URLs/DOIs, and units."
+    }
   ],
   "external_datasets": [
-    {"name": "GADM v4 world", "via": "geodata::world", "used_by": ["erw-1"]},
-    {"name": "QED cropland mask", "via": "geodata::cropland(source='QED')", "used_by": ["erw-1"]},
-    {"name": "SoilGrids Africa", "via": "geodata::soil_af", "used_by": ["erw-1"]},
-    {"name": "SPAM v2 (Africa)", "via": "geodata::crop_spam", "used_by": ["erw-2"]},
-    {"name": "EcoCrop parameter set", "via": "Recocrop::ecocropPars", "used_by": ["erw-5"]},
-    {"name": "FAOSTAT producer prices 2016–2020", "via": "csv (manual download)", "used_by": ["erw-7", "erw-8"]},
-    {"name": "WorldClim v2 MAT, MAP", "via": "geodata::worldclim_global", "used_by": ["erw-9", "erw-yield-predict"]},
-    {"name": "GLiM v1.0 lithology (Hartmann & Moosdorf 2012)", "via": "PANGAEA doi:10.1594/PANGAEA.788537 (manual download)", "used_by": ["erw-basalt-access"]},
-    {"name": "MAP friction surface 2019 (Weiss et al.)", "via": "malariaAtlas R package (manual download)", "used_by": ["erw-basalt-access"]},
-    {"name": "IEA / Ember / GET.invest 2022–2024 country energy", "via": "csv hard-coded in erw/erw-energy-country.R", "used_by": ["erw-energy-country"]}
+    {
+      "name": "GADM v4 world",
+      "via": "geodata::world",
+      "used_by": [
+        "erw-1"
+      ]
+    },
+    {
+      "name": "QED cropland mask",
+      "via": "geodata::cropland(source='QED')",
+      "used_by": [
+        "erw-1"
+      ]
+    },
+    {
+      "name": "SoilGrids Africa",
+      "via": "geodata::soil_af",
+      "used_by": [
+        "erw-1"
+      ]
+    },
+    {
+      "name": "SPAM v2 (Africa)",
+      "via": "geodata::crop_spam",
+      "used_by": [
+        "erw-2"
+      ]
+    },
+    {
+      "name": "EcoCrop parameter set",
+      "via": "Recocrop::ecocropPars",
+      "used_by": [
+        "erw-5"
+      ]
+    },
+    {
+      "name": "FAOSTAT producer prices 2016–2020",
+      "via": "csv (manual download)",
+      "used_by": [
+        "erw-7",
+        "erw-8"
+      ]
+    },
+    {
+      "name": "WorldClim v2 MAT, MAP",
+      "via": "geodata::worldclim_global",
+      "used_by": [
+        "erw-9",
+        "erw-yield-predict"
+      ]
+    },
+    {
+      "name": "GLiM v1.0 lithology (Hartmann & Moosdorf 2012)",
+      "via": "PANGAEA doi:10.1594/PANGAEA.788537 (manual download)",
+      "used_by": [
+        "erw-basalt-access"
+      ]
+    },
+    {
+      "name": "MAP friction surface 2019 (Weiss et al.)",
+      "via": "malariaAtlas R package (manual download)",
+      "used_by": [
+        "erw-basalt-access"
+      ]
+    },
+    {
+      "name": "IEA / Ember / GET.invest 2022–2024 country energy",
+      "via": "csv hard-coded in erw/erw-energy-country.R",
+      "used_by": [
+        "erw-energy-country"
+      ]
+    }
   ],
   "headline_outputs": [
-    {"name": "ERW profitability map", "file_pattern": "economics_erw/{allocation}/{crop}_{regime}.tif", "stages": ["erw-7"], "what": "Per-pixel agronomic-only, CDR-only, and combined gross margin for basalt-ERW deployment, four allocation rules × three regimes."},
-    {"name": "Delivered basalt price surface", "file_pattern": "basalt_delivered_price_usd_t.tif", "stages": ["erw-basalt-access"], "what": "Spatial cost of basalt at farm gate ($/t)."},
-    {"name": "CDR yield surface", "file_pattern": "cdr_yield_*.tif", "stages": ["erw-9"], "what": "Per-pixel cumulative CDR (t CO2/ha) net of pedogenic precipitation."},
-    {"name": "Supply curves", "file_pattern": "supply_curve_{regime}.csv", "stages": ["erw-supply"], "what": "Marginal $/tCO2 and total CDR vs annual basalt supply cap (1–500 Mt/yr)."},
-    {"name": "Sensitivity tables", "file_pattern": "output-erw-sensitivity-*.csv", "stages": ["erw-8"], "what": "Total profitable hectares and gross margin under price, yield, MRV, grain, and allocation scenarios."}
+    {
+      "name": "ERW profitability map",
+      "file_pattern": "economics_erw/{allocation}/{crop}_{regime}.tif",
+      "stages": [
+        "erw-7"
+      ],
+      "what": "Per-pixel agronomic-only, CDR-only, and combined gross margin for basalt-ERW deployment, four allocation rules × three regimes."
+    },
+    {
+      "name": "Delivered basalt price surface",
+      "file_pattern": "basalt_delivered_price_usd_t.tif",
+      "stages": [
+        "erw-basalt-access"
+      ],
+      "what": "Spatial cost of basalt at farm gate ($/t)."
+    },
+    {
+      "name": "CDR yield surface",
+      "file_pattern": "cdr_yield_*.tif",
+      "stages": [
+        "erw-9"
+      ],
+      "what": "Per-pixel cumulative CDR (t CO2/ha) net of pedogenic precipitation."
+    },
+    {
+      "name": "Supply curves",
+      "file_pattern": "supply_curve_{regime}.csv",
+      "stages": [
+        "erw-supply"
+      ],
+      "what": "Marginal $/tCO2 and total CDR vs annual basalt supply cap (1–500 Mt/yr)."
+    },
+    {
+      "name": "Sensitivity tables",
+      "file_pattern": "output-erw-sensitivity-*.csv",
+      "stages": [
+        "erw-8"
+      ],
+      "what": "Total profitable hectares and gross margin under price, yield, MRV, grain, and allocation scenarios."
+    }
   ]
 }

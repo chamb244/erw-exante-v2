@@ -8,6 +8,7 @@
 
 install.packages('terra')
 install.packages('geodata')
+install.packages('here')     # project-relative paths anchored by the repo .here marker
 remotes::install_github("gaiafrica/limer")
 install.packages('Recocrop')
 
