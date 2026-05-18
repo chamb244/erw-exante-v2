@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ERW Pipeline — Workflow Viewer</title>
+<style>
+  :root {
+    --bg: #fafaf7;
+    --fg: #1a1a1a;
+    --muted: #6a6a6a;
+    --border: #e5e3dc;
+    --card: #fff;
+    --hover: #f4f3ee;
+    --data:    #5a7a8a;
+    --package: #7e57c2;
+    --lime:    #2c8a4b;
+    --erw:     #c97a17;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  header {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+  }
+  header h1 { margin: 0 0 3px; font-size: 18px; letter-spacing: -0.01em; }
+  header .sub { color: var(--muted); font-size: 13px; }
+  header .source-tag { font-size: 11px; color: #aaa; margin-left: 8px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 290px 1fr;
+    height: calc(100vh - 64px);
+    min-height: 600px;
+  }
+
+  .sidebar {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    padding: 16px;
+    overflow-y: auto;
+  }
+  .sidebar h2 {
+    margin: 0 0 10px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .flow-btn {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent, #ccc);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    transition: background 0.12s;
+  }
+  .flow-btn:hover { background: var(--hover); }
+  .flow-btn.active {
+    background: var(--hover);
+    box-shadow: 0 0 0 1px rgba(0,0,0,.06);
+  }
+  .flow-btn .name { font-weight: 600; margin-bottom: 3px; }
+  .flow-btn .desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  .main { display: grid; grid-template-rows: 1fr auto; min-width: 0; }
+  .graph-wrap {
+    background: var(--card);
+    position: relative;
+    overflow: hidden;
+  }
+  .graph-wrap svg { width: 100%; height: 100%; display: block; }
+
+  .legend {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 11px;
+    backdrop-filter: blur(4px);
+  }
+  .legend .item { display: flex; align-items: center; gap: 8px; margin: 3px 0; }
+  .legend .swatch {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .controls {
+    position: absolute; top: 12px; left: 12px;
+    display: flex; gap: 6px;
+  }
+  .ctrl {
+    background: rgba(255,255,255,0.92);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 11px;
+    cursor: pointer;
+    color: var(--muted);
+  }
+  .ctrl:hover { background: #fff; color: var(--fg); }
+
+  .steps {
+    background: var(--card);
+    border-top: 1px solid var(--border);
+    padding: 14px 22px 22px;
+    max-height: 42vh;
+    overflow-y: auto;
+  }
+  .steps-empty {
+    color: var(--muted);
+    font-style: italic;
+    padding: 6px 0;
+  }
+  .steps-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .steps-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .steps-count { font-size: 11px; color: var(--muted); }
+
+  .step {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 12px;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    cursor: default;
+    border-radius: 4px;
+  }
+  .step:last-child { border-bottom: 0; }
+  .step:hover { background: var(--hover); }
+  .step .num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--step-color, #888);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    align-self: start;
+    margin-top: 2px;
+  }
+  .step .body { min-width: 0; }
+  .step .from-to {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .step .from-to b { color: var(--fg); }
+  .step .from-to .arrow { margin: 0 6px; opacity: 0.6; }
+  .step .passes {
+    font-size: 13px;
+  }
+  .step .note {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* svg styling */
+  .node { cursor: grab; }
+  .node:active { cursor: grabbing; }
+  .node circle { stroke-width: 2; transition: opacity 0.15s, stroke-width 0.15s; }
+  .node text { font-size: 10px; pointer-events: none; user-select: none; fill: #333; }
+  .node.dim circle { opacity: 0.18; }
+  .node.dim text { opacity: 0.32; }
+  .node.flash circle { stroke-width: 4; }
+
+  .edge { fill: none; transition: opacity 0.15s, stroke-width 0.15s; }
+  .edge.bg { stroke: #c5c2b8; stroke-width: 1; opacity: 0.45; }
+  .edge.bg.dim { opacity: 0.07; }
+  .edge.active { stroke-width: 2.2; opacity: 0.95; }
+  .edge.flash { stroke-width: 3.5; }
+
+  .badge-circle { stroke: #fff; stroke-width: 1.5; cursor: default; }
+  .badge-text {
+    font-size: 10px;
+    font-weight: 700;
+    fill: #fff;
+    pointer-events: none;
+    user-select: none;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+
+  @media (max-width: 800px) {
+    .layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .sidebar { max-height: 220px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="doc-title">…</h1>
+  <div class="sub"><span id="doc-sub"></span><span class="source-tag" id="src-tag"></span></div>
+</header>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h2>Workflows</h2>
+    <div id="flow-list"></div>
+    <h2 style="margin-top:18px">Components</h2>
+    <div id="component-summary" style="font-size:11px;color:var(--muted);line-height:1.6"></div>
+  </aside>
+
+  <main class="main">
+    <div class="graph-wrap">
+      <svg id="graph" preserveAspectRatio="xMidYMid meet"></svg>
+      <div class="controls">
+        <button class="ctrl" id="btn-reheat">Re-layout</button>
+        <button class="ctrl" id="btn-clear" style="display:none">Clear selection</button>
+      </div>
+      <div class="legend">
+        <div class="item"><span class="swatch" style="background:var(--data)"></span> External data</div>
+        <div class="item"><span class="swatch" style="background:var(--package)"></span> R package</div>
+        <div class="item"><span class="swatch" style="background:var(--erw)"></span> ERW stage</div>
+      </div>
+    </div>
+    <div class="steps" id="steps">
+      <div class="steps-empty">Select a workflow on the left to highlight its path through the components.</div>
+    </div>
+  </main>
+</div>
+
+<script type="application/json" id="embedded-data">
+{
+  "title": " ERW Pipeline — Workflow Viewer",
+  "subtitle": "Click a workflow on the left to highlight its path through the components and see what is passed between each step.",
+  "components": [
+    {"id":"ext-gadm","name":"GADM v4","kind":"external","group":"data","description":"Global administrative boundaries; world polygons and ISO codes."},
+    {"id":"ext-qed-cropland","name":"QED cropland","kind":"external","group":"data","description":"Cropland fraction raster for Africa from the QED geosurvey."},
+    {"id":"ext-soilgrids","name":"SoilGrids Africa","kind":"external","group":"data","description":"Depth-stratified soil chemistry."},
+    {"id":"ext-spam","name":"SPAM v2 Africa","kind":"external","group":"data","description":"Per-crop harvested area, production, and yield rasters for 23 crops."},
+    {"id":"ext-ecocrop-xlsx","name":"EcoCrop XLSX","kind":"external","group":"data","description":"Per-crop pH and acidity-saturation tolerance ranges."},
+    {"id":"ext-faostat","name":"FAOSTAT prices","kind":"external","group":"data","description":"Producer prices 2016-2020 for SSA countries."},
+    {"id":"ext-worldclim","name":"WorldClim v2","kind":"external","group":"data","description":"Mean annual temperature and precipitation rasters."},
+    {"id":"ext-glim","name":"GLiM lithology","kind":"external","group":"data","description":"Global lithology map; basic volcanic class flags basalt outcrops."},
+    {"id":"ext-mapfriction","name":"MAP friction","kind":"external","group":"data","description":"Travel-time friction surface (Weiss et al.)."},
+    {"id":"ext-energy-table","name":"Ember + IEA + GET.invest","kind":"external","group":"data","description":"Country-level electricity prices + grid CI for SSA (manually compiled table)."},
+    {"id":"ext-trial-data","name":"ERW trial dataset","kind":"external","group":"data","description":"Manually-compiled yield-response and CDR observations from published ERW trials."},
+    {"id":"pkg-terra","name":"terra","kind":"package","group":"package","description":"Raster GIS engine."},
+    {"id":"pkg-geodata","name":"geodata","kind":"package","group":"package","description":"Downloaders for SoilGrids, SPAM, WorldClim, GADM."},
+    {"id":"pkg-limer","name":"limer","kind":"package","group":"package","description":"gaiafrica/limer: lime-requirement methods (Kamprath, Cochrane, LiTAS) and NPV helpers."},
+    {"id":"pkg-recocrop","name":"Recocrop","kind":"package","group":"package","description":"EcoCrop suitability model."},
+    {"id":"pkg-malariaatlas","name":"malariaAtlas","kind":"package","group":"package","description":"MAP friction-surface downloader."},
+    {"id":"pkg-brms","name":"brms","kind":"package","group":"package","description":"Bayesian regression models via Stan."},
+    {"id":"erw-1","name":"SoilGrids layers","kind":"stage","group":"erw","file":"erw/erw-1-layers-soilgrids.R","description":"Build SSA mask, pull SoilGrids variables, derive ECEC + acidity saturation, mask to cropland."},
+    {"id":"erw-2","name":"SPAM layers","kind":"stage","group":"erw","file":"erw/erw-2-layers-spam.R","description":"Pull SPAM area/production/yield for 23 crops."},
+    {"id":"erw-3","name":"Basalt requirements","kind":"stage","group":"erw","file":"erw/erw-3-basalt-requirements.R","description":"Compute lime-equivalent CaCO3 rates via limer::limeRate, then Lewis-2021-calibrated lime→basalt conversion with grain-size lever. Produces targeted + uniform basalt rasters."},
+    {"id":"erw-4","name":"Crop parameters","kind":"stage","group":"erw","file":"erw/erw-4-crop-parameters.R","description":"Per-crop pH and acidity-tolerance tables."},
+    {"id":"erw-5","name":"Yield-loss function","kind":"stage","group":"erw","file":"erw/erw-5-crop-yield-loss-function.R","description":"Per-crop relative-yield rasters from Recocrop::ecocrop."},
+    {"id":"erw-9","name":"CDR yield","kind":"stage","group":"erw","file":"erw/erw-9-cdr-yield.R","description":"Spatially explicit CDR (t CO2/ha) per pixel, with aridity-driven pedogenic deduction."},
+    {"id":"erw-basalt-access","name":"Basalt access","kind":"stage","group":"erw","file":"erw/erw-basalt-access.R","description":"Delivered basalt price ($/t) and transport-km per pixel via cost-distance."},
+    {"id":"erw-energy-country","name":"Country energy","kind":"stage","group":"erw","file":"erw/erw-energy-country.R","description":"Per-country electricity price + grid CI rasters for SSA."},
+    {"id":"erw-7","name":"ERW profitability","kind":"stage","group":"erw","file":"erw/erw-7-profitability-function.R","description":"Decomposed cost + derived LCA + MRV deduction + time-resolved CDR. Four allocation rules."},
+    {"id":"erw-8","name":"ERW sensitivity","kind":"stage","group":"erw","file":"erw/erw-8-sensitivity-analysis.R","description":"Five sweeps: prices × MRV × yields × grain size × allocation rule."},
+    {"id":"erw-supply","name":"Supply ranking","kind":"stage","group":"erw","file":"erw/erw-supply.R","description":"Supply-constrained deployment ranking; produces supply-curve CSVs and deployment masks."},
+    {"id":"erw-yield-fit","name":"Yield fit (Bayesian)","kind":"stage","group":"erw","file":"erw/erw-yield-fit.R","description":"Bayesian hierarchical regression on the trial dataset."},
+    {"id":"erw-yield-predict","name":"Yield predict","kind":"stage","group":"erw","file":"erw/erw-yield-predict.R","description":"Per-crop yield-uplift rasters from the brmsfit posterior."}
+  ],
+  "flows": [
+    {"id":"erw-profit","name":"Build the ERW profitability map","color":"#c97a17","description":"End-to-end ERW workflow with decomposed costs, per-country energy economics, pedogenic-carbonate deduction, and time-resolved CDR.",
+     "steps":[
+      {"from":"ext-gadm","to":"erw-1","passes":"GADM world polygons + ISO codes","note":"SSA mask built from UN regions; island nations excluded."},
+      {"from":"ext-qed-cropland","to":"erw-1","passes":"Cropland fraction raster","note":"Reclassified > 0.1 to binary mask."},
+      {"from":"pkg-geodata","to":"erw-1","passes":"geodata::soil_af downloader","note":"Pulls SoilGrids by depth, country by country."},
+      {"from":"ext-soilgrids","to":"erw-1","passes":"pH, BLKD, exch acidity, K/Ca/Mg/Na bases at 5/15/30 cm","note":"Depth-weighted average; ECEC and acidity sat derived."},
+      {"from":"erw-1","to":"erw-2","passes":"gadm_ssa.gpkg + soil reference grid","note":"erw-2 resamples SPAM rasters onto this grid."},
+      {"from":"pkg-geodata","to":"erw-2","passes":"geodata::crop_spam downloader","note":"23 crops x 3 variables."},
+      {"from":"ext-spam","to":"erw-2","passes":"Per-crop area / production / yield rasters","note":"Cropped to SSA, resampled to ref grid."},
+      {"from":"erw-1","to":"erw-3","passes":"soilgrids_properties_cropland.tif (exch_ac, bases, BLKD, ECEC, hp_sat)","note":"Filter: only soils with acidity saturation > 10%."},
+      {"from":"erw-3","to":"pkg-limer","passes":"Soil stack + method (ka/co/LiTAS), SD=20, TAS=0..40","note":"limer::limeRate returns the t CaCO3/ha dose for each method x TAS."},
+      {"from":"pkg-limer","to":"erw-3","passes":"t CaCO3/ha → t basalt/ha via Lewis 2021","note":"Multiplied by basalt_per_lime using feedstock chemistry × reactivity × grain-size factor."},
+      {"from":"ext-ecocrop-xlsx","to":"erw-4","passes":"Per-crop acidity-saturation tolerances","note":"Combined with hard-coded pH min/max into CSVs."},
+      {"from":"erw-4","to":"erw-5","passes":"ecocrop_parameters_{ph,hp}.csv","note":"Tolerances feed the Recocrop model per crop."},
+      {"from":"erw-1","to":"erw-5","passes":"Soil pH + acidity-saturation rasters","note":"Environmental drivers for the response model."},
+      {"from":"erw-5","to":"pkg-recocrop","passes":"Crop params + soil rasters","note":"Recocrop::ecocrop builds, predict() applies the response curves."},
+      {"from":"pkg-recocrop","to":"erw-5","passes":"Per-crop relative-yield rasters","note":"Clamped [0.2, 1]. 23 crops x 2 responses = 46 rasters."},
+      {"from":"erw-3","to":"erw-9","passes":"basalt rates + basalt_feedstock_chemistry.csv","note":"erw-9 reads CDR_max_kg_per_t (~310) and the grain-adjusted reactive_fraction_ref."},
+      {"from":"erw-1","to":"erw-9","passes":"Soil pH layer","note":"Triangular f_pH peaks at pH ~5.0."},
+      {"from":"ext-worldclim","to":"erw-9","passes":"MAT + MAP","note":"Drives climate factor AND pedogenic-carbonate fraction (UNEP aridity classes)."},
+      {"from":"ext-gadm","to":"erw-energy-country","passes":"GADM polygons + ISO codes","note":"Rasterised to country code via the working grid."},
+      {"from":"ext-energy-table","to":"erw-energy-country","passes":"Electricity price + grid CI per ISO3 (Ember/IEA/AfDB)","note":"43 SSA countries: $0.05–0.40/kWh, 0.03–0.95 kg CO2/kWh."},
+      {"from":"erw-energy-country","to":"erw-7","passes":"electricity_usd_kWh + grid_CI_kg_per_kWh rasters","note":"Drives spatial grinding cost AND grinding LCA."},
+      {"from":"erw-1","to":"erw-basalt-access","passes":"gadm_ssa.gpkg + reference grid","note":"SSA extent and working resolution."},
+      {"from":"erw-2","to":"erw-basalt-access","passes":"spam_harv_area cropland mask","note":"Restricts delivered-price raster to active cropland."},
+      {"from":"ext-glim","to":"erw-basalt-access","passes":"GLiM lithology shapefile","note":"Basic volcanic + pyroclastics rasterized as basalt source mask."},
+      {"from":"pkg-malariaatlas","to":"erw-basalt-access","passes":"Friction-surface downloader","note":"Optional path; otherwise drop TIF manually in access/."},
+      {"from":"ext-mapfriction","to":"erw-basalt-access","passes":"Friction raster (minutes per meter)","note":"Input to terra::costDist."},
+      {"from":"erw-basalt-access","to":"erw-7","passes":"transport_cost + transport_km rasters","note":"Transport km feeds the LCA truck-emissions component; cost feeds the basalt-cost component."},
+      {"from":"erw-5","to":"erw-7","passes":"Per-crop hp yield-loss rasters","note":"EcoCrop baseline; replaced by erw-yield-predict when present."},
+      {"from":"erw-2","to":"erw-7","passes":"SPAM yield + harvested area","note":"Actual t/ha and ha per crop per pixel."},
+      {"from":"ext-faostat","to":"erw-7","passes":"FAOSTAT producer prices 2016-2020","note":"Median per crop across SSA countries."},
+      {"from":"erw-3","to":"erw-7","passes":"basalt_*.tif (targeted + uniform_{10,20,50})","note":"erw-7 loops over four allocation rules."},
+      {"from":"erw-9","to":"erw-7","passes":"cdr_yield_*.tif (with pedogenic deduction)","note":"Per-pixel net CDR is gross − LCA-from-rate."}
+    ]},
+    {"id":"country-energy","name":"Build country energy rasters","color":"#8a4a1a","description":"Subflow: produce per-country electricity price and grid CI rasters for SSA.",
+     "steps":[
+      {"from":"ext-gadm","to":"erw-energy-country","passes":"GADM SSA polygons + ISO codes","note":"Rasterised to the working grid via ISO3-keyed integer codes."},
+      {"from":"ext-energy-table","to":"erw-energy-country","passes":"Electricity + CI per ISO3","note":"Editable CSV. Defaults span Ethiopia (0.03 kg/kWh hydro) to South Africa (0.95 kg/kWh coal)."},
+      {"from":"erw-energy-country","to":"erw-energy-country","passes":"terra::classify per-pixel from country code","note":"Outputs: electricity_usd_kWh.tif + grid_CI_kg_per_kWh.tif. Consumed by erw-7."}
+    ]},
+    {"id":"cdr-yield","name":"Compute the spatial CDR-yield raster","color":"#7b3ab8","description":"Climate × pH × aridity scaling of the constant basalt-CDR factor from erw-3.",
+     "steps":[
+      {"from":"erw-1","to":"erw-3","passes":"soilgrids_properties_cropland.tif","note":"Input to limer::limeRate for the Kamprath / Cochrane / LiTAS year-1 and maintenance CaCO3 rates."},
+      {"from":"erw-3","to":"erw-9","passes":"basalt rates + feedstock chemistry CSV","note":"CDR_max_kg_per_t (~310) and grain-adjusted reactive_fraction_ref."},
+      {"from":"pkg-geodata","to":"erw-9","passes":"geodata::worldclim_global","note":"Global climate rasters at 10 arcmin."},
+      {"from":"ext-worldclim","to":"erw-9","passes":"MAT + MAP","note":"Cropped to SSA and resampled."},
+      {"from":"erw-1","to":"erw-9","passes":"Soil pH layer","note":"Triangular f_pH peaks at pH ~5.0; outside [4, 7] is 0.5."},
+      {"from":"erw-9","to":"erw-9","passes":"CDR per pixel = cdr_max × reactive × climate × (1 − pedogenic)","note":"Final cdr_yield_*.tif rasters consumed by erw-7."}
+    ]},
+    {"id":"basalt-access","name":"Compute delivered basalt price + transport km","color":"#1f6f9a","description":"Cost-distance from basalt outcrops over the MAP friction surface, scaled by truck-haulage economics.",
+     "steps":[
+      {"from":"erw-1","to":"erw-basalt-access","passes":"gadm_ssa.gpkg + reference grid","note":"SSA extent and working resolution."},
+      {"from":"erw-2","to":"erw-basalt-access","passes":"spam_harv_area cropland mask","note":"Delivered price only meaningful where crops are grown."},
+      {"from":"ext-glim","to":"erw-basalt-access","passes":"GLiM lithology polygons","note":"Basic volcanic + pyroclastics rasterized as source mask."},
+      {"from":"pkg-malariaatlas","to":"erw-basalt-access","passes":"Friction downloader (optional)","note":"Or drop TIF manually."},
+      {"from":"ext-mapfriction","to":"erw-basalt-access","passes":"Friction raster (min/m)","note":"Roads fast, off-road slow. Input to terra::costDist."},
+      {"from":"erw-basalt-access","to":"erw-basalt-access","passes":"costDist + economic constants","note":"travel_min x $0.04/min/t = transport cost; delivered = $10/t quarry gate + transport. Capped at 1000 km. Transport km = travel_min x 0.5."}
+    ]},
+    {"id":"erw-sens","name":"Run the ERW sensitivity sweeps","color":"#b8333a","description":"Five sweep axes over the ERW economics: prices × MRV × yields × grain size × allocation rule.",
+     "steps":[
+      {"from":"erw-3","to":"erw-7","passes":"(reused) basalt rates","note":"Static across scenarios."},
+      {"from":"erw-9","to":"erw-7","passes":"(reused) CDR-yield rasters","note":"Static; grain-size sweep scales internally."},
+      {"from":"erw-basalt-access","to":"erw-7","passes":"(reused) transport rasters","note":"Both cost and km used."},
+      {"from":"erw-energy-country","to":"erw-7","passes":"(reused) electricity + CI rasters","note":"Per-country grinding cost and LCA."},
+      {"from":"erw-7","to":"erw-8","passes":"source('erw-7-profitability-function.R')","note":"erw-8 imports profit() and all preloaded rasters."},
+      {"from":"erw-8","to":"erw-8","passes":"5 sweep loops × 3 regimes × 23 crops","note":"Five CSVs: prices, yields, mrv, grain, allocation."}
+    ]},
+    {"id":"erw-supply","name":"Supply-constrained deployment ranking","color":"#1f7a4a","description":"Post-process: rank cropland pixels by GM-per-tonne-basalt under several annual basalt-supply caps.",
+     "steps":[
+      {"from":"erw-7","to":"erw-supply","passes":"economics_erw/targeted/{crop}_{regime}.tif","note":"Per-pixel basalt tonnes (rate × area), GM ($), aggregated across 23 crops."},
+      {"from":"erw-9","to":"erw-supply","passes":"cdr_per_t_basalt.tif","note":"Used to compute total delivered CDR (Mt CO2) under each supply cap."},
+      {"from":"erw-supply","to":"erw-supply","passes":"Sort pixels descending by GM-per-t-basalt","note":"LP-dual ranking when basalt is the scarce input."},
+      {"from":"erw-supply","to":"erw-supply","passes":"Cumulative sum vs SUPPLY_CAPS_MT","note":"Marginal pixel's GM-per-t-basalt at each cap = shadow price at that supply level."},
+      {"from":"erw-supply","to":"erw-supply","passes":"Write supply_curve_{regime}.csv + masks","note":"Deployment-mask rasters at caps of 10, 50, 250 Mt/yr."}
+    ]},
+    {"id":"erw-yield-calibration","name":"Calibrate yield response from ERW trials (Bayesian)","color":"#a64ca6","description":"Bayesian hierarchical regression of log yield-ratio. Produces per-crop yield-uplift rasters that replace the EcoCrop response in erw-7.",
+     "steps":[
+      {"from":"ext-trial-data","to":"erw-yield-fit","passes":"Trial-level observations: site, crop, rate, grain, MAT, MAP, pH, log_y_ratio, sd","note":"~15 published data points."},
+      {"from":"erw-yield-fit","to":"pkg-brms","passes":"Model formula + weakly-informative priors","note":"Hierarchical model: log_y_ratio ~ log(rate) + s(MAT) + s(MAP) + pH + log(grain) + (1|crop) + (1|site)."},
+      {"from":"pkg-brms","to":"erw-yield-fit","passes":"Posterior draws (chains, summaries)","note":"Saved as RDS; small-n dataset → priors dominate."},
+      {"from":"erw-yield-fit","to":"erw-yield-predict","passes":"Fitted brmsfit object (RDS)","note":"Predict step loads and applies it to per-pixel covariates."},
+      {"from":"erw-1","to":"erw-yield-predict","passes":"Soil pH raster","note":"Baseline pH covariate."},
+      {"from":"ext-worldclim","to":"erw-yield-predict","passes":"MAT + MAP rasters","note":"Climate covariates per pixel."},
+      {"from":"erw-3","to":"erw-yield-predict","passes":"basalt rates + grain size","note":"Rate and grain size at which yield-uplift is being predicted."},
+      {"from":"erw-yield-predict","to":"erw-yield-predict","passes":"posterior_epred → per-crop yield-uplift raster","note":"Median + 5th/95th percentile rasters written per crop."},
+      {"from":"erw-yield-predict","to":"erw-7","passes":"erw_yield_uplift_{crop}.tif (when present)","note":"erw-7 uses these in place of EcoCrop response when detected."}
+    ]}
+  ]
+}
+</script>
+
+<script>
+(async function () {
+  // --- load data ----------------------------------------------------------
+  let data, source = "embedded";
+  try {
+    const r = await fetch("workflows.json", { cache: "no-store" });
+    if (r.ok) { data = await r.json(); source = "workflows.json"; }
+    else throw 0;
+  } catch (e) {
+    try {
+      data = JSON.parse(document.getElementById("embedded-data").textContent);
+    } catch (ee) {
+      document.body.innerHTML = '<pre style="padding:30px">Failed to load workflows data.</pre>';
+      return;
+    }
+  }
+
+  document.getElementById("doc-title").textContent = data.title || "Workflows";
+  document.getElementById("doc-sub").textContent = data.subtitle || "";
+  document.getElementById("src-tag").textContent = "(" + source + ")";
+
+  // --- model --------------------------------------------------------------
+  const nodes = data.components.map(c => Object.assign({}, c));
+  const idMap = new Map(nodes.map(n => [n.id, n]));
+
+  // derive edges: union of all flow steps (skip self-loops here, render specially)
+  const edgeKey = (a, b) => a + ">" + b;
+  const edgeIndex = new Map();
+  data.flows.forEach(f => f.steps.forEach(s => {
+    if (!idMap.has(s.from) || !idMap.has(s.to)) return;
+    if (s.from === s.to) return;
+    const k = edgeKey(s.from, s.to);
+    if (!edgeIndex.has(k)) edgeIndex.set(k, { from: s.from, to: s.to });
+  }));
+  const edges = Array.from(edgeIndex.values());
+
+  // --- layout: force-directed --------------------------------------------
+  const W = 1000, H = 640;
+  const colorOf = n => {
+    if (n.kind === "external") return "var(--data)";
+    if (n.kind === "package")  return "var(--package)";
+    if (n.group === "lime")    return "var(--lime)";
+    if (n.group === "erw")     return "var(--erw)";
+    return "#777";
+  };
+  const radiusOf = n => n.kind === "stage" ? 13 : n.kind === "package" ? 10 : 9;
+
+  function seedPositions() {
+    // initial X bias by kind/group to give the simulation a head start
+    const groupX = n => {
+      if (n.kind === "external") return 130;
+      if (n.kind === "package")  return 360;
+      if (n.group === "lime")    return 620;
+      if (n.group === "erw")     return 880;
+      return W / 2;
+    };
+    nodes.forEach((n, i) => {
+      n.x = groupX(n) + (Math.random() - 0.5) * 90;
+      n.y = 60 + (i % 12) * (H - 120) / 12 + (Math.random() - 0.5) * 60;
+      n.vx = 0; n.vy = 0;
+      n.r = radiusOf(n);
+      n.fixed = false;
+    });
+  }
+
+  const REPULSION = 3500;
+  const SPRING_K  = 0.045;
+  const SPRING_L  = 105;
+  const CENTER_K  = 0.006;
+  const DAMPING   = 0.84;
+  const PADDING   = 50;
+
+  function tick() {
+    for (const n of nodes) { n.fx = 0; n.fy = 0; }
+    // pairwise repulsion
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let d2 = dx*dx + dy*dy;
+        if (d2 < 0.5) { dx = Math.random() - 0.5; dy = Math.random() - 0.5; d2 = 1; }
+        const d  = Math.sqrt(d2);
+        const f  = REPULSION / d2;
+        const fx = f * dx / d, fy = f * dy / d;
+        a.fx -= fx; a.fy -= fy;
+        b.fx += fx; b.fy += fy;
+      }
+    }
+    // spring along edges
+    for (const e of edges) {
+      const a = idMap.get(e.from), b = idMap.get(e.to);
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const d  = Math.sqrt(dx*dx + dy*dy) || 1;
+      const f  = SPRING_K * (d - SPRING_L);
+      const fx = f * dx / d, fy = f * dy / d;
+      a.fx += fx; a.fy += fy;
+      b.fx -= fx; b.fy -= fy;
+    }
+    // weak center attraction
+    for (const n of nodes) {
+      n.fx += (W/2 - n.x) * CENTER_K;
+      n.fy += (H/2 - n.y) * CENTER_K * 1.3;
+    }
+    // integrate
+    for (const n of nodes) {
+      if (n.fixed) continue;
+      n.vx = (n.vx + n.fx) * DAMPING;
+      n.vy = (n.vy + n.fy) * DAMPING;
+      n.x = Math.max(PADDING, Math.min(W - PADDING, n.x + n.vx));
+      n.y = Math.max(PADDING, Math.min(H - PADDING - 20, n.y + n.vy));
+    }
+  }
+
+  function runSim(iterations) {
+    for (let i = 0; i < iterations; i++) tick();
+  }
+
+  seedPositions();
+  runSim(450);
+
+  // --- SVG ----------------------------------------------------------------
+  const SVGNS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("graph");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+  function el(name, attrs) {
+    const e = document.createElementNS(SVGNS, name);
+    if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  // arrowhead markers (regular + active variants per flow color baked in via currentColor)
+  const defs = el("defs");
+  defs.innerHTML =
+    '<marker id="arr-bg"  viewBox="0 -5 10 10" refX="18" refY="0" markerWidth="6" markerHeight="6" orient="auto">'
+    +  '<path d="M0,-5L10,0L0,5" fill="#a8a59a"/></marker>'
+    +'<marker id="arr-on" viewBox="0 -5 10 10" refX="18" refY="0" markerWidth="6" markerHeight="6" orient="auto-start-reverse">'
+    +  '<path d="M0,-5L10,0L0,5" fill="context-stroke"/></marker>';
+  svg.appendChild(defs);
+
+  const gEdges  = el("g", {id: "g-edges"});
+  const gBadges = el("g", {id: "g-badges"});
+  const gNodes  = el("g", {id: "g-nodes"});
+  svg.appendChild(gEdges);
+  svg.appendChild(gBadges);
+  svg.appendChild(gNodes);
+
+  // --- render -------------------------------------------------------------
+  let selectedFlow = null;
+  let stepEdgeMap = new Map();      // "from>to" -> [stepNums]
+  let activeNodeSet = new Set();
+  let selfStepMap = new Map();      // nodeId -> [stepNums]
+
+  function buildStepEdges(flow) {
+    stepEdgeMap = new Map();
+    activeNodeSet = new Set();
+    selfStepMap = new Map();
+    if (!flow) return;
+    flow.steps.forEach((s, i) => {
+      activeNodeSet.add(s.from);
+      activeNodeSet.add(s.to);
+      if (s.from === s.to) {
+        if (!selfStepMap.has(s.from)) selfStepMap.set(s.from, []);
+        selfStepMap.get(s.from).push(i + 1);
+      } else {
+        const k = edgeKey(s.from, s.to);
+        if (!stepEdgeMap.has(k)) stepEdgeMap.set(k, []);
+        stepEdgeMap.get(k).push(i + 1);
+      }
+    });
+  }
+
+  function renderEdges() {
+    gEdges.innerHTML = "";
+    const dim = selectedFlow != null;
+    for (const e of edges) {
+      const a = idMap.get(e.from), b = idMap.get(e.to);
+      const k = edgeKey(e.from, e.to);
+      const isActive = stepEdgeMap.has(k);
+      const line = el("line", {
+        x1: a.x, y1: a.y, x2: b.x, y2: b.y,
+        "marker-end": isActive ? "url(#arr-on)" : "url(#arr-bg)",
+        class: isActive ? "edge active" : ("edge bg" + (dim ? " dim" : "")),
+        stroke: isActive ? (selectedFlow.color || "#333") : "#a8a59a",
+        "data-key": k
+      });
+      gEdges.appendChild(line);
+    }
+  }
+
+  function renderNodes() {
+    gNodes.innerHTML = "";
+    const dim = selectedFlow != null;
+    for (const n of nodes) {
+      const isActive = !dim || activeNodeSet.has(n.id);
+      const g = el("g", {
+        class: "node" + (dim && !isActive ? " dim" : ""),
+        transform: `translate(${n.x.toFixed(1)}, ${n.y.toFixed(1)})`,
+        "data-id": n.id
+      });
+      const c = el("circle", {
+        r: n.r,
+        fill: "#fff",
+        stroke: getCSSVar(colorOf(n))
+      });
+      // fill tint
+      c.style.fill = hexFromVar(colorOf(n)) + "26"; // ~15% opacity
+      g.appendChild(c);
+
+      const label = el("text", {
+        y: n.r + 11,
+        "text-anchor": "middle"
+      });
+      label.textContent = n.name;
+      g.appendChild(label);
+
+      // self-loop badges
+      if (selectedFlow && selfStepMap.has(n.id)) {
+        selfStepMap.get(n.id).forEach((num, k) => {
+          const bx = n.r + 8 + k * 16;
+          const by = -n.r - 4;
+          const bg = el("g", { transform: `translate(${bx}, ${by})` });
+          bg.appendChild(el("circle", { r: 9, class: "badge-circle", fill: selectedFlow.color }));
+          const t = el("text", { class: "badge-text", y: 0 });
+          t.textContent = num;
+          bg.appendChild(t);
+          g.appendChild(bg);
+        });
+      }
+
+      // drag
+      attachDrag(g, n);
+      // hover -> show details in tooltip area
+      g.addEventListener("mouseenter", () => showNodeTooltip(n));
+      g.addEventListener("mouseleave", hideNodeTooltip);
+      gNodes.appendChild(g);
+    }
+  }
+
+  function renderBadges() {
+    gBadges.innerHTML = "";
+    if (!selectedFlow) return;
+    for (const [k, nums] of stepEdgeMap) {
+      const [from, to] = k.split(">");
+      const a = idMap.get(from), b = idMap.get(to);
+      if (!a || !b) continue;
+      // place badges along the edge, evenly spaced from the midpoint outward
+      const total = nums.length;
+      nums.forEach((num, j) => {
+        const t = 0.55 + (j - (total - 1) / 2) * 0.08;
+        const x = a.x + (b.x - a.x) * t;
+        const y = a.y + (b.y - a.y) * t;
+        const g = el("g", {
+          transform: `translate(${x.toFixed(1)}, ${y.toFixed(1)})`,
+          "data-step": num
+        });
+        g.appendChild(el("circle", { r: 10, class: "badge-circle", fill: selectedFlow.color }));
+        const t2 = el("text", { class: "badge-text", y: 0 });
+        t2.textContent = num;
+        g.appendChild(t2);
+        gBadges.appendChild(g);
+      });
+    }
+  }
+
+  function render() {
+    renderEdges();
+    renderNodes();
+    renderBadges();
+  }
+
+  // --- helpers ------------------------------------------------------------
+  function getCSSVar(maybeVar) {
+    if (typeof maybeVar === "string" && maybeVar.startsWith("var(")) {
+      const name = maybeVar.replace("var(", "").replace(")", "").trim();
+      return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#666";
+    }
+    return maybeVar;
+  }
+  function hexFromVar(v) { return getCSSVar(v); }
+
+  // --- drag ---------------------------------------------------------------
+  let dragging = null;
+  function attachDrag(g, n) {
+    g.addEventListener("mousedown", ev => {
+      dragging = { node: n, sx: ev.clientX, sy: ev.clientY, x0: n.x, y0: n.y, moved: false };
+      ev.preventDefault();
+    });
+  }
+  document.addEventListener("mousemove", ev => {
+    if (!dragging) return;
+    const pt = clientToViewBox(ev.clientX, ev.clientY);
+    if (!pt) return;
+    const pt0 = clientToViewBox(dragging.sx, dragging.sy);
+    const node = dragging.node;
+    node.x = dragging.x0 + (pt.x - pt0.x);
+    node.y = dragging.y0 + (pt.y - pt0.y);
+    node.x = Math.max(PADDING, Math.min(W - PADDING, node.x));
+    node.y = Math.max(PADDING, Math.min(H - PADDING - 20, node.y));
+    dragging.moved = true;
+    render();
+  });
+  document.addEventListener("mouseup", () => { dragging = null; });
+
+  function clientToViewBox(cx, cy) {
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return null;
+    const p = svg.createSVGPoint();
+    p.x = cx; p.y = cy;
+    const r = p.matrixTransform(ctm.inverse());
+    return { x: r.x, y: r.y };
+  }
+
+  // --- node tooltip -------------------------------------------------------
+  let tt = null;
+  function showNodeTooltip(n) {
+    hideNodeTooltip();
+    tt = document.createElement("div");
+    tt.style.cssText = "position:fixed;background:#fff;border:1px solid #ddd;border-radius:6px;padding:8px 10px;font-size:11px;max-width:260px;box-shadow:0 2px 8px rgba(0,0,0,.08);pointer-events:none;z-index:10";
+    tt.innerHTML = '<b style="font-size:12px">' + n.name + '</b>'
+      + (n.file ? '<div style="font-family:ui-monospace,monospace;color:#777;font-size:10px;margin-top:2px">' + n.file + '</div>' : '')
+      + '<div style="margin-top:6px;color:#444">' + (n.description || '') + '</div>';
+    document.body.appendChild(tt);
+    document.addEventListener("mousemove", moveTooltip);
+  }
+  function moveTooltip(ev) {
+    if (!tt) return;
+    tt.style.left = (ev.clientX + 12) + "px";
+    tt.style.top  = (ev.clientY + 12) + "px";
+  }
+  function hideNodeTooltip() {
+    if (tt) { tt.remove(); tt = null; document.removeEventListener("mousemove", moveTooltip); }
+  }
+
+  // --- sidebar: flow list + components ------------------------------------
+  const flowList = document.getElementById("flow-list");
+  data.flows.forEach(flow => {
+    const b = document.createElement("button");
+    b.className = "flow-btn";
+    b.style.setProperty("--accent", flow.color);
+    b.innerHTML =
+      '<div class="name">' + flow.name + '</div>'
+      + (flow.description ? '<div class="desc">' + flow.description + '</div>' : '');
+    b.addEventListener("click", () => selectFlow(flow.id));
+    b.dataset.flow = flow.id;
+    flowList.appendChild(b);
+  });
+
+  // component count summary
+  const counts = { external: 0, package: 0, "ERW stage": 0 };
+  nodes.forEach(n => {
+    if (n.kind === "stage") counts["ERW stage"]++;
+    else counts[n.kind]++;
+  });
+  document.getElementById("component-summary").innerHTML =
+    Object.entries(counts).map(([k, v]) => k + " — <b>" + v + "</b>").join("<br>")
+    + '<br><br>Drag nodes to reposition. Click <i>Re-layout</i> to re-run the simulation.';
+
+  // --- flow selection -----------------------------------------------------
+  function selectFlow(id) {
+    if (selectedFlow && selectedFlow.id === id) {
+      // toggle off
+      selectedFlow = null;
+    } else {
+      selectedFlow = data.flows.find(f => f.id === id);
+    }
+    document.querySelectorAll(".flow-btn").forEach(el => {
+      el.classList.toggle("active", selectedFlow && el.dataset.flow === selectedFlow.id);
+    });
+    buildStepEdges(selectedFlow);
+    render();
+    renderStepList();
+    document.getElementById("btn-clear").style.display = selectedFlow ? "inline-block" : "none";
+  }
+
+  // --- step list ----------------------------------------------------------
+  function renderStepList() {
+    const el = document.getElementById("steps");
+    if (!selectedFlow) {
+      el.innerHTML = '<div class="steps-empty">Select a workflow on the left to highlight its path through the components.</div>';
+      return;
+    }
+    let html =
+      '<div class="steps-head">'
+      + '<span class="steps-title">' + selectedFlow.name + '</span>'
+      + '<span class="steps-count">' + selectedFlow.steps.length + ' steps</span>'
+      + '</div>';
+    selectedFlow.steps.forEach((s, i) => {
+      const from = idMap.get(s.from), to = idMap.get(s.to);
+      html += '<div class="step" data-step="' + (i + 1) + '" style="--step-color:' + selectedFlow.color + '">'
+        + '<div class="num">' + (i + 1) + '</div>'
+        + '<div class="body">'
+        +   '<div class="from-to"><b>' + (from ? from.name : s.from) + '</b>'
+        +     '<span class="arrow">→</span><b>' + (to ? to.name : s.to) + '</b></div>'
+        +   '<div class="passes">' + escapeHTML(s.passes || '') + '</div>'
+        +   (s.note ? '<div class="note">' + escapeHTML(s.note) + '</div>' : '')
+        + '</div>'
+        + '</div>';
+    });
+    el.innerHTML = html;
+
+    // hover sync: highlight corresponding edge / node
+    el.querySelectorAll(".step").forEach(stepEl => {
+      const num = parseInt(stepEl.dataset.step, 10);
+      const step = selectedFlow.steps[num - 1];
+      stepEl.addEventListener("mouseenter", () => flashStep(step, num));
+      stepEl.addEventListener("mouseleave", unflashStep);
+    });
+  }
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+  }
+
+  function flashStep(step, num) {
+    if (step.from === step.to) {
+      const nodeG = document.querySelector('.node[data-id="' + step.from + '"]');
+      if (nodeG) nodeG.classList.add("flash");
+    } else {
+      const k = edgeKey(step.from, step.to);
+      const line = document.querySelector('.edge[data-key="' + CSS.escape(k) + '"]');
+      if (line) line.classList.add("flash");
+      [step.from, step.to].forEach(id => {
+        const g = document.querySelector('.node[data-id="' + id + '"]');
+        if (g) g.classList.add("flash");
+      });
+    }
+  }
+  function unflashStep() {
+    document.querySelectorAll(".flash").forEach(el => el.classList.remove("flash"));
+  }
+
+  // --- controls -----------------------------------------------------------
+  document.getElementById("btn-reheat").addEventListener("click", () => {
+    seedPositions();
+    runSim(450);
+    render();
+  });
+  document.getElementById("btn-clear").addEventListener("click", () => {
+    if (selectedFlow) selectFlow(selectedFlow.id);
+  });
+
+  // initial render
+  render();
+})();
+</script>
+</body>
+</html>

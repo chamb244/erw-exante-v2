@@ -1,0 +1,8 @@
+% Header includes for docs/erw-model.tex (injected by build-erw-model.sh).
+% Tighten longtable layout so wide tables with monospace cells fit on A4.
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.05}
+% Allow line breaks inside long \texttt{} strings (filenames, paths)
+\usepackage{seqsplit}

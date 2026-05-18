@@ -1,0 +1,162 @@
+{
+  "title": "GAIA ERW Pipeline — Workflow Viewer",
+  "subtitle": "Click a workflow on the left to highlight its path through the components and see what is passed between each step.",
+  "components": [
+    {"id": "ext-gadm",          "name": "GADM v4",                 "kind": "external", "group": "data",    "description": "Global administrative boundaries; world polygons and ISO codes."},
+    {"id": "ext-qed-cropland",  "name": "QED cropland",            "kind": "external", "group": "data",    "description": "Cropland fraction raster for Africa from the QED geosurvey."},
+    {"id": "ext-soilgrids",     "name": "SoilGrids Africa",        "kind": "external", "group": "data",    "description": "Depth-stratified soil chemistry: pH, bulk density, exchangeable acidity, K/Ca/Mg/Na bases."},
+    {"id": "ext-spam",          "name": "SPAM v2 Africa",          "kind": "external", "group": "data",    "description": "Per-crop harvested area, production, and yield rasters for 23 crops."},
+    {"id": "ext-ecocrop-xlsx",  "name": "EcoCrop tolerance XLSX",  "kind": "external", "group": "data",    "description": "Per-crop pH and acidity-saturation tolerance ranges. Manual input."},
+    {"id": "ext-faostat",       "name": "FAOSTAT prices",          "kind": "external", "group": "data",    "description": "Producer prices 2016–2020 for SSA countries (manual CSV download)."},
+    {"id": "ext-worldclim",     "name": "WorldClim v2",            "kind": "external", "group": "data",    "description": "Mean annual temperature and precipitation rasters."},
+    {"id": "ext-glim",          "name": "GLiM v1.0 lithology",     "kind": "external", "group": "data",    "description": "Global lithology map. Basic volcanic class flags basalt outcrops."},
+    {"id": "ext-mapfriction",   "name": "MAP friction 2019",       "kind": "external", "group": "data",    "description": "Travel-time friction surface (minutes per meter), Weiss et al."},
+    {"id": "ext-energy-table",  "name": "Ember + IEA + GET.invest",  "kind": "external", "group": "data",  "description": "Country-level electricity prices and grid carbon intensity for SSA (manually compiled table)."},
+    {"id": "ext-trial-data",    "name": "ERW field-trial dataset", "kind": "external", "group": "data",    "description": "Manually-compiled yield-response and CDR-rate observations from published ERW trials (Kisumu, Corn Belt, InPlanet, Newcastle oats, Swiss vineyards, etc.)."},
+
+    {"id": "pkg-terra",         "name": "terra",                   "kind": "package", "group": "package", "description": "Raster GIS engine. All scripts use it for I/O, masking, arithmetic."},
+    {"id": "pkg-geodata",       "name": "geodata",                 "kind": "package", "group": "package", "description": "Downloaders for SoilGrids, SPAM, WorldClim, GADM."},
+    {"id": "pkg-limer",         "name": "limer",                   "kind": "package", "group": "package", "description": "gaiafrica/limer: lime-requirement methods (Kamprath, Cochrane, LiTAS) and NPV helpers."},
+    {"id": "pkg-recocrop",      "name": "Recocrop",                "kind": "package", "group": "package", "description": "EcoCrop suitability model: per-crop relative yield from environmental responses."},
+    {"id": "pkg-malariaatlas",  "name": "malariaAtlas",            "kind": "package", "group": "package", "description": "Downloader for MAP friction surface (used by erw-basalt-access)."},
+    {"id": "pkg-brms",          "name": "brms",                    "kind": "package", "group": "package", "description": "Bayesian regression models via Stan. Used to fit the trial-calibrated yield-response model."},
+
+    {"id": "erw-1",             "name": "SoilGrids layers",        "kind": "stage",   "group": "erw",     "file": "erw/erw-1-layers-soilgrids.R", "description": "Build SSA mask, pull and depth-weight-average SoilGrids variables, derive ECEC and acidity saturation, mask to cropland."},
+    {"id": "erw-2",             "name": "SPAM crop layers",        "kind": "stage",   "group": "erw",     "file": "erw/erw-2-layers-spam.R",      "description": "Pull SPAM area/production/yield for 23 crops, crop to SSA, resample to working grid."},
+    {"id": "erw-3",             "name": "Basalt requirements",     "kind": "stage",   "group": "erw",     "file": "erw/erw-3-basalt-requirements.R", "description": "Compute lime-equivalent CaCO3 rates via limer::limeRate, then Lewis-2021-calibrated lime→basalt conversion with grain size as a decision variable. Produces both LiTAS-targeted and uniform-rate (10/20/50 t/ha) rasters."},
+    {"id": "erw-4",             "name": "Crop parameters",         "kind": "stage",   "group": "erw",     "file": "erw/erw-4-crop-parameters.R",  "description": "Per-crop pH and acidity-tolerance tables. Produces ecocrop_parameters_{ph,hp}.csv and crop_types.csv."},
+    {"id": "erw-5",             "name": "Yield-loss function",     "kind": "stage",   "group": "erw",     "file": "erw/erw-5-crop-yield-loss-function.R", "description": "Per-crop relative-yield rasters from Recocrop::ecocrop applied to soil pH and acidity saturation."},
+    {"id": "erw-9",             "name": "CDR yield",               "kind": "stage",   "group": "erw",     "file": "erw/erw-9-cdr-yield.R", "description": "Per-pixel CDR (t CO2/ha): climate-and-pH-scaled, with aridity-driven pedogenic-carbonate deduction."},
+    {"id": "erw-basalt-access", "name": "Basalt access",           "kind": "stage",   "group": "erw",     "file": "erw/erw-basalt-access.R", "description": "Cost-distance from basalt outcrops. Produces transport-km and delivered-price rasters."},
+    {"id": "erw-energy-country","name": "Country energy",          "kind": "stage",   "group": "erw",     "file": "erw/erw-energy-country.R", "description": "Per-country electricity price + grid carbon intensity rasters for SSA — drives spatial grinding economics and LCA."},
+    {"id": "erw-7",             "name": "ERW profitability",       "kind": "stage",   "group": "erw",     "file": "erw/erw-7-profitability-function.R", "description": "Decomposed cost (quarry + grinding + transport + spreading), derived LCA, MRV deduction, time-resolved CDR (NPV regime), four allocation rules."},
+    {"id": "erw-8",             "name": "ERW sensitivity",         "kind": "stage",   "group": "erw",     "file": "erw/erw-8-sensitivity-analysis.R", "description": "Five sweeps: prices × MRV × yields × grain size × allocation rule."},
+    {"id": "erw-supply",        "name": "Supply ranking",          "kind": "stage",   "group": "erw",     "file": "erw/erw-supply.R", "description": "Supply-constrained deployment: ranks pixels by GM-per-tonne-basalt; outputs supply-curve CSVs and deployment masks for several Mt/yr caps."},
+    {"id": "erw-yield-fit",     "name": "Yield fit (Bayesian)",    "kind": "stage",   "group": "erw",     "file": "erw/erw-yield-fit.R", "description": "Bayesian hierarchical regression of log yield-ratio on rate, climate, baseline pH, grain size, and crop type. Fitted on the manually-compiled trial dataset."},
+    {"id": "erw-yield-predict", "name": "Yield predict",           "kind": "stage",   "group": "erw",     "file": "erw/erw-yield-predict.R", "description": "Applies the posterior from erw-yield-fit to the SSA raster grid to produce per-crop yield-uplift rasters for use by erw-7."}
+  ],
+  "flows": [
+    {
+      "id": "erw-profit",
+      "name": "Build the ERW profitability map",
+      "color": "#c97a17",
+      "description": "End-to-end ERW workflow with decomposed costs, per-country energy economics, pedogenic-carbonate deduction, and time-resolved CDR. Produces gross-margin layers for agronomic-only, CDR-only, and combined scenarios across four allocation rules.",
+      "steps": [
+        {"from": "ext-gadm",          "to": "erw-1",   "passes": "GADM world polygons + ISO codes",                                "note": "SSA mask built from UN regions; island nations excluded."},
+        {"from": "ext-qed-cropland",  "to": "erw-1",   "passes": "Cropland fraction raster",                                       "note": "Reclassified > 0.1 to binary mask."},
+        {"from": "pkg-geodata",       "to": "erw-1",   "passes": "geodata::soil_af downloader",                                    "note": "Pulls SoilGrids by depth, country by country."},
+        {"from": "ext-soilgrids",     "to": "erw-1",   "passes": "pH, BLKD, exch acidity, K/Ca/Mg/Na bases at 5/15/30 cm",        "note": "Depth-weighted average; ECEC and acidity sat derived."},
+        {"from": "erw-1",             "to": "erw-2",   "passes": "gadm_ssa.gpkg + soil reference grid",                            "note": "erw-2 resamples SPAM rasters onto this grid."},
+        {"from": "ext-spam",          "to": "erw-2",   "passes": "Per-crop area / production / yield rasters",                    "note": "Cropped to SSA, resampled to ref grid."},
+        {"from": "erw-1",             "to": "erw-3",   "passes": "soilgrids_properties_cropland.tif",                              "note": "Filter: only soils with acidity saturation > 10%."},
+        {"from": "erw-3",             "to": "pkg-limer", "passes": "Soil stack + method (ka/co/LiTAS), TAS=0..40",                  "note": "limer::limeRate returns t CaCO3/ha per method × TAS."},
+        {"from": "pkg-limer",         "to": "erw-3",   "passes": "t CaCO3/ha rasters → converted to t basalt/ha via Lewis 2021",  "note": "erw-3 multiplies by basalt_per_lime (~5 at 100 µm) using feedstock chemistry × reactivity × grain-size factor."},
+        {"from": "ext-ecocrop-xlsx",  "to": "erw-4",   "passes": "Per-crop acidity-saturation tolerances",                          "note": "Combined with hard-coded pH min/max into CSVs."},
+        {"from": "erw-4",             "to": "erw-5",   "passes": "ecocrop_parameters_{ph,hp}.csv",                                 "note": "Per-crop tolerance ranges."},
+        {"from": "erw-1",             "to": "erw-5",   "passes": "Soil pH + acidity-saturation rasters",                           "note": "Environmental drivers for Recocrop."},
+        {"from": "erw-5",             "to": "pkg-recocrop", "passes": "Crop params + soil rasters",                                 "note": "Recocrop::ecocrop builds, predict() applies the response curves."},
+        {"from": "pkg-recocrop",      "to": "erw-5",   "passes": "Per-crop relative-yield rasters",                                 "note": "Clamped [0.2, 1]. 23 crops × 2 responses = 46 rasters."},
+        {"from": "erw-3",             "to": "erw-9",   "passes": "basalt_merlos + uniform rates + feedstock CSV",                   "note": "Includes grain_size, reactive_fraction_ref, CDR_max_kg_per_t."},
+        {"from": "erw-1",             "to": "erw-9",   "passes": "Soil pH layer",                                                   "note": "Triangular f_pH peaks at pH ~5.0."},
+        {"from": "ext-worldclim",     "to": "erw-9",   "passes": "MAT + MAP",                                                       "note": "MAT/MAP drive climate factor AND the pedogenic-carbonate fraction (UNEP aridity classes)."},
+        {"from": "ext-gadm",          "to": "erw-energy-country", "passes": "GADM polygons + ISO codes",                            "note": "Rasterized to country code via the working grid."},
+        {"from": "ext-energy-table",  "to": "erw-energy-country", "passes": "Country electricity price + grid CI table",            "note": "43 SSA countries: $0.05–0.40/kWh, 0.03–0.95 kg CO2/kWh."},
+        {"from": "erw-energy-country","to": "erw-7",   "passes": "electricity_usd_kWh + grid_CI_kg_per_kWh rasters",                 "note": "Drives spatial grinding cost AND grinding LCA emissions."},
+        {"from": "erw-1",             "to": "erw-basalt-access", "passes": "gadm_ssa + reference grid",                              "note": "SSA extent and working resolution."},
+        {"from": "erw-2",             "to": "erw-basalt-access", "passes": "cropland mask",                                          "note": "Restricts the delivered-price raster to active cropland."},
+        {"from": "ext-glim",          "to": "erw-basalt-access", "passes": "GLiM lithology",                                         "note": "Basic volcanic + pyroclastics → source mask."},
+        {"from": "ext-mapfriction",   "to": "erw-basalt-access", "passes": "Friction-surface raster",                                "note": "Input to terra::costDist."},
+        {"from": "erw-basalt-access", "to": "erw-7",   "passes": "transport_cost + transport_km rasters",                            "note": "Transport km feeds the LCA truck-emissions component; cost feeds the basalt-cost component."},
+        {"from": "erw-5",             "to": "erw-7",   "passes": "Per-crop yield-loss rasters",                                      "note": "EcoCrop baseline. Replaced by erw-yield-predict outputs when those are present."},
+        {"from": "erw-2",             "to": "erw-7",   "passes": "SPAM yield + harvested area",                                      "note": "Actual t/ha and ha per crop per pixel."},
+        {"from": "ext-faostat",       "to": "erw-7",   "passes": "FAOSTAT producer prices",                                          "note": "Median per crop across SSA."},
+        {"from": "erw-3",             "to": "erw-7",   "passes": "basalt_*.tif (targeted + uniform_{10,20,50})",                    "note": "erw-7 loops over four allocation rules."},
+        {"from": "erw-9",             "to": "erw-7",   "passes": "cdr_yield_*.tif (with pedogenic deduction)",                       "note": "Per-pixel net CDR is gross − LCA-from-rate."},
+        {"from": "erw-7",             "to": "erw-7",   "passes": "Time-resolved CDR phasing × NPV discount",                         "note": "CDR_PHASING × 1/(1+r)^t → CDR_NPV_FACTOR ≈ 0.79 at 10%. Applied only in the npv regime."}
+      ]
+    },
+    {
+      "id": "country-energy",
+      "name": "Build country energy rasters",
+      "color": "#8a4a1a",
+      "description": "Subflow: produce per-country electricity price and grid carbon intensity rasters for SSA. The CI spread (~30× across SSA) is the load-bearing factor in grinding-emissions LCA.",
+      "steps": [
+        {"from": "ext-gadm",         "to": "erw-energy-country", "passes": "GADM SSA polygons + ISO codes",                  "note": "Rasterised to the working grid via ISO3-keyed integer codes."},
+        {"from": "ext-energy-table", "to": "erw-energy-country", "passes": "Electricity + CI per ISO3 (Ember/IEA/AfDB)",      "note": "Editable CSV. Defaults span Ethiopia (0.03 kg/kWh hydro) to South Africa (0.95 kg/kWh coal)."},
+        {"from": "erw-energy-country","to": "erw-energy-country","passes": "terra::classify per-pixel from country code",     "note": "Outputs: electricity_usd_kWh.tif + grid_CI_kg_per_kWh.tif. Consumed automatically by erw-7."}
+      ]
+    },
+    {
+      "id": "cdr-yield",
+      "name": "Compute spatial CDR yield (with pedogenic deduction)",
+      "color": "#7b3ab8",
+      "description": "Climate × pH × aridity scaling of the constant basalt-CDR factor from erw-3. The pedogenic-carbonate deduction can remove 70–90% of theoretical CDR in semi-arid pixels.",
+      "steps": [
+        {"from": "erw-1",         "to": "erw-3",  "passes": "soilgrids_properties_cropland.tif",     "note": "Input to limer::limeRate for the Kamprath / Cochrane / LiTAS year-1 and maintenance CaCO3 rates."},
+        {"from": "erw-3",         "to": "erw-9",  "passes": "basalt rates + feedstock chemistry CSV","note": "CDR_max_kg_per_t (~310) and grain-adjusted reactive_fraction_ref."},
+        {"from": "ext-worldclim", "to": "erw-9",  "passes": "MAT + MAP",                              "note": "Climate factor = clamp(MAT/11) × clamp(MAP/1000)."},
+        {"from": "erw-1",         "to": "erw-9",  "passes": "Soil pH layer",                          "note": "Triangular f_pH peaks at pH ~5.0."},
+        {"from": "erw-9",         "to": "erw-9",  "passes": "pedogenic_frac from MAP (UNEP aridity)", "note": "Hyperarid 90%, arid 70%, semi-arid 40%, dry sub-humid 15%, humid 0%."},
+        {"from": "erw-9",         "to": "erw-9",  "passes": "CDR per pixel = cdr_max × reactive × climate × (1 − pedogenic)", "note": "Final cdr_yield_*.tif rasters consumed by erw-7."}
+      ]
+    },
+    {
+      "id": "basalt-access",
+      "name": "Compute delivered basalt price + transport km",
+      "color": "#1f6f9a",
+      "description": "Cost-distance from basalt outcrops over the MAP friction surface. Outputs an explicit transport-km raster used by erw-7 for the LCA truck-emissions component.",
+      "steps": [
+        {"from": "erw-1",            "to": "erw-basalt-access", "passes": "gadm_ssa + reference grid",         "note": "SSA extent and working resolution."},
+        {"from": "erw-2",            "to": "erw-basalt-access", "passes": "spam_harv_area cropland mask",       "note": "Delivered price only meaningful where crops are grown."},
+        {"from": "ext-glim",         "to": "erw-basalt-access", "passes": "GLiM polygons",                      "note": "Basic volcanic + pyroclastics rasterized as source mask."},
+        {"from": "ext-mapfriction",  "to": "erw-basalt-access", "passes": "Friction raster (min/m)",            "note": "Input to terra::costDist for accumulated travel time."},
+        {"from": "erw-basalt-access","to": "erw-basalt-access", "passes": "travel_min × $0.04/min/t → cost",    "note": "+ $10/t quarry gate. Capped at 1000 km."},
+        {"from": "erw-basalt-access","to": "erw-basalt-access", "passes": "travel_min × 0.5 → transport km",    "note": "Used by erw-7 to derive truck-CO2 emissions = km × 0.12 kg CO2/(t·km)."}
+      ]
+    },
+    {
+      "id": "erw-sens",
+      "name": "Run the ERW sensitivity sweeps",
+      "color": "#b8333a",
+      "description": "Five sweep axes over the ERW economics: prices × MRV × yields × grain size × allocation rule. The grain-size sweep reveals the cost-vs-reactivity trade-off.",
+      "steps": [
+        {"from": "erw-3",             "to": "erw-7", "passes": "(reused) basalt rates",                       "note": "Static across scenarios."},
+        {"from": "erw-9",             "to": "erw-7", "passes": "(reused) CDR-yield rasters",                  "note": "Static across price/MRV/yield/allocation sweeps; grain-size sweep scales internally."},
+        {"from": "erw-basalt-access", "to": "erw-7", "passes": "(reused) transport rasters",                  "note": "Both cost and km used."},
+        {"from": "erw-energy-country","to": "erw-7", "passes": "(reused) electricity + CI rasters",           "note": "Per-country grinding cost and LCA."},
+        {"from": "erw-7",             "to": "erw-8", "passes": "source('erw-7-profitability-function.R')",    "note": "erw-8 imports profit() and all preloaded rasters."},
+        {"from": "erw-8",             "to": "erw-8", "passes": "5 sweep loops × 3 regimes × 23 crops",        "note": "Five CSVs: prices, yields, mrv, grain, allocation."}
+      ]
+    },
+    {
+      "id": "erw-supply",
+      "name": "Supply-constrained deployment ranking",
+      "color": "#1f7a4a",
+      "description": "Post-process: rank cropland pixels by GM-per-tonne-basalt under several annual basalt-supply caps (1, 5, 10, 25, 50, 100, 250, 500 Mt/yr). Produces supply curves and deployment-mask rasters.",
+      "steps": [
+        {"from": "erw-7",      "to": "erw-supply", "passes": "economics_erw/targeted/{crop}_{regime}.tif",       "note": "Per-pixel basalt tonnes (rate × area), GM ($), aggregated across 23 crops."},
+        {"from": "erw-9",      "to": "erw-supply", "passes": "cdr_per_t_basalt.tif",                              "note": "Used to compute total delivered CDR (Mt CO2) under each supply cap."},
+        {"from": "erw-supply", "to": "erw-supply", "passes": "Sort pixels descending by GM-per-t-basalt",          "note": "This is the LP-dual ranking when basalt is the scarce input."},
+        {"from": "erw-supply", "to": "erw-supply", "passes": "Cumulative sum vs SUPPLY_CAPS_MT",                  "note": "Marginal pixel's GM-per-t-basalt at each cap = the shadow price of basalt at that supply level."},
+        {"from": "erw-supply", "to": "erw-supply", "passes": "Write supply_curve_{regime}.csv + masks",            "note": "Deployment-mask rasters at caps of 10, 50, 250 Mt/yr."}
+      ]
+    },
+    {
+      "id": "erw-yield-calibration",
+      "name": "Calibrate yield response from ERW trials (Bayesian)",
+      "color": "#a64ca6",
+      "description": "Fits a Bayesian hierarchical regression of log(yield_with_basalt / yield_control) on application rate, climate, baseline soil pH, grain size, and crop type. Produces per-crop posterior-predictive yield-uplift rasters that replace the EcoCrop-derived response in erw-7.",
+      "steps": [
+        {"from": "ext-trial-data",    "to": "erw-yield-fit",     "passes": "Trial-level observations: site, crop, rate, grain, MAT, MAP, pH, log_y_ratio, sd", "note": "~15 published data points (Kisumu, Corn Belt, InPlanet, Newcastle oats, Swiss vineyards, mesocosm)."},
+        {"from": "erw-yield-fit",     "to": "pkg-brms",          "passes": "Model formula + weakly-informative priors",                                       "note": "Hierarchical model: log_y_ratio ~ log(rate) + s(MAT) + s(MAP) + pH + log(grain) + (1|crop) + (1|site)."},
+        {"from": "pkg-brms",          "to": "erw-yield-fit",     "passes": "Posterior draws (chains, summaries)",                                              "note": "Saved as RDS; small-n dataset → priors dominate, large posterior intervals expected."},
+        {"from": "erw-yield-fit",     "to": "erw-yield-predict", "passes": "Fitted brmsfit object (RDS)",                                                      "note": "Predict step loads it and applies to per-pixel covariates."},
+        {"from": "erw-1",             "to": "erw-yield-predict", "passes": "Soil pH raster",                                                                  "note": "Baseline pH covariate."},
+        {"from": "ext-worldclim",     "to": "erw-yield-predict", "passes": "MAT + MAP rasters",                                                               "note": "Climate covariates per pixel."},
+        {"from": "erw-3",             "to": "erw-yield-predict", "passes": "basalt rates + grain size",                                                       "note": "Rate and grain size at which yield-uplift is being predicted."},
+        {"from": "erw-yield-predict", "to": "erw-yield-predict", "passes": "posterior_epred → per-crop yield-uplift raster",                                  "note": "Median + 5th/95th percentile rasters written per crop."},
+        {"from": "erw-yield-predict", "to": "erw-7",             "passes": "erw_yield_uplift_{crop}.tif (when present)",                                      "note": "erw-7 uses these in place of EcoCrop response when the rasters are detected."}
+      ]
+    }
+  ]
+}

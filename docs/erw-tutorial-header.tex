@@ -1,0 +1,13 @@
+% Header includes for docs/erw-tutorial.tex (injected by build-erw-tutorial.sh).
+% Tutorial-style: a bit more breathing room than the working paper,
+% short measure for easier reading.
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\footnotesize}
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.08}
+\usepackage[font=footnotesize,labelfont=bf,format=plain]{caption}
+\usepackage{setspace}
+\setstretch{1.15}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{16pt plus 4pt minus 2pt}{8pt plus 2pt minus 2pt}
+\titlespacing*{\subsection}{0pt}{12pt plus 3pt minus 2pt}{6pt plus 1pt minus 1pt}

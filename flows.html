@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ex-Ante ERW Pipeline — Flow Documentation</title>
+  <style>
+    :root {
+      --bg: #fafaf7;
+      --fg: #1a1a1a;
+      --muted: #6a6a6a;
+      --border: #e5e3dc;
+      --card: #ffffff;
+      --shadow: 0 1px 2px rgba(0, 0, 0, .04), 0 4px 12px rgba(0, 0, 0, .04);
+      --lime-fg: #234d20;
+      --lime-bg: #eaf3e7;
+      --lime-border: #b7d3ad;
+      --erw-fg: #b86609;
+      --erw-bg: #fbf0dc;
+      --erw-border: #e7c98a;
+      --io-bg: #f4f3ee;
+      --link: #1c4d8a;
+      --chip-bg: #efece4;
+      --chip-fg: #3a3a3a;
+      --const-bg: #f7f5ed;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 80px;
+    }
+
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 20px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+      max-width: 800px;
+    }
+
+    .meta {
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    .meta b {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    nav.tabs {
+      display: flex;
+      gap: 4px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow-x: auto;
+    }
+
+    .tab {
+      padding: 8px 14px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      border-radius: 6px 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+      background: transparent;
+      margin-bottom: -1px;
+    }
+
+    .tab.active {
+      background: var(--card);
+      border-color: var(--border);
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    .pipeline-summary {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .pipeline-summary h2 {
+      font-size: 16px;
+      margin: 0 0 8px;
+    }
+
+    .pipeline-summary p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .stage {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .stage-head {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .badge {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .badge.lime {
+      background: var(--lime-bg);
+      color: var(--lime-fg);
+      border: 1px solid var(--lime-border);
+    }
+
+    .badge.amber {
+      background: var(--erw-bg);
+      color: var(--erw-fg);
+      border: 1px solid var(--erw-border);
+    }
+
+    .stage-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .stage-file {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .stage-purpose {
+      margin: 0 0 14px;
+      color: #2a2a2a;
+    }
+
+    .io-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 12px;
+    }
+
+    .io-block {
+      background: var(--io-bg);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .io-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .io-block ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .io-block li {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+      padding: 2px 0;
+      color: #2a2a2a;
+      word-break: break-word;
+    }
+
+    .io-block li.empty {
+      color: var(--muted);
+      font-style: italic;
+      font-family: inherit;
+    }
+
+    .deps {
+      margin-top: 12px;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .deps-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .chip {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--chip-bg);
+      color: var(--chip-fg);
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+    }
+
+    .chip:hover {
+      border-color: var(--border);
+      background: #e7e3d6;
+    }
+
+    .chip.optional {
+      background: transparent;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+    }
+
+    .chip.optional::before {
+      content: "optional: ";
+      font-size: 10px;
+      opacity: .8;
+    }
+
+    .constants {
+      margin-top: 14px;
+      background: var(--const-bg);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+
+    .constants-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .constants table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 12px;
+    }
+
+    .constants td {
+      padding: 3px 8px 3px 0;
+      vertical-align: top;
+    }
+
+    .constants td:first-child {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      color: var(--lime-fg);
+      white-space: nowrap;
+    }
+
+    .constants td:nth-child(2) {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      white-space: nowrap;
+    }
+
+    .constants td:nth-child(3) {
+      color: var(--muted);
+    }
+
+    .section-divider {
+      margin: 36px 0 16px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .doc-list,
+    .dataset-list,
+    .output-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .doc-list li,
+    .dataset-list li,
+    .output-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .doc-list li:last-child,
+    .dataset-list li:last-child,
+    .output-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .mono {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .target {
+      animation: flash 1.6s ease-out;
+    }
+
+    @keyframes flash {
+      0% {
+        background: #fff4c2;
+      }
+
+      100% {
+        background: var(--card);
+      }
+    }
+
+    .err {
+      border: 1px solid #d99;
+      background: #fff5f5;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 12px;
+      color: #722;
+    }
+
+    .err code {
+      background: rgba(0, 0, 0, .05);
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    footer {
+      margin-top: 48px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* --- Modelling-approach section --- */
+    .modelling-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 24px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+    }
+
+    .modelling-section h2 {
+      font-size: 16px;
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .modelling-section>p.lede {
+      margin: 0 0 16px;
+      color: #2a2a2a;
+      max-width: 980px;
+    }
+
+    .approach-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .approach-block {
+      background: var(--io-bg);
+      border-radius: 6px;
+      padding: 12px 14px;
+      border-left: 3px solid var(--erw-border);
+    }
+
+    .approach-block .block-id {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 11px;
+      color: var(--erw-fg);
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .approach-block .block-title {
+      font-weight: 600;
+      font-size: 13px;
+      margin: 2px 0 6px;
+    }
+
+    .approach-block p {
+      margin: 0;
+      font-size: 12.5px;
+      color: #2a2a2a;
+      line-height: 1.5;
+    }
+
+    .approach-block .block-stages {
+      margin-top: 6px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      color: var(--muted);
+    }
+
+    .dvars {
+      margin-top: 16px;
+      padding: 12px 14px;
+      background: var(--const-bg);
+      border-radius: 6px;
+    }
+
+    .dvars-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .dvars ul {
+      margin: 0;
+      padding-left: 20px;
+      columns: 2;
+      column-gap: 28px;
+    }
+
+    .dvars li {
+      font-size: 12px;
+      padding: 3px 0;
+      color: #2a2a2a;
+      break-inside: avoid;
+    }
+
+    .dvars li code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 11px;
+      background: #efece4;
+      padding: 1px 5px;
+      border-radius: 3px;
+    }
+
+    /* --- TikZ flowchart --- */
+    .flowchart-wrap {
+      margin-top: 22px;
+    }
+
+    .flowchart-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin: 0 0 8px;
+      color: #2a2a2a;
+    }
+
+    .flowchart {
+      padding: 18px 14px;
+      background: #fbfaf6;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow-x: auto;
+      text-align: center;
+      min-height: 220px;
+      position: relative;
+    }
+
+    .flowchart img,
+    .flowchart svg {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .flowchart-caption {
+      font-size: 11.5px;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.6;
+      max-width: 960px;
+    }
+
+    .legend-swatches {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .legend-swatches span {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #3a3a3a;
+    }
+
+    .legend-swatches i {
+      display: inline-block;
+      width: 11px;
+      height: 11px;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, .18);
+    }
+
+    /* --- Indicator-maps gallery --- */
+    .maps-section {
+      margin-top: 22px;
+    }
+
+    .maps-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0 0 4px;
+      color: #2a2a2a;
+    }
+
+    .maps-section .maps-lede {
+      font-size: 12.5px;
+      color: var(--muted);
+      margin: 0 0 14px;
+      max-width: 980px;
+      line-height: 1.55;
+    }
+
+    .maps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+
+    .map-card {
+      background: #fbfaf6;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 10px 12px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .map-card img {
+      width: 100%;
+      height: auto;
+      border-radius: 4px;
+      background: #fff;
+      display: block;
+    }
+
+    .map-card .map-cap {
+      font-size: 11.5px;
+      color: #2a2a2a;
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+
+    .map-card .map-cap b {
+      color: #1a1a1a;
+      display: block;
+      margin-bottom: 2px;
+      font-weight: 600;
+    }
+
+    .map-card .map-meta {
+      margin-top: 4px;
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 10.5px;
+      color: var(--muted);
+    }
+
+    .tikz-links {
+      margin-top: 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .tikz-links a {
+      color: var(--link);
+      text-decoration: none;
+    }
+
+    .tikz-links a:hover {
+      text-decoration: underline;
+    }
+
+    .tikz-links code {
+      font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+      font-size: 11px;
+      background: #efece4;
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: #3a3a3a;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header>
+      <h1 id="doc-title">Ex-Ante ERW Pipeline</h1>
+      <div class="sub" id="doc-sub"></div>
+      <div class="meta" id="doc-meta"></div>
+    </header>
+
+    <nav class="tabs" id="tabs"></nav>
+
+    <section class="modelling-section" id="modelling-section">
+      <h2><span class="badge amber">erw-</span> Modelling approach</h2>
+      <p class="lede">Per-pixel geospatial profitability of basalt enhanced rock weathering at ~1 km² across 47
+        Sub-Saharan African countries and 23 SPAM crops. Nine methodological blocks compose into a single
+        decomposed-cost accounting (erw-7), with supply-constrained deployment ranking and five sensitivity sweeps on
+        top. Feedstock chemistry, grain size, and allocation rule are exposed as decision variables; three temporal
+        regimes — year-1, NPV @ 10%, and equilibrium — run in parallel.</p>
+
+      <div class="approach-grid">
+        <div class="approach-block">
+          <div class="block-id">B1 · WORKING GRID</div>
+          <div class="block-title">SoilGrids + SPAM harmonisation</div>
+          <p>SSA mask from GADM v4; depth-weighted SoilGrids properties (pH, bulk density, exchangeable acidity,
+            K/Ca/Mg/Na bases) co-registered with SPAM v2 harvested area, production, and yield for 23 crops at a common
+            10&times;-resampled grid. ECEC and acidity-saturation surfaces are derived inline.</p>
+          <div class="block-stages">erw-1 · erw-2</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B2 · BASALT RATE</div>
+          <div class="block-title">Lime demand &times; feedstock chemistry</div>
+          <p>Four lime-equivalent CaCO&#8323; rates (Kamprath, Cochrane, Aramburu-Merlos LiTAS year-1, maintenance) via
+            <code>limer::limeRate</code>, converted to t basalt ha&#8315;¹ using user-set CaO/MgO mass fractions
+            (default 10% / 7%), a Lewis-2021-calibrated reactive fraction, and a Strefler-2018 grain-size lever (10–500
+            µm). Uniform 10 / 20 / 50 t ha&#8315;¹ counterfactuals run in parallel.
+          </p>
+          <div class="block-stages">erw-3</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B3 · CDR SURFACE</div>
+          <div class="block-title">Climate &times; pH &times; pedogenic-C deduction</div>
+          <p>Per-tonne CDR potential from CaO/MgO stoichiometry, scaled by a temperature&times;moisture climate factor
+            (anchored to T<sub>ref</sub>=11 °C, P<sub>ref</sub>=1000 mm) and a triangular pH term peaked near pH 5. An
+            aridity-binned pedogenic-carbonate fraction (UNEP 1992 bands on MAP) removes alkalinity that precipitates
+            locally rather than exporting to the ocean.</p>
+          <div class="block-stages">erw-9</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B4 · LOGISTICS</div>
+          <div class="block-title">Delivered basalt-price surface</div>
+          <p>Basalt sources from GLiM v1.0 (basic-volcanic lithology). Cost-distance over the Malaria Atlas Project 2019
+            friction surface, monetised at $0.04 min&#8315;¹ t&#8315;¹ (30-t truck @ $80/h). Quarry-gate fines at $10/t;
+            haul capped at 1000 km beyond which truck-diesel LCA would erase the credit.</p>
+          <div class="block-stages">erw-basalt-access</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B5 · ENERGY</div>
+          <div class="block-title">Country-resolved electricity</div>
+          <p>Per-country industrial electricity price ($/kWh) and grid carbon intensity (kg CO&#8322;/kWh) rasterised
+            onto the working grid. Drives both the grinding-cost term and the grinding-LCA term inside erw-7. Falls back
+            to flat $0.10/kWh + 0.60 kg/kWh when missing.</p>
+          <div class="block-stages">erw-energy-country</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B6 · AGRONOMIC RESPONSE</div>
+          <div class="block-title">EcoCrop curves + Bayesian uplift</div>
+          <p>Per-crop EcoCrop pH and acidity-saturation tolerance tables (23 crops × 2 responses) feed a Recocrop
+            relative-yield surface clamped to [0.2, 1]. In parallel, a Bayesian hierarchical brms regression on the
+            curated ERW-trial dataset yields posterior uplift surfaces in pH, MAT, MAP, grain size, and crop type. erw-7
+            prefers the Bayesian uplift when present; otherwise falls back to EcoCrop.</p>
+          <div class="block-stages">erw-4 · erw-5 · erw-yield-fit · erw-yield-predict</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B7 · PROFITABILITY</div>
+          <div class="block-title">Decomposed cost + derived LCA</div>
+          <p>Cost side: quarry + grinding + transport + spreading. Credit side: CDR &times; $150/tCO&#8322; &minus;
+            $30/tCO&#8322; MRV. Yield side: agronomic uplift &times; FAOSTAT 2016–20 producer prices. Three regimes
+            (year-1, NPV @ 10%, equilibrium) with a 30 / 25 / 20 / 15 / 10 % CDR phasing over five years.</p>
+          <div class="block-stages">erw-7</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B8 · DEPLOYMENT FRONTIER</div>
+          <div class="block-title">Supply-constrained ranking</div>
+          <p>Pixels ranked descending by gross margin per tonne basalt — the LP dual on the basalt-supply constraint.
+            Produces supply curves and deployment masks at 1 / 5 / 10 / 25 / 50 / 100 / 250 / 500 Mt yr&#8315;¹ caps,
+            plus an unconstrained reference.</p>
+          <div class="block-stages">erw-supply</div>
+        </div>
+
+        <div class="approach-block">
+          <div class="block-id">B9 · SENSITIVITY</div>
+          <div class="block-title">Five-axis robustness scan</div>
+          <p>(i) crop &times; basalt &times; carbon-price grid; (ii) yield uplift 1.0–2.5&times;; (iii) MRV 0–80
+            $/tCO&#8322;; (iv) grain size 10 / 30 / 50 / 100 / 200 / 500 µm; (v) allocation rule (targeted + uniform 10
+            / 20 / 50). All sweeps run across the three regimes and 23 crops.</p>
+          <div class="block-stages">erw-8</div>
+        </div>
+      </div>
+
+      <div class="dvars">
+        <div class="dvars-label">Decision variables (and where they enter)</div>
+        <ul>
+          <li><code>CaO_frac</code>, <code>MgO_frac</code> — feedstock chemistry, B2 + B3</li>
+          <li><code>grain_size_um</code> — 10–500 µm, B2 + B9</li>
+          <li><code>allocation</code> — LiTAS-targeted vs uniform 10 / 20 / 50, B7 + B9</li>
+          <li><code>CARBON_PRICE_USD_T</code> — default $150/tCO&#8322;, B7 + B9</li>
+          <li><code>DISCOUNT_RATE_PCT</code> — default 10 %, NPV regime in B7</li>
+          <li><code>MRV_COST_USD_T_CO2</code> — default $30/tCO&#8322;, B7 + B9</li>
+        </ul>
+      </div>
+
+      <div class="flowchart-wrap">
+        <div class="flowchart-title">1. Conceptual framework — the scientific argument</div>
+        <div class="flowchart" id="framework-fig">
+          <img src="docs/erw-conceptual-framework.svg"
+            alt="ERW conceptual framework: three causal streams (biogeochemistry / agronomy / economic geography) converging on a per-pixel gross-margin equation, modulated by decision variables and producing three downstream uses">
+        </div>
+        <div class="flowchart-caption">
+          Three causal streams converge on a per-pixel gross margin
+          <span class="mono">&pi;(x,y) = R<sub>CDR</sub> + R<sub>agro</sub> &minus; C</span>:
+          a <span style="color:#234d70">biogeochemical</span> chain from feedstock chemistry and grain size through
+          climate-and-pH dissolution kinetics to net alkalinity export;
+          an <span style="color:#5a3f8c">agronomic</span> chain from soil acidity through lime-equivalent demand and
+          crop response to a yield-revenue term;
+          and an <span style="color:#a35a0a">economic-geography</span> chain from feedstock supply through logistics,
+          grinding, and operations to a total cost.
+          The dashed cross-link captures the structural insight that agronomic lime demand <em>sets the basalt
+            application rate</em> that the biogeochemistry stream then dissolves.
+          Decision variables (top, dashed) modulate the whole framework; outputs (bottom) are the three deliverables.
+          <div class="legend-swatches">
+            <span><i style="background:#cee1f4;border-color:#3a6fa7"></i> biogeochemistry / CDR</span>
+            <span><i style="background:#e3d6ee;border-color:#6e4ba0"></i> agronomy / yield uplift</span>
+            <span><i style="background:#fbdfb8;border-color:#cc7a14"></i> economic geography / cost</span>
+            <span><i style="background:#d6ecd0;border-color:#3a8c3a"></i> gross-margin equation</span>
+            <span><i style="background:#fcdcd2;border-color:#b14a3a"></i> output</span>
+          </div>
+        </div>
+        <div class="tikz-links">
+          Source: <a href="docs/erw-conceptual-framework.tex"><code>docs/erw-conceptual-framework.tex</code></a>
+          &nbsp;·&nbsp;
+          <a href="docs/erw-conceptual-framework.pdf">PDF</a> &nbsp;·&nbsp;
+          <a href="docs/erw-conceptual-framework.png">PNG (220 dpi)</a> &nbsp;·&nbsp;
+          <a href="docs/erw-conceptual-framework.svg">SVG</a>
+        </div>
+      </div>
+
+      <div class="flowchart-wrap">
+        <div class="flowchart-title">2. Pipeline architecture — how the code implements it</div>
+        <div class="flowchart" id="flowchart">
+          <img src="docs/erw-pipeline-flow.svg"
+            alt="ERW pipeline TikZ flowchart: data → working grid → geospatial surfaces → erw-7 profitability → ranking and sensitivity">
+        </div>
+        <div class="flowchart-caption">
+          Data &rarr; working grid &rarr; six geospatial surfaces &rarr; erw-7 profitability convergence &rarr; ranking
+          and sensitivity. Optional arms (<span class="mono">erw-basalt-access</span>, <span
+            class="mono">erw-energy-country</span>, <span class="mono">erw-yield-predict</span>) feed erw-7 when
+          present; otherwise the pipeline falls back to flat constants and EcoCrop curves.
+          <div class="legend-swatches">
+            <span><i style="background:#dde9f5;border-color:#3a6fa7"></i> raw data</span>
+            <span><i style="background:#e6e6e6;border-color:#999"></i> working grid</span>
+            <span><i style="background:#fde2c5;border-color:#cc7a14"></i> geospatial process</span>
+            <span><i style="background:#e8def0;border-color:#7a4ea6"></i> Bayesian uplift</span>
+            <span><i style="background:#d8ecd2;border-color:#3a8c3a"></i> economic</span>
+            <span><i style="background:#fcdcd2;border-color:#b14a3a"></i> output</span>
+          </div>
+        </div>
+        <div class="tikz-links">
+          Source: <a href="docs/erw-pipeline-flow.tex"><code>docs/erw-pipeline-flow.tex</code></a> &nbsp;·&nbsp;
+          <a href="docs/erw-pipeline-flow.pdf">PDF</a> &nbsp;·&nbsp;
+          <a href="docs/erw-pipeline-flow.png">PNG (220 dpi)</a> &nbsp;·&nbsp;
+          <a href="docs/erw-pipeline-flow.svg">SVG</a>
+          &nbsp;— rebuild with
+          <code>pdflatex docs/erw-pipeline-flow.tex &amp;&amp; pdftocairo -svg docs/erw-pipeline-flow.pdf docs/erw-pipeline-flow.svg</code>
+        </div>
+      </div>
+
+      <div class="maps-section">
+        <h3>3. Indicator &amp; outcome maps — actual model surfaces</h3>
+        <p class="maps-lede">
+          Rendered with <code class="mono">terra</code> from <code class="mono">erw/erw-plot-maps.R</code>. SSA-wide
+          rasters at the SoilGrids&times;10 working grid (~1&nbsp;km²), masked to cropland and overlaid with GADM v4
+          country borders. Together these surfaces are the inputs and intermediates that <code class="mono">erw-7</code>
+          composes into the per-pixel gross margin.
+        </p>
+        <div class="maps-grid">
+          <div class="map-card">
+            <img src="docs/maps/01-soil-ph.png" alt="Soil pH map">
+            <div class="map-cap">
+              <b>Soil pH (topsoil)</b>
+              Drives B1/B2: lower pH means higher lime-equivalent demand and a wider acid-catalysed dissolution window
+              in B3.
+              <div class="map-meta">soilgrids_properties_cropland.tif &middot; band <code>ph</code></div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/02-basalt-rate-merlos.png" alt="Basalt application rate (LiTAS year-1)">
+            <div class="map-cap">
+              <b>Basalt application rate</b>
+              B2 output (LiTAS year-1, t/ha). Highest in humid acid-soil belts (Guinea/Congo) where lime demand peaks.
+              <div class="map-meta">basalt_merlos.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/03-cdr-per-t-basalt.png" alt="CDR per tonne basalt">
+            <div class="map-cap">
+              <b>CDR efficiency</b>
+              B3 per-tonne CDR potential after climate &times; pH scaling and pedogenic-C deduction (t&nbsp;CO₂ per t
+              basalt).
+              <div class="map-meta">cdr_per_t_basalt.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/04-cdr-yield-merlos.png" alt="Cumulative CDR yield (LiTAS year-1)">
+            <div class="map-cap">
+              <b>CDR yield (cumulative)</b>
+              B3 final yield = rate &times; efficiency (t&nbsp;CO₂/ha). Strongest in humid tropics, suppressed under
+              aridity.
+              <div class="map-meta">cdr_yield_merlos.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/05-cdr-climate-factor.png" alt="CDR climate scaling factor">
+            <div class="map-cap">
+              <b>Climate scaling factor</b>
+              f(MAT, MAP) component of B3 - Arrhenius temperature term &times; moisture term, anchored at
+              T<sub>ref</sub>=11&nbsp;°C, P<sub>ref</sub>=1000&nbsp;mm.
+              <div class="map-meta">cdr_climate_factor.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/06-pedogenic-fraction.png" alt="Pedogenic-C fraction lost">
+            <div class="map-cap">
+              <b>Pedogenic-C deduction</b>
+              Fraction of alkalinity precipitating locally (UNEP 1992 aridity bands on MAP). High in Sahel/Horn — these
+              regions are penalised before counting CDR.
+              <div class="map-meta">cdr_pedogenic_fraction.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/07-electricity-price.png" alt="Industrial electricity price">
+            <div class="map-cap">
+              <b>Industrial electricity price</b>
+              B5 country tariff surface ($/kWh) — drives grinding-cost economics in <code>erw-7</code>.
+              <div class="map-meta">electricity_usd_kWh.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/08-grid-CI.png" alt="Grid carbon intensity">
+            <div class="map-cap">
+              <b>Grid carbon intensity</b>
+              B5 grid CI (kg&nbsp;CO₂/kWh) — drives the grinding-LCA deduction from gross CDR.
+              <div class="map-meta">grid_CI_kg_per_kWh.tif</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/09-basalt-sources.png" alt="Mafic feedstock sources">
+            <div class="map-cap">
+              <b>Mafic feedstock sources</b>
+              B4 source mask: GLiM v1 basic volcanics (basalt s.s., 5,266 SSA polygons) <em>plus</em> basic plutonics (gabbro, 1,189 polygons) — 6,455 polygons total, 1.40 M cells. Concentrated in the Ethiopian highlands, East African Rift, the Cameroon volcanic line, Madagascar, and southern Africa. Ultramafics (olivine, serpentinite) intentionally excluded for cropland use — see <a href="docs/erw-review.md">erw-review.md</a> §3 on Ni/Cr leaching.
+              <div class="map-meta">basalt_source_mask.tif (built by <a href="erw/erw-build-basalt-mask.R">erw-build-basalt-mask.R</a>, classes <code>vb</code>+<code>py</code>+<code>pb</code>)</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/12-feedstock-class.png" alt="Feedstock by GLiM class">
+            <div class="map-cap">
+              <b>Feedstock by GLiM class</b>
+              The same source mask split by lithology: basalt (1.32 M pixels) dominates the volcanic provinces; gabbro (78 k pixels) appears as cratonic intrusions in southern and West Africa. No pyroclastic (<code>py</code>) polygons mapped in SSA at GLiM v1 resolution. Industrial by-products (steel slag, cement-kiln dust, mine tailings) are <em>not</em> represented and would shift the supply geography materially.
+              <div class="map-meta">basalt_source_class.tif &middot; 1 = basalt, 3 = gabbro</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/10-basalt-traveltime.png" alt="Travel time to nearest mafic source">
+            <div class="map-cap">
+              <b>Travel time to nearest mafic source</b>
+              B4 cost-distance over the MAP friction surface (2019, motorised). Mean 815&nbsp;min, capped at 1000&nbsp;min (~1000&nbsp;km @ 60&nbsp;km/h) — the cap binds across much of West Africa and the Sahel.
+              <div class="map-meta">basalt_traveltime_min.tif &middot; requires <a href="erw/erw-fetch-friction-surface.R">erw-fetch-friction-surface.R</a></div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/11-basalt-delivered-price.png" alt="Delivered mafic feedstock price ($/t)">
+            <div class="map-cap">
+              <b>Delivered mafic-feedstock price</b>
+              B4 final cost surface: $10/t quarry gate + $0.04/min/t haulage. Range $10–$50/t (mean $40.8) — pixels near the Ethiopian/Kenyan rift, southern-African gabbros, and the Cameroon line get cheap feedstock; West Africa pays the cap.
+              <div class="map-meta">basalt_delivered_price_usd_t.tif</div>
+            </div>
+          </div>
+        </div>
+        <div class="tikz-links">
+          Render script: <a href="erw/erw-plot-maps.R"><code>erw/erw-plot-maps.R</code></a>
+          &nbsp;— rebuild with <code>Rscript erw/erw-plot-maps.R</code>
+        </div>
+      </div>
+    </section>
+
+    <main id="content"></main>
+
+    <div id="shared"></div>
+
+    <footer id="footer"></footer>
+  </div>
+
+  <script type="application/json" id="embedded-flows">
+{
+  "title": "Ex-Ante ERW Pipeline",
+  "subtitle": "Geospatial profitability model for Enhanced Rock Weathering with basalt in Sub-Saharan Africa (erw/erw-*)",
+  "scope": "Sub-Saharan Africa, 23 SPAM crops, SoilGrids soil properties, EcoCrop response curves, FAOSTAT 2016-2020 prices, basalt feedstock chemistry with grain-size lever",
+  "layout": {"erw_dir":"erw/","docs_dir":"docs/"},
+  "pipelines": [
+    {
+      "id": "erw", "name": "ERW Ex-Ante", "prefix": "erw-", "color": "amber",
+      "summary": "Geospatial profitability model for Enhanced Rock Weathering with basalt. Builds the SSA soil + SPAM working grid, computes lime-equivalent and basalt application rates with feedstock chemistry as a decision variable, climate-and-pH-scaled CDR yield with an aridity-driven pedogenic-carbonate deduction, spatial delivered-basalt-price and country-energy surfaces, decomposed-cost profitability with derived LCA, a Bayesian agronomic-uplift module, supply-constrained deployment ranking, and five sensitivity sweeps.",
+      "stages": [
+        {"id":"erw-0","file":"erw/erw-0-install-packages.R","name":"Install packages","purpose":"Bootstrap R dependencies for the pipeline.","inputs":["CRAN","github:gaiafrica/limer"],"outputs":["installed: terra, geodata, limer, Recocrop, brms, malariaAtlas, readxl, reshape2, viridis"],"depends_on":[]},
+        {"id":"erw-1","file":"erw/erw-1-layers-soilgrids.R","name":"SoilGrids layers","purpose":"Build SSA mask, pull SoilGrids depth-weighted soil properties (pH, bulk density, exchangeable acidity, K/Ca/Mg/Na bases) and a QED cropland mask, derive ECEC and acidity saturation.","inputs":["GADM world","geodata::country_codes","geodata::cropland (QED)","geodata::soil_af BLKD/pH/acid-exch at 5,15,30 cm","geodata::soil_af K/Ca/Mg/Na-exch at 20 cm"],"outputs":["gadm_ssa.gpkg","geosurvey_processed.tif","soilgrids_properties_all.tif","soilgrids_properties_cropland.tif"],"depends_on":["erw-0"]},
+        {"id":"erw-2","file":"erw/erw-2-layers-spam.R","name":"SPAM crop layers","purpose":"Pull SPAM harvested area, production, and yield for 23 crops, crop to SSA, resample to the SoilGrids grid aggregated 10x.","inputs":["gadm_ssa.gpkg","soilgrids_properties_all.tif (reference)","geodata::crop_spam x 23 crops x 3 variables"],"outputs":["spam_harv_area_processed.tif","spam_prod_processed.tif","spam_yield_processed.tif"],"depends_on":["erw-1"]},
+        {"id":"erw-3","file":"erw/erw-3-basalt-requirements.R","name":"Basalt requirements","purpose":"Compute lime-equivalent CaCO3 rates (Kamprath, Cochrane, Aramburu-Merlos LiTAS year-1 and maintenance) via limer::limeRate, then convert to t basalt/ha using user-set feedstock chemistry (10% CaO + 7% MgO by default), Lewis-2021-calibrated reactive fraction, and a grain-size lever. Produces both LiTAS-targeted rates and uniform-rate (10/20/50 t/ha) rasters.","inputs":["soilgrids_properties_cropland.tif","spam_harv_area_processed.tif"],"outputs":["caco3_kamprath.tif","caco3_cochrane.tif","caco3_merlos.tif","caco3_merlos_maintenance.tif","basalt_kamprath.tif","basalt_cochrane.tif","basalt_merlos.tif","basalt_merlos_maintenance.tif","basalt_uniform_{10,20,50}.tif","basalt_feedstock_chemistry.csv","cdr_const_targeted.tif","cdr_const_targeted_maintenance.tif","cdr_const_uniform_{10,20,50}.tif"],"depends_on":["erw-1","erw-2"],
+         "key_constants":[
+           {"name":"CaO_frac","value":"0.10","notes":"Mass fraction of CaO in basalt feedstock."},
+           {"name":"MgO_frac","value":"0.07","notes":"Mass fraction of MgO in basalt feedstock."},
+           {"name":"grain_size_um","value":"100 um","notes":"Decision variable. Sweeps 10-500 um in erw-8."},
+           {"name":"reactive_fraction_ref","value":"0.20","notes":"Lewis 2021 calibration at reference grain x climate."},
+           {"name":"GRAIN_BETA","value":"0.5","notes":"Surface-area exponent for grain-size factor."},
+           {"name":"GRIND_ALPHA","value":"1.2","notes":"Strefler 2018 grinding-energy exponent."}
+         ]},
+        {"id":"erw-4","file":"erw/erw-4-crop-parameters.R","name":"Crop parameters","purpose":"Build per-crop EcoCrop pH and acidity-saturation tolerance tables for the 23 SPAM crops. Produces a crop-type lookup (cereal / legume / RTB / commodity) and response-curve figures.","inputs":["ecocrop_parameters_hp_final.xlsx (external)"],"outputs":["crop_types.csv","ecocrop_parameters_ph.csv","ecocrop_parameters_hp.csv","crop-parameters-1.png"],"depends_on":[]},
+        {"id":"erw-5","file":"erw/erw-5-crop-yield-loss-function.R","name":"Yield-loss function","purpose":"Run Recocrop::ecocrop per crop x response (pH and acidity saturation) on the cropland-masked soil stack to produce relative-yield rasters, clamped to [0.2, 1]. erw-7 falls back to these when erw-yield-predict outputs are absent.","inputs":["soilgrids_properties_cropland.tif","ecocrop_parameters_hp.csv","ecocrop_parameters_ph.csv"],"outputs":["ecocrop_f/{hp,ph}_crop_suitability_{crop}_0.tif (23 x 2)"],"depends_on":["erw-1","erw-4"]},
+        {"id":"erw-9","file":"erw/erw-9-cdr-yield.R","name":"CDR yield","purpose":"Per-pixel CDR (t CO2/ha cumulative): climate-and-pH scaling on the per-tonne CDR potential, with an aridity-driven pedogenic-carbonate deduction that removes alkalinity precipitating locally rather than exporting to the ocean.","inputs":["basalt_merlos.tif","basalt_merlos_maintenance.tif","basalt_uniform_{10,20,50}.tif","basalt_feedstock_chemistry.csv","soilgrids_properties_cropland.tif (pH layer)","WorldClim MAT (geodata::worldclim_global tavg)","WorldClim MAP (geodata::worldclim_global prec)"],"outputs":["cdr_climate_factor.tif","cdr_pedogenic_fraction.tif","cdr_per_t_basalt.tif","cdr_yield_merlos.tif","cdr_yield_merlos_maintenance.tif","cdr_yield_uniform_{10,20,50}.tif"],"depends_on":["erw-3","erw-1"],
+         "key_constants":[
+           {"name":"T_ref","value":"11 C","notes":"Reference MAT anchor (US Corn Belt)."},
+           {"name":"P_ref","value":"1000 mm","notes":"Reference MAP anchor."},
+           {"name":"f_pH","value":"triangular peak ~ pH 5.0","notes":"Acid-catalysed dissolution scaling."},
+           {"name":"pedogenic_frac","value":"MAP-binned 0-90%","notes":"UNEP 1992 aridity bands using MAP as v1 proxy for AI=P/PET."}
+         ]},
+        {"id":"erw-basalt-access","file":"erw/erw-basalt-access.R","name":"Basalt access","purpose":"Per-pixel delivered basalt price ($/t) = quarry-gate price + cost-distance from basalt sources x $/min/t. Uses GLiM lithology (basic volcanic) and the Malaria Atlas Project friction surface.","inputs":["gadm_ssa.gpkg","soilgrids_properties_all.tif (reference grid)","spam_harv_area_processed.tif (cropland mask)","GLiM v1.0 lithology shapefile (external, PANGAEA)","MAP friction surface 2019 (external)"],"outputs":["basalt_source_mask.tif","basalt_traveltime_min.tif","basalt_transport_km.tif","basalt_transport_cost_usd_t.tif","basalt_delivered_price_usd_t.tif"],"depends_on":["erw-1","erw-2"],
+         "key_constants":[
+           {"name":"QUARRY_GATE_PRICE","value":"$10/t","notes":"Basalt fines as quarry by-product."},
+           {"name":"USD_PER_MIN_PER_T","value":"$0.04/min/t","notes":"30-t truck at $80/hr operating cost."},
+           {"name":"EFFECTIVE_KM_PER_MIN","value":"0.5 (~30 km/h)","notes":"Effective speed for distance approximation."},
+           {"name":"MAX_HAUL_KM","value":"1000 km","notes":"Beyond cap, lifecycle emissions likely erase the credit."}
+         ]},
+        {"id":"erw-energy-country","file":"erw/erw-energy-country.R","name":"Country energy","purpose":"Per-country electricity price ($/kWh, industrial tariff) and grid carbon intensity (kg CO2/kWh) rasters for SSA. Drives spatially-varying grinding economics and grinding LCA in erw-7.","inputs":["gadm_ssa.gpkg","soilgrids_properties_all.tif (reference grid)"],"outputs":["electricity_usd_kWh.tif","grid_CI_kg_per_kWh.tif","country_energy_table.csv"],"depends_on":["erw-1"]},
+        {"id":"erw-yield-fit","file":"erw/erw-yield-fit.R","name":"Yield fit (Bayesian)","purpose":"Bayesian hierarchical regression of log(yield_with_basalt / yield_control) on rate, baseline pH, climate, grain size, and crop type. Fitted on the manually-compiled trial dataset (~14 rows; prior-dominated framework that grows as new ERW field trials are appended).","inputs":["erw/erw-trial-data.csv"],"outputs":["erw_yield_fit.rds","erw_yield_fit_summary.txt","erw_yield_fit_posterior.csv"],"depends_on":[]},
+        {"id":"erw-yield-predict","file":"erw/erw-yield-predict.R","name":"Yield predict","purpose":"Apply the brmsfit posterior means to per-pixel covariates (pH, MAT, MAP, grain) and per-crop random intercepts to produce yield-uplift rasters. erw-7 consumes these in place of EcoCrop-derived response when present.","inputs":["erw_yield_fit.rds","soilgrids_properties_cropland.tif (pH)","WorldClim MAT, MAP","basalt_feedstock_chemistry.csv","basalt_merlos.tif"],"outputs":["erw_yield_uplift_{crop}_median.tif (23)"],"depends_on":["erw-yield-fit","erw-3","erw-1"]},
+        {"id":"erw-7","file":"erw/erw-7-profitability-function.R","name":"Profitability (ERW)","purpose":"Decomposed cost (quarry + grinding + transport + spreading), derived per-pixel LCA, MRV deduction, time-resolved CDR (NPV regime), and four allocation rules (LiTAS-targeted + uniform 10/20/50 t/ha). Auto-detects basalt-access and country-energy rasters; falls back to flat constants when absent.","inputs":["spam_yield_processed.tif","spam_harv_area_processed.tif","ecocrop_parameters_hp.csv","crop_types.csv","FAOSTAT_data_en_4-24-2023.csv","basalt_merlos.tif","basalt_merlos_maintenance.tif","basalt_uniform_{10,20,50}.tif","cdr_yield_merlos.tif","cdr_yield_merlos_maintenance.tif","cdr_yield_uniform_{10,20,50}.tif","basalt_feedstock_chemistry.csv","soilgrids_properties_all.tif","ecocrop_f/hp_crop_suitability_*_0.tif","basalt_transport_cost_usd_t.tif (optional)","basalt_transport_km.tif (optional)","electricity_usd_kWh.tif (optional)","grid_CI_kg_per_kWh.tif (optional)","erw_yield_uplift_{crop}_median.tif (optional)"],"outputs":["economics_erw/{allocation}/{crop}_{regime}.tif (4 x 23 x 3 = 276)"],"depends_on":["erw-1","erw-2","erw-4","erw-5","erw-3","erw-9"],"optional_depends_on":["erw-basalt-access","erw-energy-country","erw-yield-predict"],
+         "key_constants":[
+           {"name":"QUARRY_GATE_USD_T","value":"$10/t","notes":"Ex-quarry feedstock price."},
+           {"name":"SPREADING_USD_T","value":"$8/t","notes":"On-farm spreading cost."},
+           {"name":"ELECTRICITY_USD_KWH_FB","value":"$0.10/kWh","notes":"Fallback when country raster missing."},
+           {"name":"GRID_CI_KG_PER_KWH_FB","value":"0.60 kg/kWh","notes":"Fallback when country raster missing."},
+           {"name":"TRUCK_KGCO2_PER_T_KM","value":"0.12","notes":"Diesel heavy truck."},
+           {"name":"CARBON_PRICE_USD_T","value":"$150/tCO2","notes":"Mid of 2024-25 ERW credit market."},
+           {"name":"MRV_COST_USD_T_CO2","value":"$30/tCO2","notes":"Sampling + lab + verification + registry."},
+           {"name":"DISCOUNT_RATE_PCT","value":"10%","notes":"For NPV regime."},
+           {"name":"CDR_PHASING","value":"30/25/20/15/10% over 5 yr","notes":"Time-resolved CDR realisation."}
+         ]},
+        {"id":"erw-8","file":"erw/erw-8-sensitivity-analysis.R","name":"Sensitivity (ERW)","purpose":"Five sweeps: (1) crop-price x basalt-price x carbon-price grid; (2) yield-factor 1.0-2.5; (3) MRV cost 0-80 $/tCO2; (4) grain size 10/30/50/100/200/500 um; (5) allocation rule (targeted + uniform_{10,20,50}). All sweeps run all three regimes (year1/npv/equilibrium) and 23 crops.","inputs":["sources erw-7 in full"],"outputs":["output-erw-sensitivity-prices.csv","output-erw-sensitivity-yields.csv","output-erw-sensitivity-mrv.csv","output-erw-sensitivity-grain.csv","output-erw-sensitivity-allocation.csv"],"depends_on":["erw-7"]},
+        {"id":"erw-supply","file":"erw/erw-supply.R","name":"Supply ranking","purpose":"Supply-constrained deployment frontier: ranks SSA cropland pixels descending by GM-per-tonne-basalt (the LP-dual on the basalt supply constraint). Outputs supply curves and deployment masks for selected caps.","inputs":["economics_erw/targeted/{crop}_{regime}.tif","cdr_per_t_basalt.tif"],"outputs":["gm_per_t_basalt_{regime}.tif","supply_curve_{regime}.csv","deployment_under_{10,50,250}_Mt_{regime}.tif"],"depends_on":["erw-7","erw-9"],
+         "key_constants":[
+           {"name":"SUPPLY_CAPS_MT","value":"1, 5, 10, 25, 50, 100, 250, 500, infty","notes":"Annual basalt-supply caps evaluated."}
+         ]}
+      ]
+    }
+  ],
+  "documents": [
+    {"file":"docs/erw-tutorial.pdf","purpose":"Layman tutorial (compiled PDF, 18 pages) — explains the project, the conceptual framework, the nine modelling blocks, and the headline maps in plain language. Every assumption is anchored to a numbered reference; the key-constants table in §7.1 and the Scope (§8) + Limitations (§9) sections lay out what the model does and does not currently do. Glossary at the back. Source: docs/erw-tutorial.md → tex → PDF via docs/build-erw-tutorial.sh."},
+    {"file":"docs/erw-working-paper.pdf","purpose":"Working paper (compiled PDF, 19 pages, 20 verified references) — academic-style write-up: abstract, introduction, conceptual framework, methods with numbered equations, illustrative outputs, limitations and roadmap, references. Source: docs/erw-working-paper.md → docs/erw-working-paper.tex → PDF via docs/build-erw-working-paper.sh."},
+    {"file":"docs/erw-model.pdf","purpose":"Living model documentation (compiled PDF, 15 pages) — single source of truth for current pipeline state, block-by-block status, headline numbers, decision variables, and a dated changelog. Source: docs/erw-model.md → docs/erw-model.tex → PDF via docs/build-erw-model.sh. Edit the .md and re-run the build script."},
+    {"file":"docs/erw-review.md","purpose":"Evidence review on ERW: chemistry, feedstocks, application practice, CDR potential, agronomic co-benefits, SSA case, risks, economics."},
+    {"file":"docs/erw-README.md","purpose":"Runbook: file inventory, run order, key constants, deferred work, output schema, and known portability issues."},
+    {"file":"docs/erw-parameters.md","purpose":"Catalogue of every constant and assumption used by erw-*.R scripts, with citations, source URLs/DOIs, and units."}
+  ],
+  "external_datasets": [
+    {"name":"GADM v4 world","via":"geodata::world","used_by":["erw-1"]},
+    {"name":"QED cropland mask","via":"geodata::cropland(source='QED')","used_by":["erw-1"]},
+    {"name":"SoilGrids Africa","via":"geodata::soil_af","used_by":["erw-1"]},
+    {"name":"SPAM v2 (Africa)","via":"geodata::crop_spam","used_by":["erw-2"]},
+    {"name":"EcoCrop parameter set","via":"Recocrop::ecocropPars","used_by":["erw-5"]},
+    {"name":"FAOSTAT producer prices 2016-2020","via":"csv (manual download)","used_by":["erw-7","erw-8"]},
+    {"name":"WorldClim v2 MAT, MAP","via":"geodata::worldclim_global","used_by":["erw-9","erw-yield-predict"]},
+    {"name":"GLiM v1.0 lithology (Hartmann & Moosdorf 2012)","via":"PANGAEA doi:10.1594/PANGAEA.788537 (manual download)","used_by":["erw-basalt-access"]},
+    {"name":"MAP friction surface 2019 (Weiss et al.)","via":"malariaAtlas R package (manual download)","used_by":["erw-basalt-access"]},
+    {"name":"IEA / Ember / GET.invest 2022-2024 country energy","via":"csv hard-coded in erw/erw-energy-country.R","used_by":["erw-energy-country"]}
+  ],
+  "headline_outputs": [
+    {"name":"ERW profitability map","file_pattern":"economics_erw/{allocation}/{crop}_{regime}.tif","stages":["erw-7"],"what":"Per-pixel agronomic-only, CDR-only, and combined gross margin for basalt-ERW deployment, four allocation rules x three regimes."},
+    {"name":"Delivered basalt price surface","file_pattern":"basalt_delivered_price_usd_t.tif","stages":["erw-basalt-access"],"what":"Spatial cost of basalt at farm gate ($/t)."},
+    {"name":"CDR yield surface","file_pattern":"cdr_yield_*.tif","stages":["erw-9"],"what":"Per-pixel cumulative CDR (t CO2/ha) net of pedogenic precipitation."},
+    {"name":"Supply curves","file_pattern":"supply_curve_{regime}.csv","stages":["erw-supply"],"what":"Marginal $/tCO2 and total CDR vs annual basalt supply cap (1-500 Mt/yr)."},
+    {"name":"Sensitivity tables","file_pattern":"output-erw-sensitivity-*.csv","stages":["erw-8"],"what":"Total profitable hectares and gross margin under price, yield, MRV, grain, and allocation scenarios."}
+  ]
+}
+</script>
+
+  <script>
+    (async function () {
+      // Load JSON: try external file first, fall back to embedded copy.
+      let data, source = "embedded";
+      try {
+        const r = await fetch("flows.json", { cache: "no-store" });
+        if (r.ok) { data = await r.json(); source = "flows.json"; }
+        else { throw new Error("status " + r.status); }
+      } catch (e) {
+        try {
+          data = JSON.parse(document.getElementById("embedded-flows").textContent);
+        } catch (ee) {
+          document.getElementById("content").innerHTML =
+            '<div class="err">Could not load <code>flows.json</code> or the embedded fallback. '
+            + 'Serve this directory over HTTP (<code>python3 -m http.server</code>) and reload.</div>';
+          return;
+        }
+      }
+
+      // ---------------- render ----------------
+      document.getElementById("doc-title").textContent = data.title;
+      document.getElementById("doc-sub").textContent = data.subtitle || "";
+      const totalStages = data.pipelines.reduce((n, p) => n + p.stages.length, 0);
+      document.getElementById("doc-meta").innerHTML =
+        "<span><b>Scope</b> " + (data.scope || "") + "</span>"
+        + "<span><b>Pipelines</b> " + data.pipelines.length + "</span>"
+        + "<span><b>Stages</b> " + totalStages + "</span>"
+        + "<span><b>Datasets</b> " + (data.external_datasets || []).length + "</span>"
+        + "<span style=\"opacity:.6\">data source: " + source + "</span>";
+
+      // tabs
+      const tabsEl = document.getElementById("tabs");
+      const tabsDef = [{ id: "all", label: "All" }].concat(
+        data.pipelines.map(p => ({ id: p.id, label: p.name }))
+      );
+      tabsDef.forEach((t, i) => {
+        const b = document.createElement("button");
+        b.className = "tab" + (i === 0 ? " active" : "");
+        b.textContent = t.label;
+        b.dataset.tab = t.id;
+        b.addEventListener("click", () => switchTab(t.id));
+        tabsEl.appendChild(b);
+      });
+
+      function switchTab(id) {
+        document.querySelectorAll(".tab").forEach(el => {
+          el.classList.toggle("active", el.dataset.tab === id);
+        });
+        renderContent(id);
+      }
+
+      // shape an id -> stage map for dep lookup
+      const stageIndex = {};
+      data.pipelines.forEach(p => p.stages.forEach(s => { stageIndex[s.id] = { stage: s, pipeline: p }; }));
+
+      function stageCard(stage, pipeline) {
+        const card = document.createElement("section");
+        card.className = "stage";
+        card.id = "stage-" + stage.id;
+
+        const head = document.createElement("div");
+        head.className = "stage-head";
+        head.innerHTML =
+          '<span class="badge ' + pipeline.color + '">' + stage.id + '</span>'
+          + '<h3 class="stage-name">' + stage.name + '</h3>'
+          + '<span class="stage-file">' + stage.file + '</span>';
+        card.appendChild(head);
+
+        const purpose = document.createElement("p");
+        purpose.className = "stage-purpose";
+        purpose.textContent = stage.purpose;
+        card.appendChild(purpose);
+
+        const io = document.createElement("div");
+        io.className = "io-grid";
+        io.appendChild(ioBlock("Inputs", stage.inputs));
+        io.appendChild(ioBlock("Outputs", stage.outputs));
+        card.appendChild(io);
+
+        if ((stage.depends_on && stage.depends_on.length) ||
+          (stage.optional_depends_on && stage.optional_depends_on.length)) {
+          const deps = document.createElement("div");
+          deps.className = "deps";
+          deps.innerHTML = '<span class="deps-label">Depends on</span>';
+          (stage.depends_on || []).forEach(d => deps.appendChild(depChip(d, false)));
+          (stage.optional_depends_on || []).forEach(d => deps.appendChild(depChip(d, true)));
+          card.appendChild(deps);
+        }
+
+        if (stage.key_constants && stage.key_constants.length) {
+          const c = document.createElement("div");
+          c.className = "constants";
+          const label = document.createElement("div");
+          label.className = "constants-label";
+          label.textContent = "Key constants";
+          c.appendChild(label);
+          const tbl = document.createElement("table");
+          stage.key_constants.forEach(k => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = '<td>' + k.name + '</td><td>' + k.value + '</td><td>' + (k.notes || "") + '</td>';
+            tbl.appendChild(tr);
+          });
+          c.appendChild(tbl);
+          card.appendChild(c);
+        }
+
+        return card;
+      }
+
+      function ioBlock(label, items) {
+        const w = document.createElement("div");
+        w.className = "io-block";
+        const lbl = document.createElement("div");
+        lbl.className = "io-label";
+        lbl.textContent = label;
+        w.appendChild(lbl);
+        const ul = document.createElement("ul");
+        if (!items || items.length === 0) {
+          const li = document.createElement("li");
+          li.className = "empty";
+          li.textContent = "—";
+          ul.appendChild(li);
+        } else {
+          items.forEach(it => {
+            const li = document.createElement("li");
+            li.textContent = it;
+            ul.appendChild(li);
+          });
+        }
+        w.appendChild(ul);
+        return w;
+      }
+
+      function depChip(id, isOptional) {
+        const a = document.createElement("a");
+        a.className = "chip" + (isOptional ? " optional" : "");
+        a.textContent = id;
+        a.href = "#stage-" + id;
+        a.addEventListener("click", ev => {
+          ev.preventDefault();
+          const el = document.getElementById("stage-" + id);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "start" });
+            el.classList.remove("target");
+            void el.offsetWidth;
+            el.classList.add("target");
+          }
+        });
+        return a;
+      }
+
+      function renderContent(tabId) {
+        const c = document.getElementById("content");
+        c.innerHTML = "";
+        data.pipelines
+          .filter(p => tabId === "all" || p.id === tabId)
+          .forEach(p => {
+            const sum = document.createElement("section");
+            sum.className = "pipeline-summary";
+            sum.innerHTML =
+              '<h2><span class="badge ' + p.color + '">' + p.prefix + '</span> ' + p.name + '</h2>'
+              + '<p>' + p.summary + '</p>';
+            c.appendChild(sum);
+            p.stages.forEach(s => c.appendChild(stageCard(s, p)));
+          });
+      }
+
+      // shared/footer sections (datasets, docs, headline outputs)
+      const sh = document.getElementById("shared");
+      if (data.external_datasets && data.external_datasets.length) {
+        const div = document.createElement("div");
+        div.innerHTML = '<div class="section-divider">External datasets</div>';
+        const ul = document.createElement("ul");
+        ul.className = "dataset-list";
+        data.external_datasets.forEach(d => {
+          const li = document.createElement("li");
+          li.innerHTML = '<b>' + d.name + '</b> — <span class="mono">' + d.via + '</span>'
+            + ' <span style="color:var(--muted)">used by: '
+            + d.used_by.map(u => '<span class="mono">' + u + '</span>').join(", ")
+            + '</span>';
+          ul.appendChild(li);
+        });
+        div.appendChild(ul);
+        sh.appendChild(div);
+      }
+      if (data.headline_outputs && data.headline_outputs.length) {
+        const div = document.createElement("div");
+        div.innerHTML = '<div class="section-divider">Headline outputs</div>';
+        const ul = document.createElement("ul");
+        ul.className = "output-list";
+        data.headline_outputs.forEach(o => {
+          const li = document.createElement("li");
+          li.innerHTML = '<b>' + o.name + '</b> — <span class="mono">' + o.file_pattern + '</span><br>'
+            + '<span style="color:var(--muted)">' + o.what + ' (from '
+            + o.stages.map(s => '<span class="mono">' + s + '</span>').join(", ") + ')</span>';
+          ul.appendChild(li);
+        });
+        div.appendChild(ul);
+        sh.appendChild(div);
+      }
+      if (data.documents && data.documents.length) {
+        const div = document.createElement("div");
+        div.innerHTML = '<div class="section-divider">Companion documents</div>';
+        const ul = document.createElement("ul");
+        ul.className = "doc-list";
+        data.documents.forEach(d => {
+          const li = document.createElement("li");
+          li.innerHTML = '<span class="mono">' + d.file + '</span> — '
+            + '<span style="color:var(--muted)">' + d.purpose + '</span>';
+          ul.appendChild(li);
+        });
+        div.appendChild(ul);
+        sh.appendChild(div);
+      }
+
+      document.getElementById("footer").textContent =
+        "Generated from flows.json. Open this file via a local HTTP server for live JSON edits, "
+        + "or rely on the embedded fallback when opened directly from disk.";
+
+      // initial render
+      renderContent("all");
+    })();
+  </script>
+</body>
+
+</html>
