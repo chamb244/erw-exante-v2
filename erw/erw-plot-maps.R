@@ -5,12 +5,13 @@
 
 suppressMessages({
   library(terra)
+  library(here)
 })
 
-# Paths -----------------------------------------------------------------------
-ROOT <- normalizePath(".")
-DATA <- file.path(ROOT, "data")
-OUT  <- file.path(ROOT, "docs", "maps")
+# Paths — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+DATA <- here::here("data")
+OUT  <- here::here("docs", "maps")
 dir.create(OUT, recursive = TRUE, showWarnings = FALSE)
 
 # Country borders -------------------------------------------------------------

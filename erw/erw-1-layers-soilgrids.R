@@ -20,8 +20,10 @@
 #   soilgrids_properties_cropland.tif   same masked to cropland
 # ------------------------------------------------------------------------------
 
-# directories
-input_path <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/input-data/'
+# directories — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+library(here)
+input_path <- paste0(here::here('data'), '/')
 
 # ------------------------------------------------------------------------------
 

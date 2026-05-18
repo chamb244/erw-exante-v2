@@ -19,11 +19,13 @@
 # source(). Adjust the path if you reorganise the directory.
 # ------------------------------------------------------------------------------
 
-# directories
-input_path  <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/input-data/'
-output_path <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/output-data/'
+# directories — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+library(here)
+input_path  <- paste0(here::here('data'), '/')
+output_path <- paste0(here::here('data'), '/')
 
-source('erw-7-profitability-function.R')
+source(here::here('erw', 'erw-7-profitability-function.R'))
 
 # ------------------------------------------------------------------------------
 # helpers

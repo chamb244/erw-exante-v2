@@ -31,13 +31,16 @@
 #   erw_yield_fit_posterior.csv  (posterior draws, columns = coefficients)
 # ------------------------------------------------------------------------------
 
-input_path  <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/input-data/'
-output_path <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/output-data/'
+# directories — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+library(here)
+input_path  <- paste0(here::here('data'), '/')
+output_path <- paste0(here::here('data'), '/')
 
 # ------------------------------------------------------------------------------
 # 1) load trial data
 
-trials <- read.csv('erw-trial-data.csv', stringsAsFactors = FALSE)
+trials <- read.csv(here::here('erw', 'erw-trial-data.csv'), stringsAsFactors = FALSE)
 
 # light QC
 trials <- subset(trials, !is.na(log_y_ratio) & !is.na(se_log_y_ratio) & !is.na(rate_t_ha))

@@ -27,7 +27,10 @@
 #   country_energy_table.csv      (canonical table — edit here, re-run script)
 # ------------------------------------------------------------------------------
 
-input_path  <- 'D:/# Jvasco/Working Papers/GAIA Guiding Acid Soil Investments/1-ex-ante-analysis/input-data/'
+# directories — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+library(here)
+input_path  <- paste0(here::here('data'), '/')
 
 # ------------------------------------------------------------------------------
 # 1) country energy table — SSA countries

@@ -7,9 +7,12 @@
 
 suppressMessages({
   library(terra)
+  library(here)
 })
 
-DATA <- "data"
+# Paths — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+DATA <- here::here("data")
 gdb  <- file.path(DATA, "LiMW_GIS 2015.gdb")
 ref  <- rast(file.path(DATA, "soilgrids_properties_all.tif"))[[1]]
 ssa  <- vect(file.path(DATA, "gadm_ssa.gpkg"))

@@ -8,9 +8,12 @@
 
 suppressMessages({
   library(terra)
+  library(here)
 })
 
-DATA   <- "data"
+# Paths — resolved from the project root via the {here} package
+# (anchored by the .here marker at the repo root)
+DATA   <- here::here("data")
 access <- file.path(DATA, "access")
 dir.create(access, recursive = TRUE, showWarnings = FALSE)
 
