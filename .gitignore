@@ -36,3 +36,7 @@ paper/analysis/_cache/
 README.pdf
 datagadm_ssa.gpkg
 datageosurvey_processed.tif
+
+# --- Office temp/owner lock files ---
+~$*
+**/~$*
