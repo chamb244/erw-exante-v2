@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ERW Walkthrough — Speaker Script</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=ranade@400,500,600,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --primary:#1B3A2F; --accent:#B8862A; --bg:#FAF7F0;
+  --text:#1c1c1c; --muted:#5A5A5A; --faint:#8A8A8A;
+  --rule:rgba(27,58,47,0.16);
+}
+*{box-sizing:border-box; margin:0; padding:0;}
+html,body{ background:var(--bg); color:var(--text);
+  font-family:"Ranade",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased; letter-spacing:-0.003em;}
+.wrap{ max-width:820px; margin:0 auto; padding:46px 54px 60px;}
+
+/* title block */
+.doc-head{ border-bottom:2px solid var(--primary); padding-bottom:20px; margin-bottom:26px;}
+.doc-head .kicker{ font-size:11px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--accent); margin-bottom:10px;}
+.doc-head h1{ font-size:30px; line-height:1.12; font-weight:700; color:var(--primary); letter-spacing:-0.02em; margin-bottom:12px;}
+.doc-head p{ font-size:13.5px; line-height:1.55; color:var(--muted); max-width:640px;}
+.doc-head .meta{ margin-top:12px; font-size:12.5px; color:var(--faint);}
+
+/* per-slide block */
+.slide-note{ break-inside:avoid; page-break-inside:avoid; margin:0 0 22px; padding:14px 0 18px 20px;
+  border-left:3px solid var(--accent); }
+.slide-note .num{ font-size:11px; font-weight:700; letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); }
+.slide-note h2{ font-size:18px; font-weight:700; color:var(--primary); letter-spacing:-0.01em; margin:3px 0 8px; line-height:1.2;}
+.slide-note .cue{ font-size:12px; color:var(--faint); font-style:italic; margin-bottom:10px; }
+.slide-note p.say{ font-size:14px; line-height:1.66; color:var(--text); margin-bottom:9px; }
+.slide-note p.say:last-child{ margin-bottom:0; }
+.slide-note strong{ color:var(--primary); font-weight:600; }
+
+.divider-note{ border-left-color:var(--primary); background:rgba(27,58,47,0.035); border-radius:0 6px 6px 0; padding-right:18px;}
+
+.foot{ margin-top:30px; padding-top:14px; border-top:1px solid var(--rule); font-size:11.5px; color:var(--faint); }
+
+@page{ size:A4; margin:16mm 15mm; }
+@media print{
+  html,body{ background:white; }
+  .wrap{ padding:0; max-width:none; }
+  .slide-note{ break-inside:avoid; page-break-inside:avoid; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="doc-head">
+    <div class="kicker">Speaker script &#183; read-aloud narration</div>
+    <h1>Mapping the public and private returns to<br>Enhanced Rock Weathering in Sub-Saharan Africa</h1>
+    <p>A slide-by-slide talk track for the full walkthrough. Each block gives the slide, a one-line
+    on-screen cue, and the words to say. Paced for reading aloud: roughly 24&#8211;28 minutes at a normal pace,
+    plus questions.</p>
+    <div class="meta">B. H. Gebrekidan &amp; J. Chamberlin &#183; CIMMYT &#183; working draft for Agricultural Economics &#183; 26 slides</div>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 1</div>
+    <h2>Cover &#183; title</h2>
+    <div class="cue">On screen: title, authors, and the headline magnitudes (44 countries, 23 crops, 2.1 Mha combined-only).</div>
+    <p class="say">Thanks, everyone. Today I&#8217;ll walk through our ex-ante analysis mapping the public and private returns to enhanced rock weathering across Sub-Saharan Africa. This is joint work with Jordan Chamberlin, and it&#8217;s a working draft we&#8217;re preparing for Agricultural Economics.</p>
+    <p class="say">The core of the exercise is a spatially explicit, decomposed profitability model: 44 countries, 23 crops, evaluated on a per-pixel grid at about a tenth of a degree. The question I want to leave you with by the end is simple to state. Where does enhanced rock weathering actually pay, and, the more interesting part, where does neither the yield benefit nor the carbon revenue justify it on its own, yet together they do?</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 2</div>
+    <h2>The proposition &#183; ERW pays the farmer twice</h2>
+    <div class="cue">On screen: two value-stream cards and the acidity-gradient schematic.</div>
+    <p class="say">Let me start with the basic proposition, which is that enhanced rock weathering can pay the farmer twice. When you spread finely ground basalt on cropland, you couple two value streams that are usually completely separate.</p>
+    <p class="say">The first is private and agronomic: the alkalinity in the rock neutralizes soil acidity, exactly like agricultural lime, and that raises yields. That benefit accrues to the farmer. The second is public: as the rock weathers it durably removes CO&#8322; from the atmosphere, and that removal can be sold into voluntary carbon markets. The schematic on the left is the intuition for the whole paper: the two returns are spatially complementary along the acidity gradient. So the central question is where each return justifies deployment on its own, and where neither does alone, yet the two together do.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 3</div>
+    <h2>What we ask &#183; six research questions</h2>
+    <div class="cue">On screen: Q1 through Q6, with Q4 highlighted.</div>
+    <p class="say">That framing gives us six research questions. The first three are about the individual envelopes: where does the private yield return alone justify the investment; where does the public carbon return alone justify it; and where do the two coincide, the intersection.</p>
+    <p class="say">Question four is the one I care most about: where does neither stream suffice alone, but the combined margin is still positive. Five and six are robustness and policy: how stable is the deployable geography to our parameter assumptions, and what would push the carbon envelope outward. I&#8217;ll spend most of the results section on question four, and then use five and six to define a robust core and the levers on the carbon case.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 4</div>
+    <h2>Modeling framework &#183; a decomposed per-pixel gross margin</h2>
+    <div class="cue">On screen: the conceptual-framework diagram and the equation pi = R_agro + R_CDR &minus; C.</div>
+    <p class="say">Here&#8217;s the modeling framework. Everything reduces to one per-pixel gross margin: pi equals the agronomic return, plus the carbon return, minus the fully delivered cost.</p>
+    <p class="say">The diagram shows how we build each term. On the left, biogeochemistry gives us durable carbon removal; in the middle, agronomy gives us the yield uplift; on the right, economic geography gives us the delivered cost, feedstock, grinding, transport, and spreading. We compute all three at about a tenth-of-a-degree resolution, across 44 countries and 23 crops, area-weighted to each pixel. The key design choice is that we don&#8217;t collapse this into a single supply curve. Instead we classify every pixel by which stream, or combination of streams, makes its margin positive. And we evaluate it under three temporal regimes: year one, net present value, and equilibrium steady state, which is our headline.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 5</div>
+    <h2>Inputs &#183; public data layers behind every pixel</h2>
+    <div class="cue">On screen: the nine input layers and their sources.</div>
+    <p class="say">Briefly, the inputs. Everything here is public data, which matters for reproducibility. Soil pH and buffering from SoilGrids; crop distributions from SPAM; the crop pH-suitability response from EcoCrop; basalt source geology from GLiM; a travel-time delivered-cost surface from the malaria-atlas friction layer; climate from WorldClim for the weathering kinetics; producer prices from FAOSTAT; the lime-equivalent dose from LiTAS; and the carbonate acidity sink we use for the net-export accounting. No proprietary layers, so anyone can rebuild this.</p>
+  </div>
+
+  <div class="slide-note divider-note">
+    <div class="num">Slide 6 &#183; section divider</div>
+    <h2>Part I &#183; the assumption sets</h2>
+    <div class="cue">On screen: Part I title.</div>
+    <p class="say">Before the results, I want to be explicit about five modeling choices that govern everything downstream: how we build delivered cost, the carbon price, the net-export carbon accounting, an over-liming yield penalty, and kinetic weathering saturation. Let me take them one at a time.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 7</div>
+    <h2>Assumption 1 &#183; delivered cost is dominated by transport</h2>
+    <div class="cue">On screen: four cost cards and the solar-transport saving map.</div>
+    <p class="say">Assumption one is delivered cost, and the headline is that cost is dominated by transport, which makes it a real lever, not just an accounting detail. We build the cost up per pixel: grinding, feedstock, freight, spreading, and MRV.</p>
+    <p class="say">Transport is what binds. Delivered cost rises steeply with travel time, so remote acid soils get priced out even where the agronomy is excellent. The map shows one lever we test: solar or electrified haulage. Cutting variable transport cost by 25 to 40 percent visibly expands the viable frontier, especially in the interior. And MRV, the monitoring cost, we don&#8217;t put in the cost stack; we net it from the carbon price, which I&#8217;ll come to next.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 8</div>
+    <h2>Assumption 1 &#183; delivered cost, decomposed</h2>
+    <div class="cue">On screen: the per-tonne cost table, transport row highlighted.</div>
+    <p class="say">This is the cost decomposition in numbers, per tonne of basalt. Quarry-gate feedstock is about ten dollars; basalt fines are essentially an aggregate by-product. Grinding to fifty microns is an energy cost that scales with the local electricity tariff. Spreading is another eight dollars.</p>
+    <p class="say">The one term that varies across space is transport, travel time times about four cents per tonne-minute over the friction surface, and that&#8217;s the highlighted row because it&#8217;s what determines where ERW is deployable. MRV, twenty dollars per tonne of CO&#8322;, is netted separately from the carbon price. And note the life-cycle CO&#8322; of grinding, transport, and spreading is deducted from gross removal, so we&#8217;re not ignoring the emissions of doing this.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 9</div>
+    <h2>Assumption 2 &#183; the carbon return uses a net VCM price</h2>
+    <div class="cue">On screen: R_CDR = durable CDR &#215; (p &minus; m), and the price ladder table.</div>
+    <p class="say">Assumption two is the carbon price. The carbon return is durable removal times a net price: the voluntary-carbon-market price p, minus the MRV cost m. Two things worth saying. First, &#8220;the VCM price&#8221; isn&#8217;t one number. Cheap avoidance credits trade in the single digits, but durable engineered removals like ours sell in the low hundreds, so our 150-dollar baseline is a mid-range figure for durable removal, not the bargain price.</p>
+    <p class="say">Second, we don&#8217;t rely on any single price; we sweep a full ladder, shown in the table. At 150 dollars the durable public envelope is about 1.65 million hectares, under ten percent of treated cropland. It only becomes large, approaching half of treated cropland, at prices well above where the market is today. So price is one of three levers, and I&#8217;ll return to it.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 10</div>
+    <h2>Assumption 3 &#183; credit only carbon that is durably exported</h2>
+    <div class="cue">On screen: durable CDR = max(gross &minus; F&#183;S, 0), and the ~80% cut.</div>
+    <p class="say">Assumption three is the most important one in the paper, so let me slow down. We only credit carbon that is durably exported. Durable removal equals gross removal minus the alkalinity that gets spent neutralizing soil acidity.</p>
+    <p class="say">Why subtract it? Because that alkalinity re-releases its CO&#8322;, exactly the way agricultural lime does, so it was never a removal, and crediting it would overstate the climate benefit. When you net it out, roughly eighty percent of the credited removal is cut at first application. That sounds dramatic, but it&#8217;s the honest number: durable removal is fundamentally a steady-state phenomenon, which is precisely why our headline uses the equilibrium regime rather than year one.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 11</div>
+    <h2>Assumption 4 &#183; too much alkalinity can depress yield</h2>
+    <div class="cue">On screen: the over-liming mechanism and the sensitivity band figure.</div>
+    <p class="say">Assumption four is a penalty on the private side: too much alkalinity can actually depress yield. Beyond the lime requirement, you push pH past the crop&#8217;s optimum, and the EcoCrop response gives back a yield haircut at that post-application pH. We damp the pH shift by soil buffering.</p>
+    <p class="say">The effect is concentrated on high uniform doses. At the targeted dose it only trims the private return modestly, from about 4.3 down to 4.0 million hectares, a seven-percent haircut. We carry a low-to-high sensitivity band, and it bites hardest in the uniform-fifty case, where you&#8217;re deliberately over-applying.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 12</div>
+    <h2>Assumption 5 &#183; weathering reacts less-than-linearly with dose</h2>
+    <div class="cue">On screen: sat(D) = (Kd+50)/(Kd+D) and the concavity figure.</div>
+    <p class="say">Assumption five is kinetic saturation: weathering reacts less than linearly with dose, so the effective reacted tonnage saturates as you pile on more rock. We normalize to the Lewis 2021 fifty-tonne reference and report it as a band, because the saturation constant isn&#8217;t calibrated for our region.</p>
+    <p class="say">The key finding is subtle. Saturation makes carbon removal concave in dose, which gives us an interior optimum, but it does not drive the public envelope to zero. In fact, below the fifty-tonne reference, per-tonne reactivity is higher, so at our targeted doses durable removal actually rises. What limits the carbon case is not kinetics; it&#8217;s that the marginal abatement cost exceeds the price, which I&#8217;ll show you in results.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 13</div>
+    <h2>Design space &#183; temporal regimes &#215; allocation rules</h2>
+    <div class="cue">On screen: the three regimes and the allocation rules, headline highlighted.</div>
+    <p class="say">Quickly, the design space. Alongside those five assumptions we sweep two axes. Temporal regime: year one, which is most conservative on carbon; net present value at ten percent; and equilibrium steady state, which is our headline. And allocation rule: the targeted lime-equivalent dose, which is agronomically matched and is our headline, versus fixed uniform rates of 10, 20, and 50 tonnes per hectare, which we use to trace how removal and over-liming scale with dose. So the headline throughout is equilibrium, targeted, net-export.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 14</div>
+    <h2>How to read the returns &#183; establishment vs. steady state</h2>
+    <div class="cue">On screen: the establishment-then-maintenance bar chart and two explanatory cards.</div>
+    <p class="say">One slide on how to read the numbers, because the temporal accounting matters. Think of two phases. In year one, establishment, you apply the full lime-equivalent dose. That&#8217;s a big upfront cost, and durable carbon largely collapses because the alkalinity first has to pay down the standing acidity debt. Then in steady state, maintenance, you only top up, but you realize the full annual yield benefit every year.</p>
+    <p class="say">Our headline figures are the steady-state numbers: full annual yield against a fully-costed recurring dose. For the private envelope that&#8217;s roughly 3.5 billion dollars of yield for about 1.74 billion of rock, call it two-to-one per cycle. The important point is that we don&#8217;t fold the big establishment dose into that equilibrium ratio; the upfront investment is captured separately in the year-one regime.</p>
+  </div>
+
+  <div class="slide-note divider-note">
+    <div class="num">Slide 15 &#183; section divider</div>
+    <h2>Part II &#183; results</h2>
+    <div class="cue">On screen: Part II title.</div>
+    <p class="say">With the assumptions on the table, let me turn to results: the envelopes and the combined-only band, the durable carbon and its abatement cost, what shifts the frontier, the optimal rates, and finally the robust core geography.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 16</div>
+    <h2>Results &#183; a five-way pixel classification</h2>
+    <div class="cue">On screen: the typology map and the five-class key.</div>
+    <p class="say">We classify every pixel five ways. Private-sufficient, where the yield return alone covers cost. Public-sufficient, where the carbon return alone covers it. The intersection, where both hold at once. Combined-only, the interesting one, where neither stream alone clears, but the total margin is still positive. And neither, where the pixel simply isn&#8217;t deployable.</p>
+    <p class="say">The map is the whole analysis in one picture: green is private-led, blue is carbon-led, purple is both, gold is the combined-only band, and grey is treated cropland that doesn&#8217;t pencil. Notice the geography, private-led in the Congo basin and the highlands, carbon-led concentrated in West Africa, Ethiopia, and Madagascar.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 17</div>
+    <h2>Results &#183; where yield alone pays</h2>
+    <div class="cue">On screen: the private-sufficient map and the 4.3 Mha / $3.5 B stats.</div>
+    <p class="say">Taking them one at a time. This is where yield alone pays, land where the agronomic return covers the full delivered cost with no carbon credit at all. It&#8217;s about 4.3 million hectares, roughly 3.5 billion dollars of private return, and it&#8217;s the single largest envelope under the targeted dose. But, and this is the setup for everything that follows, it&#8217;s still a minority of acid cropland. Most viable land needs more than yield to pencil.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 18</div>
+    <h2>Results &#183; where carbon alone pays (durably)</h2>
+    <div class="cue">On screen: the public-sufficient map and the 1.7 Mha / 9.4% stats.</div>
+    <p class="say">This is where carbon alone pays, durably, at 150 dollars a tonne, land where net-export removal covers cost with no yield benefit at all. It&#8217;s about 1.7 million hectares, under ten percent of treated cropland. It&#8217;s smaller than the private envelope and it&#8217;s price-conditional. The reason it&#8217;s so tightly bound is the combination of net-export accounting and today&#8217;s carbon price, and that&#8217;s exactly why the combined case is the one that matters.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 19</div>
+    <h2>Results &#183; the combined-only band is the policy object</h2>
+    <div class="cue">On screen: the intersection map and the 4.3 / 1.7 / 6.9 Mha stats.</div>
+    <p class="say">So here is the central result. There&#8217;s a band of about 2.1 million hectares, the gold, that is combined-only: neither the yield return nor the carbon return alone covers cost, yet together the margin is positive. Put the three numbers together: 4.3 million hectares private, 1.7 million public, but 6.9 million hectares once you allow the streams to combine.</p>
+    <p class="say">The economic point is the one sentence I&#8217;d want you to take away. Voluntary carbon finance here is not a bonus on an already-profitable practice; it&#8217;s the marginal revenue that unlocks an otherwise-unprofitable, yield-improving investment. That reframes ERW away from a pure carbon-supply story. And the additionality logic runs the right way: the credits are least additional on private-sufficient land, where the farmer would lime anyway, and most additional precisely in this combined-only band.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 20</div>
+    <h2>Results &#183; marginal abatement cost, not kinetics</h2>
+    <div class="cue">On screen: the MAC map and the $446/tCO&#8322; median.</div>
+    <p class="say">Now, what limits the carbon case? It&#8217;s the marginal abatement cost, the cost of removing one more tonne of CO&#8322;, and specifically it&#8217;s the delivered cost per tonne of rock divided by the durable removal per tonne of rock. The median across viable cropland is 446 dollars a tonne, well above today&#8217;s 150. The public envelope is exactly the land where that abatement cost is below the net price.</p>
+    <p class="say">And the important diagnostic is that the abatement cost is high because of the denominator, how much CO&#8322; a tonne of rock verifiably removes, not because of kinetics or cost. That removal efficiency is the largest and least-resolved number in the whole model, which makes field calibration of it our clear priority.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 21</div>
+    <h2>Results &#183; three levers that shift the public envelope</h2>
+    <div class="cue">On screen: the three-lever cards and the price-vs-area supply curve.</div>
+    <p class="say">So what shifts the public envelope outward? Three levers. One, a higher carbon price: public area climbs from two percent of treated cropland at 100 dollars to about half at 500; that&#8217;s the most direct lever, but it&#8217;s exogenous to us. Two, lower delivered cost: the transport reductions from solar haulage I showed earlier, which lower the abatement cost pixel by pixel. And three, more durable removal per tonne of rock: raising verified removal cuts the abatement cost directly, and it&#8217;s first-order, whereas kinetic saturation is second-order here. Price, cost, removal, those are the three.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 22</div>
+    <h2>Results &#183; each objective has an interior optimum</h2>
+    <div class="cue">On screen: the three optimal-rate panels (private, public, combined).</div>
+    <p class="say">Because of the two refinements, over-liming and saturation, each per-pixel objective is concave, which means there&#8217;s an interior optimal application rate for the private, public, and combined margins. These maps show that pixel-specific optimum. The takeaway is that the combined optimum is moderate, typically well below the blanket-high uniform doses: enough over-application to earn extra carbon, but not so much that over-liming and saturation start eroding the return.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 23</div>
+    <h2>Results &#183; a defensible priority geography</h2>
+    <div class="cue">On screen: the core-targeting map and the ~0.8 Mha / ~0.5 M farms / ~$0.75 B stats.</div>
+    <p class="say">Finally, robustness. If we intersect the envelope across the full plausible parameter grid, we isolate the land that stays viable under most assumptions, the robust core. It&#8217;s about 0.8 million hectares, reaching on the order of half a million farms, with roughly 0.75 billion dollars of crop value at stake. This is the geography you&#8217;d deploy first, a defensible priority, and it&#8217;s the base you expand from as the price rises or delivered cost falls.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 24</div>
+    <h2>Takeaways &#183; a coupled proposition</h2>
+    <div class="cue">On screen: the four numbered takeaways.</div>
+    <p class="say">Four takeaways. First, the two returns rarely each suffice alone, but together they make a meaningful area of cropland profitable that neither would, that 2.1 million hectare combined-only band. Second, carbon finance is the margin, not a bonus; it&#8217;s what unlocks a yield-improving investment on most viable land, which reframes the whole exercise.</p>
+    <p class="say">Third, the binding constraint is durable removal per tonne: net-export accounting cuts first-application removal by about eighty percent, the median abatement cost is 446 dollars, and the three levers are price, cost, and verified removal. And fourth, treating ERW as coupled genuinely changes the answer, both where to deploy first and what to invest in to expand it.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 25</div>
+    <h2>Next &#183; caveats and where we go</h2>
+    <div class="cue">On screen: caveats on the left, next steps on the right.</div>
+    <p class="say">To close on caveats and next steps. The single highest-value thing we can do is field-calibrate durable removal per tonne; it sets the abatement cost and the entire public case. What we haven&#8217;t yet modeled matters too: tenure and who finances the upfront cost, nitrous-oxide and compaction effects, and country-level credit eligibility under Article 6. That last one is really the question of whether the combined-only band is institutionally realizable, not just economically. Farm counts are order-of-magnitude, from national holding sizes.</p>
+    <p class="say">Next, we&#8217;ll widen the sensitivity sweep around the parameters that move results most, fold the optimal-rate maps into the manuscript, and share the repository for coauthor review.</p>
+  </div>
+
+  <div class="slide-note">
+    <div class="num">Slide 26</div>
+    <h2>Closing &#183; thank you</h2>
+    <div class="cue">On screen: the closing panel.</div>
+    <p class="say">That&#8217;s the walkthrough, thank you. To summarize in one line: enhanced rock weathering in Sub-Saharan Africa is a coupled agronomic-and-carbon proposition, and the interesting geography is where carbon finance is the marginal revenue that tips a yield investment into profitability. I&#8217;m happy to take questions.</p>
+  </div>
+
+  <div class="foot">Speaker script generated to accompany ERW_Public_Private_Returns_Walkthrough &#183; 26 slides &#183; read at a normal pace for ~24&#8211;28 minutes.</div>
+
+</div>
+</body>
+</html>

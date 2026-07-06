@@ -535,19 +535,18 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="topbar"><span class="brand">Modeling framework</span><span class="section">Decomposed per-pixel gross margin</span></div>
     <div class="eyebrow">Modeling framework</div>
     <h2>A decomposed per-pixel gross margin.</h2>
-    <div class="eq">\[ \pi \;=\; R_{\text{agro}} \;+\; R_{\text{CDR}} \;-\; C \]</div>
-    <p class="small dim" style="text-align:center; margin:-4px 0 14px;">per-hectare gross margin = private agronomic return + public carbon return &minus; full delivered cost</p>
-    <div class="two-col" style="gap:18px;">
-      <ul class="clean small">
-        <li><strong>Resolution.</strong> ~0.083&#176; grid &#215; 44 SSA countries &#215; 23 SPAM crops, area-weighted to each pixel.</li>
-        <li><strong>Three streams.</strong> Agronomic yield uplift, durable CDR credit, and a fully decomposed delivered cost.</li>
-      </ul>
-      <ul class="clean small">
-        <li><strong>Decision object.</strong> Each pixel is classified by which stream(s) make the margin positive, not a single supply curve.</li>
-        <li><strong>Regimes.</strong> Evaluated at year-1, NPV @ 10%, and equilibrium steady state (headline).</li>
-      </ul>
+    <div class="split s60">
+      <div class="chart-wrap full"><img src="figures/fig-conceptual-framework.png" alt="ERW conceptual framework: three streams (biogeochemistry, agronomy, economic geography) recombine into a per-pixel gross margin, then feed the outputs"></div>
+      <div style="align-self:center;">
+        <div class="eq small">\[ \pi \;=\; R_{\text{agro}} \;+\; R_{\text{CDR}} \;-\; C \]</div>
+        <ul class="clean small" style="margin-top:14px;">
+          <li><strong>Three streams.</strong> Agronomy (yield uplift), biogeochemistry (durable CDR), and a fully decomposed delivered cost.</li>
+          <li><strong>Resolution.</strong> ~0.083&#176; grid &#215; 44 SSA countries &#215; 23 SPAM crops, area-weighted to each pixel.</li>
+          <li><strong>Decision object.</strong> Each pixel is classified by which stream(s) make the margin positive, not a single supply curve.</li>
+          <li><strong>Regimes.</strong> Year-1, NPV @ 10%, and equilibrium steady state (headline).</li>
+        </ul>
+      </div>
     </div>
-    <p class="source-note">The pipeline decomposes agronomy, biogeochemistry, and economic geography before recombining them per pixel (next: the assumption sets).</p>
     <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
   </section>
 
@@ -597,7 +596,25 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
   </section>
 
-  <!-- ============ 8 · ASSUMPTION 2 · CARBON PRICE ============ -->
+  <!-- ============ 8 · ASSUMPTION 1 · DELIVERED COST (decomposed table) ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Assumption 1</span><span class="section">Delivered cost</span></div>
+    <div class="eyebrow">Assumption 1 &#183; delivered cost</div>
+    <h2>Delivered basalt cost, decomposed.</h2>
+    <table class="compact">
+      <tr><th style="text-align:left;">Component</th><th style="text-align:left;">Cost per t basalt</th><th style="text-align:left;">Type</th><th style="text-align:left;">Basis / source</th></tr>
+      <tr><td class="lead">Quarry-gate feedstock</td><td style="text-align:left;">$10 / t</td><td style="text-align:left;">fixed</td><td style="text-align:left;">basalt fines (aggregate by-product)</td></tr>
+      <tr><td class="lead">Grinding (50 &micro;m)</td><td style="text-align:left;">19.4 kWh/t &#215; local tariff (&#8776;$1.9/t)</td><td style="text-align:left;">fixed *</td><td style="text-align:left;">Strefler et al. 2018 energy curve</td></tr>
+      <tr class="hl"><td class="lead">Transport (haulage)</td><td style="text-align:left;">travel-time &#215; $0.04/min/t</td><td style="text-align:left;">variable</td><td style="text-align:left;">30 t truck over MAP friction surface</td></tr>
+      <tr><td class="lead">Spreading</td><td style="text-align:left;">$8 / t</td><td style="text-align:left;">fixed</td><td style="text-align:left;">on-farm application</td></tr>
+      <tr><td class="lead">Delivered cost / t</td><td style="text-align:left;">quarry + grinding + transport + spreading</td><td style="text-align:left;">= sum</td><td style="text-align:left;">the delivered $/t consumed per pixel</td></tr>
+      <tr><td class="lead">MRV (netted separately)</td><td style="text-align:left;">$20 / tCO&#8322;</td><td style="text-align:left;">per tCO&#8322;</td><td style="text-align:left;">netted from carbon price; Levy et al. 2024 pilot $30</td></tr>
+    </table>
+    <p class="source-note">* Grinding cost varies with the country electricity tariff. Transport is the only spatially varying term: it drives where ERW is deployable. Life-cycle CO&#8322; of grinding, transport, and spreading is separately deducted from gross removal.</p>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 9 · ASSUMPTION 2 · CARBON PRICE ============ -->
   <section class="slide">
     <div class="topbar"><span class="brand">Assumption 2</span><span class="section">Carbon price</span></div>
     <div class="eyebrow">Assumption 2 &#183; carbon price</div>
@@ -700,7 +717,46 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
   </section>
 
-  <!-- ============ 13 · PART II DIVIDER ============ -->
+  <!-- ============ 14 · HOW TO READ THE RETURNS (establishment vs steady state) ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">How to read the returns</span><span class="section">Establishment vs. maintenance</span></div>
+    <div class="eyebrow">How to read the returns</div>
+    <h2>Establishment dose vs. steady-state maintenance.</h2>
+    <div class="split s55">
+      <div>
+        <p class="small dim" style="margin-bottom:10px;">Full annual yield benefit is realized every year once soils are held at target.</p>
+        <div style="display:flex; align-items:flex-end; gap:16px; height:230px; border-bottom:2px solid var(--rule-strong);">
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%;"><div style="height:94%; background:var(--accent); border-radius:4px 4px 0 0;"></div></div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%;"><div style="height:28%; background:var(--primary); border-radius:4px 4px 0 0;"></div></div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%;"><div style="height:28%; background:var(--primary); border-radius:4px 4px 0 0;"></div></div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%;"><div style="height:28%; background:var(--primary); border-radius:4px 4px 0 0;"></div></div>
+          <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-end; height:100%;"><div style="height:28%; background:var(--primary); border-radius:4px 4px 0 0;"></div></div>
+        </div>
+        <div style="display:flex; gap:16px; margin-top:8px;">
+          <div style="flex:1; text-align:center;" class="small dim">Year 1<br>(establishment)</div>
+          <div style="flex:1; text-align:center;" class="small dim">Year 2</div>
+          <div style="flex:1; text-align:center;" class="small dim">Year 3</div>
+          <div style="flex:1; text-align:center;" class="small dim">Year 4</div>
+          <div style="flex:1; text-align:center;" class="small dim">steady state<br>(maintenance)</div>
+        </div>
+        <p class="small dim" style="margin-top:12px;">Bar height &#8733; basalt applied that period, charged at its full delivered cost.</p>
+      </div>
+      <div>
+        <div class="card hl" style="margin-bottom:12px;">
+          <span class="label-tag">Equilibrium: the headline</span>
+          <p class="small">Full annual yield vs the fully-costed maintenance top-up, once soils are at target. Private envelope: &#8776; $3.5 B yield for &#8776; $1.74 B rock (~2:1 per cycle). Excludes the establishment dose.</p>
+        </div>
+        <div class="card" style="margin-bottom:12px;">
+          <span class="label-tag">Year 1: establishment</span>
+          <p class="small">One-time full lime-equivalent dose: larger upfront cost, and durable carbon largely collapses (alkalinity first pays down the standing acidity debt). Reported separately as the establishment / upper-bound contrast.</p>
+        </div>
+        <p class="small dim">Headline figures are steady-state annual: full yield against a fully-costed recurring dose. The upfront establishment investment is captured in the year-1 regime, not folded into the equilibrium ratio.</p>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 15 · PART II DIVIDER ============ -->
   <section class="slide section">
     <div class="topbar"><span class="brand">Part II</span><span class="section">Results</span></div>
     <div class="eyebrow">Part II</div>
