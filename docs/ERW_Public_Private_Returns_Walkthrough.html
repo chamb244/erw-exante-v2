@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERW · Public &amp; Private Returns in SSA · Walkthrough</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=ranade@400,500,600,700&display=swap" rel="stylesheet">
+<!-- KaTeX for properly typeset equations -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #1B3A2F;
+  --primary-soft: #2D5544;
+  --primary-pale: #E8EFEB;
+  --accent: #B8862A;
+  --accent-soft: #D9A93D;
+  --accent-pale: #F5E9CB;
+  --bg: #FAF7F0;
+  --bg-deep: #0F1A14;
+  --text: #1A1A1A;
+  --text-muted: #5A5A5A;
+  --text-faint: #8A8A8A;
+  --neg: #A93B2A;
+  --rule: rgba(27, 58, 47, 0.18);
+  --rule-strong: rgba(27, 58, 47, 0.34);
+  --shadow: 0 1px 2px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.07);
+  /* CIMMYT brand strips (segment colors/proportions from cimmyt-templete.pptx master) */
+  --strip-top: linear-gradient(to right, #6BC32F 0 13.4%, #356270 13.4% 27.4%, #90C6CA 27.4% 41%, #68441B 41% 48%, #F9B737 48% 54.9%, #6BC32F 54.9% 100%);
+  --strip-bottom: linear-gradient(to right, #6BC32F 0 10%, #356270 10% 19.9%, #90C6CA 19.9% 29.5%, #68441B 29.5% 34.4%, #F9B737 34.4% 39.3%, #6BC32F 39.3% 100%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: #2a2a26;
+  font-family: "Ranade", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+}
+.deck {
+  position: relative;
+  width: min(100%, 1280px);
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 48px);
+  background: var(--bg);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  overflow: hidden;
+  border-radius: 4px;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 48px 72px 60px;
+  display: none;
+  flex-direction: column;
+  background: rgba(255,255,255,0.7); /* soft white over the cream deck base */
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+/* CIMMYT header strip (top right) and footer strip (full width), as in the slide master */
+.slide::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  width: 39.5%;
+  height: 17px;
+  background: var(--strip-top);
+  z-index: 5;
+}
+.slide::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 12px;
+  height: 10px;
+  background: var(--strip-bottom);
+  z-index: 5;
+}
+/* White box interrupting the bottom strip, logo centered on the strip line (as in the master) */
+.cimmyt-foot-logo {
+  position: absolute;
+  right: 100px;
+  bottom: 0;
+  z-index: 6;
+  background: #fff;
+  padding: 5px 18px;
+}
+.cimmyt-foot-logo img { height: 28px; display: block; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 22px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.topbar .brand { color: var(--primary); }
+.topbar .section { color: var(--text-faint); }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.deck h1 {
+  font-size: 54px;
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+.deck h2 {
+  font-size: 32px;
+  line-height: 1.14;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--primary);
+  margin-bottom: 18px;
+  max-width: 1040px;
+}
+.deck h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.deck p, .deck li {
+  font-size: 16px;
+  line-height: 1.52;
+  color: var(--text);
+}
+.deck p.lead { font-size: 16px; line-height: 1.5; max-width: 980px; }
+.deck p.dim { color: var(--text-muted); }
+.deck p.small, .deck li.small { font-size: 13.5px; line-height: 1.46; }
+.deck strong { font-weight: 700; color: var(--primary); }
+.deck em { font-style: italic; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--primary-pale);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+ul.clean, ol.clean { list-style: none; }
+ul.clean li, ol.clean li { position: relative; padding-left: 22px; margin-bottom: 10px; }
+ul.clean li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 9px;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+ol.clean { counter-reset: step; }
+ol.clean li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 2px;
+  width: 18px; height: 18px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+ul.clean.small li, ol.clean.small li { font-size: 13.3px; line-height: 1.44; margin-bottom: 8px; padding-left: 20px; }
+ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  margin-top: 8px;
+}
+.stat { border-top: 3px solid var(--primary); padding-top: 14px; }
+.stat .num { font-size: 44px; line-height: 1; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
+.stat .num .unit { font-size: 22px; font-weight: 600; color: var(--accent); margin-left: 3px; }
+.stat .label { margin-top: 10px; font-size: 13px; color: var(--text-muted); line-height: 1.42; max-width: 250px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.split { display: grid; gap: 40px; flex: 1; min-height: 0; align-items: center; grid-template-rows: minmax(0, 1fr); }
+.split > * { min-width: 0; min-height: 0; }
+.split.s60 { grid-template-columns: 1.5fr 1fr; }
+.split.s55 { grid-template-columns: 1.2fr 1fr; }
+.split.s40 { grid-template-columns: 1fr 1.5fr; }
+
+.card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 6px 6px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.card.hl { background: var(--accent-pale); border-top-color: var(--accent); }
+.card .label-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.ask {
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 6px 6px;
+  box-shadow: var(--shadow);
+}
+.ask.hl { background: var(--accent-pale); border-top-color: var(--accent); }
+.ask h3 { font-size: 15px; margin-bottom: 6px; }
+.ask p { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+.deck table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.deck table th {
+  text-align: right;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  padding: 9px 12px 9px 0;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.deck table th:first-child, .deck table td:first-child { text-align: left; }
+.deck table td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+  line-height: 1.45;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.deck table td.lead { font-weight: 600; color: var(--primary); text-align: left; }
+.deck table tr.hl td { background: var(--accent-pale); font-weight: 600; }
+.deck table .neg { color: var(--neg); }
+.deck table.compact td, .deck table.compact th { padding-top: 6.5px; padding-bottom: 6.5px; font-size: 13.5px; }
+.deck table.dense td, .deck table.dense th { padding-top: 4px; padding-bottom: 4px; font-size: 12.5px; }
+
+.phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.phases.three { grid-template-columns: repeat(3, 1fr); }
+.phase {
+  padding: 16px 18px;
+  border-top: 3px solid var(--primary);
+  background: white;
+  box-shadow: var(--shadow);
+  border-radius: 0 0 6px 6px;
+}
+.phase.active { border-top-color: var(--accent); background: var(--accent-pale); }
+.phase .phase-label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.phase .phase-title { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 6px; line-height: 1.25; }
+.phase .phase-body { font-size: 12.5px; color: var(--text-muted); line-height: 1.42; }
+
+.eq {
+  background: white;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 16px 22px;
+  margin: 14px 0;
+  font-family: "Ranade", serif;
+  font-size: 23px;
+  text-align: center;
+  color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.eq .rm { color: var(--text-muted); font-weight: 500; }
+.eq sub, .eq sup { font-size: 0.62em; }
+.eq.small { font-size: 18px; padding: 12px 18px; }
+/* KaTeX rendering: route math through the house palette and control sizes */
+.deck .katex { color: var(--primary); font-size: 1.06em; }
+.eq .katex { font-size: 1.5em; }
+.eq.small .katex { font-size: 1.2em; }
+.eq .katex-display { margin: 0; }
+
+.deck blockquote {
+  font-size: 21px;
+  line-height: 1.42;
+  font-weight: 500;
+  color: var(--primary);
+  border-left: 3px solid var(--accent);
+  padding-left: 24px;
+  max-width: 1000px;
+  letter-spacing: -0.01em;
+  margin-top: 20px;
+}
+.deck blockquote cite { display: block; margin-top: 12px; font-size: 13px; font-style: normal; color: var(--text-muted); font-weight: 600; letter-spacing: 0.04em; }
+
+.chart-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 0; }
+.chart-wrap img {
+  max-height: 100%;
+  min-height: 0;
+  max-width: 82%;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 6px 14px rgba(0,0,0,0.10), 0 20px 42px rgba(0,0,0,0.16);
+}
+.chart-wrap.full img { max-width: 96%; }
+.chart-cap { font-size: 13px; color: var(--text-muted); text-align: center; max-width: 920px; line-height: 1.45; }
+.split .chart-wrap { max-height: 100%; min-height: 0; align-self: stretch; }
+.split .chart-wrap img { max-width: 100%; max-height: 100%; }
+
+.source-note { margin-top: auto; padding-top: 12px; font-size: 12px; color: var(--text-faint); line-height: 1.4; }
+
+.footer {
+  position: absolute;
+  bottom: 30px;
+  left: 72px;
+  right: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* ---- cover (light) ---- */
+.slide.cover {
+  background: rgba(255,255,255,0.7);
+  color: var(--text);
+  padding: 72px 88px;
+  justify-content: space-between;
+}
+.slide.cover .topbar { border-color: var(--rule); color: var(--text-muted); }
+.slide.cover .topbar .brand { color: var(--primary); }
+.slide.cover .eyebrow { color: var(--accent); }
+.slide.cover h1 { color: var(--primary); font-size: 46px; line-height: 1.1; letter-spacing: -0.015em; }
+.slide.cover .lead { color: var(--text-muted); margin-top: 20px; font-size: 18px; max-width: 940px; }
+.slide.cover .lead strong { color: var(--accent) !important; }
+.cover-meta {
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.cover-meta .label-row { font-weight: 600; color: var(--accent); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px; }
+.cover-meta .value-row { color: var(--text); font-size: 14px; line-height: 1.4; }
+.cover-stats { display: flex; gap: 54px; margin-top: 8px; }
+.cover-stats .cs .n { font-size: 40px; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; line-height: 1; }
+.cover-stats .cs .l { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; max-width: 200px; line-height: 1.4; }
+
+/* ---- section divider (light) ---- */
+.slide.section { background: rgba(255,255,255,0.7); color: var(--text); justify-content: center; padding: 72px 88px; }
+.slide.section .topbar { border-color: var(--rule); color: var(--text-muted); position: absolute; top: 48px; left: 88px; right: 88px; }
+.slide.section .topbar .brand { color: var(--primary); }
+.slide.section .eyebrow { color: var(--accent); }
+.slide.section h1 { color: var(--primary); font-size: 60px; }
+.slide.section p { color: var(--text-muted); font-size: 19px; max-width: 880px; margin-top: 6px; }
+.slide.section .secrule { width: 80px; height: 5px; background: var(--accent); border-radius: 3px; margin: 22px 0; }
+
+/* ---- CIMMYT closing panel ---- */
+.slide.closing { padding: 0; }
+.slide.closing::after { display: none; }
+/* panel width matches the collage's aspect ratio (1147x1500) so nothing is cropped */
+.closing-photo { position: absolute; left: 0; top: 0; width: 43.02%; height: 100%; object-fit: fill; }
+.closing-right {
+  position: absolute; left: 43.02%; right: 0; top: 0; bottom: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 56px 60px 150px; gap: 20px; text-align: center;
+}
+.closing-right .eyebrow { margin-bottom: 0; }
+.deck p.closing-thanks { font-size: 42px; line-height: 1.16; font-weight: 700; letter-spacing: -0.015em; color: var(--primary); }
+.deck p.closing-meta { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+.closing-meta .mono { color: var(--primary); }
+.closing-logo { position: absolute; right: 64px; bottom: 44px; width: 240px; }
+
+.nav {
+  position: fixed;
+  bottom: 14px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  color: white;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  z-index: 1000;
+}
+.nav button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.nav button:hover { background: rgba(255,255,255,0.1); }
+.progress { position: absolute; left: 0; top: 0; height: 3px; background: var(--accent); transition: width 0.3s ease; z-index: 10; }
+
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0; }
+  html, body { background: white !important; height: auto !important; overflow: visible !important; }
+  body { display: block !important; padding: 0 !important; }
+  .nav, .progress { display: none !important; }
+  .deck { width: 13.333in !important; max-height: none !important; aspect-ratio: auto !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
+  .slide {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: 13.333in;
+    height: 7.5in;
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+  <div class="progress" id="progress" style="width: 0;"></div>
+
+  <!-- ============ 1 · COVER ============ -->
+  <section class="slide cover active">
+    <div class="topbar">
+      <span class="brand">ERW ex ante analysis</span>
+      <span class="section">Full walkthrough &#183; coauthor review</span>
+    </div>
+    <div>
+      <div class="eyebrow">Ex ante analysis &#183; full walkthrough</div>
+      <h1>Mapping the public and private returns to<br>Enhanced Rock Weathering in Sub-Saharan Africa</h1>
+      <p class="lead">A spatially explicit, decomposed profitability model that asks where each return justifies deployment,
+      and where <strong>neither suffices alone yet together they do</strong>.</p>
+    </div>
+    <div class="cover-stats">
+      <div class="cs"><div class="n">44</div><div class="l">SSA countries on a per-pixel grid</div></div>
+      <div class="cs"><div class="n">23</div><div class="l">SPAM crops, area-weighted to each pixel</div></div>
+      <div class="cs"><div class="n">~0.083&#176;</div><div class="l">grid resolution of the decision object</div></div>
+      <div class="cs"><div class="n">2.1 Mha</div><div class="l">combined-only band, the policy object</div></div>
+    </div>
+    <div class="cover-meta">
+      <div><div class="label-row">Authors</div><div class="value-row">B. H. Gebrekidan (CIMMYT-Ethiopia) &#183; J. Chamberlin (CIMMYT-Kenya)</div></div>
+      <div><div class="label-row">Method</div><div class="value-row">Decomposed per-pixel gross margin</div></div>
+      <div><div class="label-row">Headline regime</div><div class="value-row">Equilibrium &#215; targeted, net-export</div></div>
+      <div><div class="label-row">Status</div><div class="value-row">Working draft &#183; Agricultural Economics</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · THE PROPOSITION ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">The proposition</span><span class="section">Two coupled value streams</span></div>
+    <div class="eyebrow">The proposition</div>
+    <h2>ERW pays the farmer twice.</h2>
+    <div class="split s55">
+      <div>
+        <p class="lead">Spreading finely ground basalt on cropland couples two value streams that are usually separate:</p>
+        <div class="two-col" style="gap:18px; margin-top:16px;">
+          <div class="card">
+            <span class="label-tag">Private &#183; agronomic</span>
+            <p class="small">Alkalinity neutralizes soil acidity like agricultural lime, raising yields. Accrues to the farmer.</p>
+          </div>
+          <div class="card">
+            <span class="label-tag">Public &#183; carbon (CDR)</span>
+            <p class="small">Weathering durably removes atmospheric CO&#8322;, monetizable through voluntary carbon markets (VCM).</p>
+          </div>
+        </div>
+        <div class="card hl" style="margin-top:16px;">
+          <p class="small"><strong>Central question:</strong> where does each return justify deployment, and where does neither suffice alone, yet together they do?</p>
+        </div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-schematic.png" alt="Schematic: private and public returns are spatially complementary along the acidity gradient"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 3 · SIX RESEARCH QUESTIONS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">What we ask</span><span class="section">Six research questions</span></div>
+    <div class="eyebrow">What we ask</div>
+    <h2>Six research questions.</h2>
+    <div class="three-col" style="row-gap:16px;">
+      <div class="card"><span class="label-tag">Q1</span><p class="small">Where does the <strong>private</strong> (yield) return alone justify ERW investment?</p></div>
+      <div class="card"><span class="label-tag">Q2</span><p class="small">Where does the <strong>public</strong> (carbon) return alone justify it?</p></div>
+      <div class="card"><span class="label-tag">Q3</span><p class="small">Where do the two <strong>coincide</strong>, the intersection?</p></div>
+      <div class="card hl"><span class="label-tag">Q4</span><p class="small">Where does neither stream alone suffice, but the <strong>combined margin</strong> is positive?</p></div>
+      <div class="card"><span class="label-tag">Q5</span><p class="small">How <strong>robust</strong> is the deployable geography to parameter assumptions?</p></div>
+      <div class="card"><span class="label-tag">Q6</span><p class="small">What would shift the <strong>public (carbon) envelope</strong> outward?</p></div>
+    </div>
+    <p class="source-note">Q4 is the central result; Q5 and Q6 define the robust core and the levers on the carbon case.</p>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 4 · MODELING FRAMEWORK ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Modeling framework</span><span class="section">Decomposed per-pixel gross margin</span></div>
+    <div class="eyebrow">Modeling framework</div>
+    <h2>A decomposed per-pixel gross margin.</h2>
+    <div class="eq">\[ \pi \;=\; R_{\text{agro}} \;+\; R_{\text{CDR}} \;-\; C \]</div>
+    <p class="small dim" style="text-align:center; margin:-4px 0 14px;">per-hectare gross margin = private agronomic return + public carbon return &minus; full delivered cost</p>
+    <div class="two-col" style="gap:18px;">
+      <ul class="clean small">
+        <li><strong>Resolution.</strong> ~0.083&#176; grid &#215; 44 SSA countries &#215; 23 SPAM crops, area-weighted to each pixel.</li>
+        <li><strong>Three streams.</strong> Agronomic yield uplift, durable CDR credit, and a fully decomposed delivered cost.</li>
+      </ul>
+      <ul class="clean small">
+        <li><strong>Decision object.</strong> Each pixel is classified by which stream(s) make the margin positive, not a single supply curve.</li>
+        <li><strong>Regimes.</strong> Evaluated at year-1, NPV @ 10%, and equilibrium steady state (headline).</li>
+      </ul>
+    </div>
+    <p class="source-note">The pipeline decomposes agronomy, biogeochemistry, and economic geography before recombining them per pixel (next: the assumption sets).</p>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 5 · INPUTS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Inputs</span><span class="section">Public data layers</span></div>
+    <div class="eyebrow">Inputs</div>
+    <h2>Public data layers behind every pixel.</h2>
+    <table class="compact">
+      <tr><th style="text-align:left;">Layer</th><th style="text-align:left;">Source</th><th style="text-align:left;">What it supplies</th></tr>
+      <tr><td class="lead">Soil</td><td style="text-align:left;">SoilGrids</td><td style="text-align:left;">pH, ECEC, texture on cropland</td></tr>
+      <tr><td class="lead">Crops</td><td style="text-align:left;">SPAM v2</td><td style="text-align:left;">23 crop distributions &amp; production</td></tr>
+      <tr><td class="lead">Agronomy</td><td style="text-align:left;">EcoCrop</td><td style="text-align:left;">crop pH-suitability response</td></tr>
+      <tr><td class="lead">Feedstock</td><td style="text-align:left;">GLiM</td><td style="text-align:left;">basalt source geology</td></tr>
+      <tr><td class="lead">Logistics</td><td style="text-align:left;">MAP friction</td><td style="text-align:left;">travel-time delivered-cost surface</td></tr>
+      <tr><td class="lead">Climate</td><td style="text-align:left;">WorldClim</td><td style="text-align:left;">temperature &amp; moisture for weathering</td></tr>
+      <tr><td class="lead">Prices</td><td style="text-align:left;">FAOSTAT</td><td style="text-align:left;">2016&#8211;20 producer-price medians</td></tr>
+      <tr><td class="lead">Lime req.</td><td style="text-align:left;">LiTAS</td><td style="text-align:left;">lime-equivalent dose (targeting)</td></tr>
+      <tr><td class="lead">Carbonate</td><td style="text-align:left;">Merlos / Kamprath</td><td style="text-align:left;">acidity sink for net-export</td></tr>
+    </table>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 6 · PART I DIVIDER ============ -->
+  <section class="slide section">
+    <div class="topbar"><span class="brand">Part I</span><span class="section">The assumption sets</span></div>
+    <div class="eyebrow">Part I</div>
+    <h1>The assumption sets</h1>
+    <div class="secrule"></div>
+    <p>Five modeling choices govern every result: delivered cost, carbon price, net-export CDR accounting, an over-liming private penalty, and kinetic weathering saturation.</p>
+  </section>
+
+  <!-- ============ 7 · ASSUMPTION 1 · DELIVERED COST ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Assumption 1</span><span class="section">Delivered cost</span></div>
+    <div class="eyebrow">Assumption 1 &#183; delivered cost</div>
+    <h2>Cost is dominated by transport, a real lever.</h2>
+    <div class="split s55">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Decomposed cost</span><p class="small">Grinding + feedstock + freight + spreading + MRV, built up per pixel from the friction surface.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Transport binds</span><p class="small">Delivered cost rises steeply with travel time; remote acid soils are priced out even where agronomy is strong.</p></div>
+        <div class="card hl" style="margin-bottom:12px;"><span class="label-tag">The solar lever</span><p class="small">Electrified / solar-assisted haulage cuts variable transport cost; a ~25&#8211;40% reduction visibly expands the viable frontier.</p></div>
+        <div class="card"><span class="label-tag">MRV</span><p class="small">A per-tonne monitoring cost <em>m</em> is netted from the carbon price (see Assumption 2).</p></div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-solar-saving.png" alt="Delivered-cost saving from solar transport, dollars per tonne of basalt"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 8 · ASSUMPTION 2 · CARBON PRICE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Assumption 2</span><span class="section">Carbon price</span></div>
+    <div class="eyebrow">Assumption 2 &#183; carbon price</div>
+    <h2>The carbon return uses a net VCM price.</h2>
+    <div class="eq small">\[ R_{\text{CDR}} \;=\; \text{durable CDR}\;\times\;(\,p - m\,) \]</div>
+    <div class="split s55" style="margin-top:6px;">
+      <div>
+        <p class="small dim"><em>p</em> = VCM carbon price ($/tCO&#8322;) &#183; <em>m</em> = per-tonne MRV cost</p>
+        <p class="small" style="margin-top:10px;">Baseline today&#8217;s price is <strong>$150/tCO&#8322;</strong>, but we sweep a full price ladder. Price is one of the three levers that move the public envelope (Results).</p>
+        <div class="card hl" style="margin-top:14px;"><p class="small">At $150 the durable public envelope is <strong>1.65 Mha</strong> (9.4% of treated cropland); it only becomes large at prices well above today&#8217;s.</p></div>
+      </div>
+      <div>
+        <p class="small dim" style="margin-bottom:6px;">Public envelope grows with price &#183; equilibrium, targeted</p>
+        <table class="compact">
+          <tr><th style="text-align:left;">$/tCO&#8322;</th><th>Public Mha</th><th>% treated</th><th>Durable CDR (Mt)</th></tr>
+          <tr><td class="lead">$100</td><td>0.35</td><td>2.0%</td><td>1.7</td></tr>
+          <tr class="hl"><td class="lead">$150</td><td>1.65</td><td>9.4%</td><td>4.8</td></tr>
+          <tr><td class="lead">$250</td><td>2.51</td><td>14.3%</td><td>6.1</td></tr>
+          <tr><td class="lead">$350</td><td>4.84</td><td>27.6%</td><td>11.0</td></tr>
+          <tr><td class="lead">$500</td><td>8.76</td><td>49.9%</td><td>15.8</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 9 · ASSUMPTION 3 · NET-EXPORT CDR ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Assumption 3</span><span class="section">Net-export CDR</span></div>
+    <div class="eyebrow">Assumption 3 &#183; net-export CDR</div>
+    <h2>Credit only carbon that is durably exported.</h2>
+    <div class="split s55">
+      <div>
+        <div class="eq small">\[ \text{durable CDR} \;=\; \max(\,\text{gross CDR} - F\!\cdot\!S,\; 0\,) \]</div>
+        <p class="small dim"><em>F</em> = 0.88 tCO&#8322; per tCaCO&#8322;-eq &#183; <em>S</em> = acidity sink (standing / maintenance)</p>
+        <p class="small" style="margin-top:12px;">Alkalinity spent neutralizing soil acidity re-releases its CO&#8322;, exactly as agricultural lime does, so it must be deducted. A first-order sequential bound.</p>
+        <div class="card hl" style="margin-top:14px;">
+          <span class="label-tag">Why it matters</span>
+          <p class="small"><strong>&#8776; 80%</strong> of credited removal is cut at first application once acidity neutralization is netted out. Durable removal is largely a steady-state phenomenon, which is why the headline uses the equilibrium regime.</p>
+        </div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-netexport.png" alt="Net-export CDR accounting: gross vs net-export CDR against soil pH"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 10 · ASSUMPTION 4 · OVER-LIMING PENALTY ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Assumption 4</span><span class="section">Over-liming penalty</span></div>
+    <div class="eyebrow">Assumption 4 &#183; over-liming penalty</div>
+    <h2>Too much alkalinity can depress yield.</h2>
+    <div class="split s55">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Mechanism</span><p class="small">Beyond the lime requirement, pH is pushed past the crop optimum; the EcoCrop response applies a yield haircut at the post-application pH.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Buffered shift</span><p class="small">pH change is damped by soil buffering (&beta; = k<sub>&beta;</sub>&#183;ECEC); reacted alkalinity A = gross CDR / F.</p></div>
+        <div class="card hl" style="margin-bottom:12px;"><span class="label-tag">Effect</span><p class="small">Concentrated on high uniform doses. Central estimate trims the targeted private return only modestly (4.31 &#8594; 4.02 Mha, &minus;7%).</p></div>
+        <div class="card"><span class="label-tag">Sensitivity</span><p class="small">A low&#8211;high band over (k<sub>&beta;</sub>, realized-alkalinity) is carried; the uniform-50 case is where it bites hardest.</p></div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-overliming.png" alt="Over-liming penalty on the private return: central estimate and sensitivity band"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 11 · ASSUMPTION 5 · KINETIC SATURATION ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Assumption 5</span><span class="section">Kinetic saturation</span></div>
+    <div class="eyebrow">Assumption 5 &#183; kinetic saturation</div>
+    <h2>Weathering reacts less-than-linearly with dose.</h2>
+    <div class="split s55">
+      <div>
+        <div class="eq small">\[ \operatorname{sat}(D) \;=\; \dfrac{K_d + 50}{K_d + D} \]</div>
+        <p class="small" style="margin-top:10px;">Effective reacted tonnage saturates in applied dose D, normalized to the Lewis (2021) 50 t/ha reference (sat = 1 there). Reported as a band over K<sub>d</sub>.</p>
+        <div class="card hl" style="margin-top:14px;">
+          <span class="label-tag">Key finding</span>
+          <p class="small">Saturation makes CDR concave in dose (giving an interior optimum), but it does not drive the public envelope to zero. Below the 50 t/ha reference, per-tonne reactivity is higher, so at targeted doses durable CDR actually rises. What binds the carbon case is <strong>MAC &gt; price</strong>, not kinetics.</p>
+        </div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-saturation.png" alt="Kinetic saturation makes CDR concave in dose; durable CDR and public area vs dose"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 12 · DESIGN SPACE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Design space</span><span class="section">Regimes &#215; allocation rules</span></div>
+    <div class="eyebrow">Design space</div>
+    <h2>Temporal regimes &#215; allocation rules.</h2>
+    <p class="lead">Two axes are swept alongside the assumption sets; the headline is <strong>equilibrium &#215; targeted, net-export</strong>.</p>
+    <h3 style="margin-top:18px; color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Temporal regimes</h3>
+    <div class="phases three" style="margin-top:8px;">
+      <div class="phase"><div class="phase-label">Year-1</div><div class="phase-body">One-time dose &amp; cost; durable CDR net of standing acidity. Most conservative on carbon.</div></div>
+      <div class="phase"><div class="phase-label">NPV @ 10%</div><div class="phase-body">Discounted stream of relief and durable removal.</div></div>
+      <div class="phase active"><div class="phase-label">Equilibrium</div><div class="phase-body">Steady-state durable removal, the headline regime.</div></div>
+    </div>
+    <h3 style="margin-top:16px; color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Allocation rules</h3>
+    <div class="phases" style="margin-top:8px; grid-template-columns:1fr 1fr;">
+      <div class="phase active"><div class="phase-label">Targeted</div><div class="phase-body">LiTAS lime-equivalent dose, agronomically matched. Headline.</div></div>
+      <div class="phase"><div class="phase-label">Uniform 10 / 20 / 50 t/ha</div><div class="phase-body">Fixed rates, tracing how CDR and over-liming scale with dose.</div></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 13 · PART II DIVIDER ============ -->
+  <section class="slide section">
+    <div class="topbar"><span class="brand">Part II</span><span class="section">Results</span></div>
+    <div class="eyebrow">Part II</div>
+    <h1>Results</h1>
+    <div class="secrule"></div>
+    <p>Envelopes and the combined-only band &#183; durable carbon and marginal abatement cost &#183; what shifts the public frontier &#183; optimal rates &#183; the robust core geography.</p>
+  </section>
+
+  <!-- ============ 14 · RESULTS · TYPOLOGY ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; typology</span><span class="section">Five-way classification</span></div>
+    <div class="eyebrow">Results &#183; typology</div>
+    <h2>A five-way pixel classification.</h2>
+    <div class="split s60">
+      <div class="chart-wrap full"><img src="figures/fig-typology.png" alt="Return typology map, equilibrium net-export CDR, targeted"></div>
+      <div style="display:flex; flex-direction:column; gap:16px; align-self:center;">
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#2E7D32; margin-top:3px;"></span><p class="small"><strong>Private-sufficient</strong> &#183; R<sub>agro</sub> &minus; C &gt; 0</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#1E5FA8; margin-top:3px;"></span><p class="small"><strong>Public-sufficient</strong> &#183; R<sub>CDR</sub> &minus; C &gt; 0</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#7B2D8E; margin-top:3px;"></span><p class="small"><strong>Intersection</strong> &#183; both hold at the same pixel</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#D9A93D; margin-top:3px;"></span><p class="small"><strong>Combined-only</strong> &#183; neither alone, but GM &gt; 0</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#9E9E9E; margin-top:3px;"></span><p class="small"><strong>Neither</strong> &#183; GM &le; 0, not deployable</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 15 · RESULTS · PRIVATE ENVELOPE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; private envelope</span><span class="section">Where yield alone pays</span></div>
+    <div class="eyebrow">Results &#183; private envelope</div>
+    <h2>Where yield alone pays.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-private.png" alt="Private-sufficient (yield) map, equilibrium"></div>
+      <div>
+        <p class="lead">Land where the agronomic return covers the full delivered cost with no carbon credit at all.</p>
+        <div class="stats" style="margin-top:18px; gap:22px;">
+          <div class="stat"><div class="num">4.3<span class="unit">Mha</span></div><div class="label">private-sufficient area</div></div>
+          <div class="stat"><div class="num">$3.5<span class="unit">B</span></div><div class="label">private return</div></div>
+        </div>
+        <div class="card hl" style="margin-top:18px;"><p class="small">The largest single envelope under the targeted dose. But it is a minority of acid cropland: most viable land needs more than yield to pencil.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 16 · RESULTS · PUBLIC ENVELOPE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; public envelope</span><span class="section">Where carbon alone pays</span></div>
+    <div class="eyebrow">Results &#183; public envelope</div>
+    <h2>Where carbon alone pays (durably).</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-public.png" alt="Public-sufficient (durable net-export CDR) map, equilibrium, $150/tCO2"></div>
+      <div>
+        <p class="lead">Land where durable, net-export CDR at $150/tCO&#8322; covers cost with no yield benefit.</p>
+        <div class="stats" style="margin-top:18px; gap:22px;">
+          <div class="stat"><div class="num">1.7<span class="unit">Mha</span></div><div class="label">durable public area</div></div>
+          <div class="stat"><div class="num">9.4<span class="unit">%</span></div><div class="label">of treated cropland</div></div>
+        </div>
+        <div class="card hl" style="margin-top:18px;"><p class="small">Smaller than the private envelope, and price-conditional. Net-export accounting and today&#8217;s VCM price keep the carbon-only case tightly bound, the reason the combined case matters.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 17 · RESULTS · THE CENTRAL RESULT ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; the central result</span><span class="section">The combined-only band</span></div>
+    <div class="eyebrow">Results &#183; the central result</div>
+    <h2>The combined-only band is the policy object.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-intersection.png" alt="Intersection map, equilibrium, net-export CDR"></div>
+      <div>
+        <div class="card hl" style="margin-bottom:16px;"><span class="label-tag">2.1 Mha &#183; combined-only</span><p class="small">Neither the yield return nor the carbon return alone covers cost, yet together the margin is positive.</p></div>
+        <div class="stats" style="gap:14px; grid-template-columns:repeat(3,1fr);">
+          <div class="stat"><div class="num">4.3</div><div class="label">private (Mha)</div></div>
+          <div class="stat"><div class="num">1.7</div><div class="label">public (Mha)</div></div>
+          <div class="stat"><div class="num">6.9</div><div class="label">combined (Mha)</div></div>
+        </div>
+        <p class="small dim" style="margin-top:16px;">The economic point: voluntary carbon finance is not a bonus on an already-profitable practice; it is the marginal revenue that unlocks an otherwise-unprofitable, yield-improving investment.</p>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 18 · RESULTS · WHAT BINDS THE CARBON CASE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; the binding constraint</span><span class="section">Marginal abatement cost</span></div>
+    <div class="eyebrow">Results &#183; what binds the carbon case</div>
+    <h2>Marginal abatement cost, not kinetics.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-mac.png" alt="Marginal abatement cost of durable net-export CDR map, equilibrium, targeted"></div>
+      <div>
+        <div class="stat" style="margin-bottom:16px;"><div class="num">$446<span class="unit">/tCO&#8322;</span></div><div class="label" style="max-width:320px;">median marginal abatement cost, well above today&#8217;s $150 VCM price</div></div>
+        <div class="card" style="margin-bottom:12px;"><p class="small">MAC = delivered cost per tonne of rock &divide; durable CDR per tonne. The public envelope is exactly the land where <strong>MAC &lt; net price</strong> (p &minus; m).</p></div>
+        <div class="card hl"><p class="small">So the carbon case is limited by how much CO&#8322; a tonne of rock verifiably removes, the largest and least-resolved lever, and the clear field-calibration priority.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 19 · RESULTS · THREE LEVERS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; three levers</span><span class="section">Shifting the public envelope</span></div>
+    <div class="eyebrow">Results &#183; three levers</div>
+    <h2>What shifts the public envelope outward.</h2>
+    <div class="split s55">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">1 &#183; Higher VCM price (p)</span><p class="small">Public area climbs from 2% of treated cropland at $100 to ~50% at $500. The most direct lever.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">2 &#183; Lower delivered cost (C)</span><p class="small">Transport-cost reductions (e.g. solar haulage) lower MAC pixel-by-pixel; see Assumption 1.</p></div>
+        <div class="card hl"><span class="label-tag">3 &#183; More durable CDR per tonne</span><p class="small">Raising verified removal per tonne of rock cuts MAC directly. Kinetic saturation is second-order here.</p></div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-supply-curve.png" alt="Public envelope vs carbon price, targeted, MRV $20"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 20 · RESULTS · OPTIMAL RATES ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; optimal rates</span><span class="section">Interior optima by objective</span></div>
+    <div class="eyebrow">Results &#183; optimal application rates</div>
+    <h2>Each objective has an interior optimum.</h2>
+    <div class="split s60">
+      <div class="chart-wrap full"><img src="figures/fig-optimal-rates.png" alt="Pixel-specific optimal ERW application rate by objective: private, public, combined"></div>
+      <div>
+        <p class="lead">With both refinements, each per-pixel objective is concave, so a pixel-specific optimal rate exists for the private, public, and combined margins.</p>
+        <div class="card hl" style="margin-top:16px;"><p class="small">The combined optimum is <strong>moderate</strong> (typically well below blanket-high uniform doses): enough over-application to earn extra carbon, but not so much that over-liming and saturation erode the return.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 21 · RESULTS · ROBUST CORE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results &#183; robust core</span><span class="section">A defensible priority geography</span></div>
+    <div class="eyebrow">Results &#183; robust core</div>
+    <h2>A defensible priority geography.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-core.png" alt="Core targeting tiers map, full-grid robustness"></div>
+      <div>
+        <p class="lead">Intersecting the envelope across the plausible parameter grid isolates land that stays viable under most assumptions.</p>
+        <div class="stats" style="margin-top:16px; gap:14px; grid-template-columns:repeat(3,1fr);">
+          <div class="stat"><div class="num">~0.8<span class="unit">Mha</span></div><div class="label">robust core-priority cropland</div></div>
+          <div class="stat"><div class="num">~0.5<span class="unit">M</span></div><div class="label">farms reached</div></div>
+          <div class="stat"><div class="num">~$0.75<span class="unit">B</span></div><div class="label">crop value at stake</div></div>
+        </div>
+        <div class="card hl" style="margin-top:16px;"><p class="small">This is the geography one would deploy first, and the base to expand as price rises or cost falls.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 22 · TAKEAWAYS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Takeaways</span><span class="section">A coupled proposition</span></div>
+    <div class="eyebrow">Takeaways</div>
+    <h2>ERW is a coupled agronomic-and-carbon proposition.</h2>
+    <div class="two-col" style="row-gap:16px;">
+      <div class="card"><span class="label-tag">1</span><h3 style="font-size:15px;">The two returns rarely each suffice alone</h3><p class="small">But together they make a meaningful area of SSA cropland profitable that neither would, the 2.1 Mha combined-only band.</p></div>
+      <div class="card hl"><span class="label-tag">2</span><h3 style="font-size:15px;">Carbon finance is the margin, not a bonus</h3><p class="small">On most viable land, VCM revenue is what unlocks a yield-improving investment. That reframes ERW away from a pure CDR supply curve.</p></div>
+      <div class="card"><span class="label-tag">3</span><h3 style="font-size:15px;">The binding constraint is durable CDR per tonne</h3><p class="small">Net-export accounting cuts first-application removal ~80%; median MAC is $446. Price, delivered cost, and verified removal are the three levers.</p></div>
+      <div class="card"><span class="label-tag">4</span><h3 style="font-size:15px;">Treating it as coupled changes the answer</h3><p class="small">It changes both where to deploy first (the robust core) and what to invest in to expand it (field calibration of removal).</p></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 23 · NEXT ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Next</span><span class="section">Caveats &amp; direction</span></div>
+    <div class="eyebrow">Next</div>
+    <h2>Caveats and where we go next.</h2>
+    <div class="two-col">
+      <div>
+        <h3 style="color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Caveats</h3>
+        <div class="ask hl" style="margin-top:10px;"><h3>Priorities</h3><p>Field calibration of durable removal per tonne is the single highest-value input; it sets MAC and the whole public case.</p></div>
+        <div class="ask" style="margin-top:12px;"><h3>Not yet modeled</h3><p>Tenure and who finances the upfront cost, compaction / N&#8322;O effects, and country-level credit eligibility (Article 6).</p></div>
+        <div class="ask" style="margin-top:12px;"><h3>Farm counts</h3><p>Based on national average holding sizes; order-of-magnitude.</p></div>
+      </div>
+      <div>
+        <h3 style="color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Next</h3>
+        <div class="ask" style="margin-top:10px;"><h3>Sensitivity sweep</h3><p>Expand around the parameters that move results most: removal per tonne, price, delivered cost, k<sub>&beta;</sub>, K<sub>d</sub>.</p></div>
+        <div class="ask" style="margin-top:12px;"><h3>Optimal-rate maps</h3><p>Fold the pixel-specific private and combined optimal-rate maps into the manuscript.</p></div>
+        <div class="ask" style="margin-top:12px;"><h3>Share &amp; collaborate</h3><p>Push erw-exante-v2 to GitHub for coauthor review; manuscript points to the repo.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 24 · CLOSING (CIMMYT collage panel) ============ -->
+  <section class="slide closing">
+    <img class="closing-photo" src="figures/cimmyt_collage.jpg" alt="CIMMYT field photo collage">
+    <div class="closing-right">
+      <div class="eyebrow">Discussion</div>
+      <p class="closing-thanks">Thank you for<br>your interest!</p>
+      <p class="closing-meta">
+        Mapping the public and private returns to<br>Enhanced Rock Weathering in Sub-Saharan Africa<br><br>
+        <span class="mono">B. H. Gebrekidan &#183; J. Chamberlin</span><br>
+        CIMMYT &#183; working draft for Agricultural Economics
+      </p>
+    </div>
+    <img class="closing-logo" src="figures/cimmyt_logo_stacked.svg" alt="CIMMYT &#8211; CGIAR">
+  </section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">&#8249;</button>
+  <span id="counter">1 / 1</span>
+  <button id="next" aria-label="Next slide">&#8250;</button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const total = slides.length;
+  let idx = 0;
+  slides.forEach((s, k) => { const p = s.querySelector('.pageno'); if (p) p.textContent = String(k + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0'); });
+  slides.forEach(s => {
+    if (s.classList.contains('closing')) return;
+    const l = document.createElement('div');
+    l.className = 'cimmyt-foot-logo';
+    l.innerHTML = '<img src="figures/cimmyt_logo_horizontal.svg" alt="CIMMYT – CGIAR">';
+    s.appendChild(l);
+  });
+  function go(n) {
+    idx = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+    counter.textContent = (idx + 1) + ' / ' + total;
+    progress.style.width = ((idx + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
+  }
+  document.getElementById('next').onclick = () => go(idx + 1);
+  document.getElementById('prev').onclick = () => go(idx - 1);
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(idx - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(total - 1);
+    else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+    else if (e.key.toLowerCase() === 'p') window.print();
+  });
+  const h = parseInt(location.hash.slice(1), 10);
+  go(isNaN(h) ? 0 : h - 1);
+
+  // Typeset equations once KaTeX (deferred) has loaded.
+  function typeset() {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    document.addEventListener('DOMContentLoaded', typeset);
+    window.addEventListener('load', typeset);
+  } else {
+    document.addEventListener('DOMContentLoaded', typeset);
+  }
+</script>
+</body>
+</html>
