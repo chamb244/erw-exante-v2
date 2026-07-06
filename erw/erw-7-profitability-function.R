@@ -18,7 +18,10 @@
 #   transport      transport_km × truck_kgCO2_per_t_km
 #   spreading      spreading_kgCO2_per_t  (small)
 #
-# Net CDR (t CO2/ha) = gross_CDR − LCA_per_ha
+# Net-export CDR (t CO2/ha) = max(gross_CDR − F × acidity_sink, 0)   (durable)
+#   F = CDR_eff / effective_NV ≈ 0.88 tCO2 / tCaCO3-eq; sink is regime-specific
+#   (standing acidity for year1/NPV, maintenance acidity for equilibrium)
+# Net CDR (t CO2/ha) = max(net_export_CDR − LCA_per_ha, 0)
 # CDR revenue ($/ha) = net_CDR × (carbon_price − mrv_cost_per_tco2)
 # Gross margin ($/ha) = agronomic_return + cdr_revenue − basalt_cost
 #
@@ -78,6 +81,14 @@ GRAIN_SIZE_UM        <- get_fs('grain_size_um')
 GRINDING_KWH_PER_T   <- get_fs('grinding_kWh_per_t')
 GRINDING_USD_PER_T   <- get_fs('grinding_usd_per_t_at_ref_electricity')
 PROJECT_HORIZON_YR   <- get_fs('project_horizon_yr')
+
+# net-export CDR factor: CO2 re-released per t CaCO3-eq of acidity neutralized.
+# Not tuned — falls straight out of the feedstock's own chemistry:
+#   F = CDR_eff (kg CO2 / t basalt) / effective_NV (kg CaCO3-eq / t basalt) ≈ 0.88
+CDR_EFF_KG_PER_T <- get_fs('CDR_eff_kg_per_t_ref')     # 87.6 kg CO2 / t basalt
+EFFECTIVE_NV_T   <- get_fs('effective_NV')             # 0.0996 t CaCO3-eq / t basalt
+F_REEXPORT       <- CDR_EFF_KG_PER_T / (EFFECTIVE_NV_T * 1000)
+cat('Net-export F (tCO2 re-released per tCaCO3-eq): ', round(F_REEXPORT, 3), '\n', sep='')
 
 # ------------------------------------------------------------------------------
 # cost components (override per scenario in erw-8)
@@ -195,6 +206,15 @@ basalt_stacks <- list(
                     multi_layer = FALSE)
 )
 
+# regime-specific acidity sinks for the net-export deduction (t CaCO3/ha):
+#   year-1 / NPV -> standing exchangeable acidity (Kamprath lime requirement)
+#   equilibrium  -> annual maintenance acidity (re-acidification only)
+# NA (non-acid pixels) -> 0: no acidity to neutralize, so alkalinity fully exports.
+acidity_standing <- agg10(paste0(input_path, 'caco3_kamprath.tif'))
+acidity_standing <- terra::ifel(is.na(acidity_standing), 0, acidity_standing)
+acidity_maint    <- agg10(paste0(input_path, 'caco3_merlos_maintenance.tif'))[[1]]
+acidity_maint    <- terra::ifel(is.na(acidity_maint), 0, acidity_maint)
+
 # per-crop basalt + CDR, with allocation-rule-aware masking
 bf <- function(crop, alloc, maintenance = FALSE) {
   st <- basalt_stacks[[alloc]]
@@ -262,12 +282,21 @@ basalt_cost <- function(crop, basalt_tha, cost_per_t) {
   c(setNames(basalt_tha, paste0(crop, '_basalt_tha')), cost)
 }
 
-# CDR revenue with derived LCA + MRV
+# CDR revenue with net-export deduction, derived LCA + MRV
 cdr_revenue <- function(crop, basalt_tha, cdr_gross_tha, lca_kg_per_t,
-                        carbon_price, mrv_cost_per_tco2) {
+                        carbon_price, mrv_cost_per_tco2,
+                        acidity_sink, f_reexport) {
   gross <- cdr_gross_tha; names(gross) <- paste0(crop, '_cdr_gross_tha')
+  # (1) net-export deduction: subtract the alkalinity consumed neutralizing soil
+  # acidity, which re-releases its CO2 (HCO3- + H+ -> H2O + CO2) exactly like
+  # agricultural lime. Only alkalinity that exports as bicarbonate is durable.
+  s <- terra::resample(acidity_sink, gross)
+  s <- terra::ifel(is.na(s), 0, s)
+  net_export <- gross - f_reexport * s
+  net_export <- terra::ifel(net_export < 0, 0, net_export)
+  # (2) lifecycle supply-chain emissions (grinding / transport / spreading)
   lca_per_ha_t <- basalt_tha * lca_kg_per_t / 1000
-  net <- gross - lca_per_ha_t
+  net <- net_export - lca_per_ha_t
   net <- terra::ifel(net < 0, 0, net); names(net) <- paste0(crop, '_cdr_net_tha')
   rev <- net * (carbon_price - mrv_cost_per_tco2)
   rev <- terra::ifel(rev < 0, 0, rev); names(rev) <- paste0(crop, '_cdr_revenue_usha')
@@ -308,7 +337,8 @@ profit <- function(crop, yield_resp, yf, crop_price, returns_f,
     ret[[agro_layer]] <- ret[[agro_layer]] * PROJECT_HORIZON_YR
     cost <- basalt_cost(crop, rate_tha, basalt_cost_per_t)
     cdr  <- cdr_revenue(crop, rate_tha, cdr_tha, lca_kg_per_t,
-                        carbon_price, mrv_cost_per_tco2)
+                        carbon_price, mrv_cost_per_tco2,
+                        acidity_sink = acidity_standing, f_reexport = F_REEXPORT)
 
   } else if (returns_f == 'npv') {
     r1 <- returns(crop, yield_resp, yield_f = yf, crop_price)
@@ -321,7 +351,8 @@ profit <- function(crop, yield_resp, yf, crop_price, returns_f,
     # CDR_NPV_FACTOR < 1 captures the time-value loss vs upfront treatment
     # (typically ~0.79 for a 5-yr first-order phasing at 10% discount).
     cdr  <- cdr_revenue(crop, rate_tha, cdr_tha, lca_kg_per_t,
-                        carbon_price, mrv_cost_per_tco2)
+                        carbon_price, mrv_cost_per_tco2,
+                        acidity_sink = acidity_standing, f_reexport = F_REEXPORT)
     cdr_rev_npv <- cdr[[paste0(crop, '_cdr_revenue_usha')]] * CDR_NPV_FACTOR
     names(cdr_rev_npv) <- paste0(crop, '_cdr_revenue_usha')
     cdr[[paste0(crop, '_cdr_revenue_usha')]] <- cdr_rev_npv
@@ -330,7 +361,8 @@ profit <- function(crop, yield_resp, yf, crop_price, returns_f,
     ret  <- returns(crop, yield_resp, yield_f = yf, crop_price)
     cost <- basalt_cost(crop, rate_m_tha, basalt_cost_per_t)
     cdr  <- cdr_revenue(crop, rate_m_tha, cdr_m_tha, lca_kg_per_t,
-                        carbon_price, mrv_cost_per_tco2)
+                        carbon_price, mrv_cost_per_tco2,
+                        acidity_sink = acidity_maint, f_reexport = F_REEXPORT)
   }
 
   agro_ret <- ret[[paste0(crop, '_agro_return_usha')]]

@@ -47,7 +47,9 @@ TBL_OUT <- here::here("docs", "tables")
 dir.create(MAP_OUT, recursive = TRUE, showWarnings = FALSE)
 dir.create(TBL_OUT, recursive = TRUE, showWarnings = FALSE)
 
-REGIME      <- "year1"
+# "equilibrium" is the manuscript headline (steady-state, net-export CDR now baked
+# into erw-7's _cdr_net_tha layer). Switch to "year1" for the upper-bound contrast.
+REGIME      <- "equilibrium"
 ALLOCS      <- c("targeted", "uniform_20")
 MRV         <- 20      # $/tCO2  (erw-7 default)
 CARBON_BASE <- 150     # $/tCO2
