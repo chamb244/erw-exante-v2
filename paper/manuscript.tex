@@ -396,7 +396,34 @@ it is then netted of grinding, transport, and spreading life-cycle emissions. Th
 agronomic return is the modeled yield response to acidity neutralization valued
 at crop-specific producer prices. We adopt baseline parameters of a \$150/\tco{}
 credit price, \$20/\tco{} MRV cost, 50~$\mu$m grain size, and a
-10\% discount rate.
+10\% discount rate. Table~\ref{tab:costs} decomposes the delivered cost.
+
+\begin{table}[t]
+\centering
+\caption{Delivered-cost decomposition per tonne of basalt, with the separate MRV
+deduction. Delivered cost $=$ quarry-gate $+$ grinding $+$ transport $+$
+spreading; MRV is netted from the carbon price rather than added to delivered
+cost. Transport is the only spatially varying (variable) term and drives the
+cost heterogeneity that determines where ERW is deployable; grinding cost varies
+with the country electricity tariff. Life-cycle \co{} of grinding, transport, and
+spreading is separately deducted from gross removal (not shown).}
+\label{tab:costs}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{2.9cm}p{4.3cm}p{1.15cm}p{4.7cm}@{}}
+\toprule
+Component & Reference value & Type & Basis / source \\
+\midrule
+Quarry-gate feedstock & \$10/t & fixed & basalt fines as aggregate by-product \\
+Grinding (50~$\mu$m) & 19.4~kWh/t $\times$ tariff ($\approx$\$1.9/t) & fixed & \citet{strefler2018} energy curve \\
+Transport (haulage) & travel-time $\times$ \$0.04/min/t & variable & 30\,t truck over MAP friction surface \\
+Spreading & \$8/t & fixed & on-farm application \\
+\midrule
+\textbf{Delivered cost/t} & quarry $+$ grind $+$ transport $+$ spread & & consumed per pixel \\
+MRV (netted separately) & \$20/\tco{} & per \tco{} & \citet{levy2024} pilot benchmark \$30 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Net-export carbon accounting}\label{sec:netexport}
 The alkalinity released by weathering can either neutralize soil acidity or
