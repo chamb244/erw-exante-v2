@@ -1,0 +1,169 @@
+#!/usr/bin/env bash
+# Build docs/erw-results.tex + docs/erw-results.pdf from docs/erw-results.md.
+#
+# The Markdown file is the canonical source of truth — edit erw-results.md,
+# not erw-results.tex (which is regenerated each time this script runs).
+#
+# The actual table rows are filled in from docs/tables/output-*.csv before
+# pandoc runs, by a short awk pipeline below. Run erw/erw-10-profitability-
+# maps-tables.R first to populate those CSVs.
+#
+# Dependencies: pandoc, xelatex, awk. Run from the repo root or from docs/.
+
+set -euo pipefail
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$HERE"
+
+MD="erw-results.md"
+TEX="erw-results.tex"
+PDF="erw-results.pdf"
+TBL="tables"
+
+if [[ ! -f "$MD" ]]; then
+  echo "error: $MD not found in $HERE" >&2
+  exit 1
+fi
+
+# Build a working copy with the placeholder table rows substituted by real
+# CSV rows. Each placeholder is the literal line
+#   | _filled by erw-10 from <csv>.csv_ |
+# and is replaced with N markdown table rows.
+
+TMP_MD="$(mktemp -t erw-results-XXXX.md)"
+trap 'rm -f "$TMP_MD"' EXIT
+
+awk -v tbl="$TBL" '
+  function csv_quote_strip(s) {
+    gsub(/^"/, "", s); gsub(/"$/, "", s); return s
+  }
+  function read_csv(file,   line, n, hdr, body) {
+    n = 0
+    while ((getline line < file) > 0) {
+      n++
+      if (n == 1) { hdr = line; continue }
+      body[n-1] = line
+    }
+    close(file)
+    BODY_N = n - 1
+    for (i = 1; i <= BODY_N; i++) BODY[i] = body[i]
+  }
+  function split_csv(line, arr,   n, i, c, inq, field) {
+    n = 0; field = ""; inq = 0
+    for (i = 1; i <= length(line); i++) {
+      c = substr(line, i, 1)
+      if (c == "\"") { inq = !inq; continue }
+      if (c == "," && !inq) { n++; arr[n] = field; field = ""; continue }
+      field = field c
+    }
+    n++; arr[n] = field
+    return n
+  }
+
+  /\| _filled by erw-10 from output-ssa-summary\.csv_ \|/ {
+    file = tbl "/output-ssa-summary.csv"
+    delete BODY; BODY_N = 0
+    while ((getline line < file) > 0) {
+      if (++ln == 1) continue
+      delete arr
+      nf = split_csv(line, arr)
+      if (nf < 9) continue
+      printf "| %s | %s | %s | %s | %s | %s | %s | %s | %s |\n", \
+        arr[1], arr[2], arr[3], arr[4], arr[5], arr[6], arr[7], arr[8], arr[9]
+    }
+    close(file); ln = 0
+    next
+  }
+
+  /\| _filled by erw-10 from output-crop-ranking\.csv_ \|/ {
+    file = tbl "/output-crop-ranking.csv"
+    # Collect npv-targeted rows, sort by gm_total_musd desc, take top 8
+    delete rows; n = 0
+    while ((getline line < file) > 0) {
+      if (++ln == 1) continue
+      delete arr
+      split_csv(line, arr)
+      if (arr[1] != "npv" || arr[2] != "targeted") continue
+      n++
+      rows[n] = arr[3] "\t" arr[4] "\t" arr[5] "\t" arr[6]
+    }
+    close(file); ln = 0
+    # Bubble sort (n is small)
+    for (i = 1; i <= n; i++) for (j = i+1; j <= n; j++) {
+      split(rows[i], a, "\t"); split(rows[j], b, "\t")
+      if (b[2]+0 > a[2]+0) { tmp = rows[i]; rows[i] = rows[j]; rows[j] = tmp }
+    }
+    for (i = 1; i <= n && i <= 8; i++) {
+      split(rows[i], a, "\t")
+      printf "| %d | %s | %s | %s | %s |\n", i, a[1], a[2], a[3], a[4]
+    }
+    next
+  }
+
+  /\| _filled by erw-10 from output-country-summary\.csv_ \|/ {
+    file = tbl "/output-country-summary.csv"
+    delete rows; n = 0
+    while ((getline line < file) > 0) {
+      if (++ln == 1) continue
+      delete arr
+      split_csv(line, arr)
+      if (arr[1] != "npv" || arr[2] != "targeted") continue
+      # Drop countries with no CDR potential (flat zero across the board)
+      if (arr[5]+0 == 0) continue
+      n++
+      rows[n] = arr[3] "\t" arr[4] "\t" arr[5] "\t" arr[6]
+    }
+    close(file); ln = 0
+    for (i = 1; i <= n; i++) for (j = i+1; j <= n; j++) {
+      split(rows[i], a, "\t"); split(rows[j], b, "\t")
+      if (b[2]+0 > a[2]+0) { tmp = rows[i]; rows[i] = rows[j]; rows[j] = tmp }
+    }
+    for (i = 1; i <= n && i <= 12; i++) {
+      split(rows[i], a, "\t")
+      printf "| %d | %s | %s | %s | %s |\n", i, a[1], a[2], a[4], a[3]
+    }
+    next
+  }
+
+  { print }
+' "$MD" > "$TMP_MD"
+
+echo "==> pandoc: $MD (+ CSV substitutions) -> $TEX"
+pandoc -f markdown -t latex "$TMP_MD" \
+  -o "$TEX" \
+  --standalone \
+  --toc \
+  --pdf-engine=xelatex \
+  --top-level-division=section \
+  -V documentclass=article \
+  -V fontsize=11pt \
+  -V geometry:margin=2.0cm \
+  -V colorlinks=true \
+  -V linkcolor=NavyBlue \
+  -V urlcolor=NavyBlue \
+  -V toccolor=NavyBlue \
+  -V mainfont="Helvetica Neue" \
+  -V monofont="Menlo" \
+  -V title="Ex-Ante ERW --- Results dashboard" \
+  -V subtitle="Profitability maps and tables under different assumptions" \
+  -V date="$(date +%Y-%m-%d)" \
+  --include-in-header="erw-model-header.tex"
+
+{
+  echo "% =====================================================================";
+  echo "% AUTO-GENERATED from docs/erw-results.md by docs/build-erw-results.sh.";
+  echo "% Do NOT edit this file directly — your changes will be overwritten on";
+  echo "% the next rebuild. Edit erw-results.md and re-run build-erw-results.sh.";
+  echo "% =====================================================================";
+  cat "$TEX";
+} > "$TEX.tmp" && mv "$TEX.tmp" "$TEX"
+
+echo "==> xelatex pass 1"
+xelatex -interaction=nonstopmode -halt-on-error "$TEX" > /dev/null
+echo "==> xelatex pass 2 (cross-refs)"
+xelatex -interaction=nonstopmode -halt-on-error "$TEX" > /dev/null
+
+rm -f erw-results.aux erw-results.log erw-results.out erw-results.toc
+
+pages=$(pdfinfo "$PDF" 2>/dev/null | awk '/^Pages:/ {print $2}')
+size=$(du -h "$PDF" | cut -f1)
+echo "==> wrote $PDF (${pages:-?} pages, $size)"

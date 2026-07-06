@@ -42,7 +42,7 @@ spreading finely-ground silicate rock (almost always basalt) on cropland
    hectare and a 12–16 % yield uplift over four years [5]; a 2024–25
    smallholder trial in Kisumu County, Kenya reported a 71 % first-year
    and 79 % second-year maize-yield increase from a single 20 t/ha
-   basalt application [6],
+   nephelinite (volcanic rock powder) application [6],
 3. uses **existing infrastructure** (rock from quarries that already
    exist; tractors that already spread lime; logistics chains that
    already exist), and
@@ -197,8 +197,10 @@ basalt on a farmer's field. The cost has four components:
    electricity cost, so it varies by country (industrial electricity
    tariffs in Sub-Saharan Africa range roughly $0.05 to $0.20 per kWh).
 4. **Spreading the rock on the field** ($8 per tonne) and
-   **measuring/verifying the CDR for the carbon market** ($30 per tonne
-   of CO₂ removed).
+   **measuring/verifying the CDR for the carbon market** ($20 per tonne
+   of CO₂ removed under the 2026-05-26-refreshed defaults — midpoint
+   of Levy et al. 2024 first-of-kind pilots and the at-scale
+   aggregator-pooled forecast).
 
 The output of this chain is the **delivered cost surface**: dollars per
 tonne of basalt that arrives at a farmer's field.
@@ -326,8 +328,8 @@ per hectare), and for every choice of *time horizon* (year-1, ten-year
 net-present value at 10 % discount, or equilibrium). The output is a
 large stack of map layers — 276 of them per run: 23 crops × 4 allocation
 rules × 3 regimes. Default policy parameters: carbon price $150/tCO₂
-(the 2024–25 mid-market for verified ERW credits), MRV cost $30/tCO₂,
-discount rate 10 % per year, CDR phasing 30/25/20/15/10 % over five
+(the 2024–25 mid-market for verified ERW credits), MRV cost $20/tCO₂,
+grain size 50 µm, discount rate 10 % per year, CDR phasing 30/25/20/15/10 % over five
 years.
 
 ## Block 8 — The supply ranking
@@ -379,26 +381,118 @@ nearest basalt is hundreds of kilometres away.](maps/11-basalt-delivered-price.p
 
 # 7. What we have actually produced so far
 
-By **2026-05-16**, the model is in the following state:
+By **2026-05-26**, the model is in the following state:
 
 - All five of the input-and-surface blocks (1, 2, 3, 4, 5) have been
   run end-to-end on real data and produce the maps above.
 - The pH map matches the qualitative geography of African soils that
   you would expect from any soil-science textbook.
 - The CDR yield map peaks in the humid tropics, exactly where the
-  literature [2, 5] says it should.
+  literature [2, 5] says it should. With the 2026-05-26 round-1
+  refresh (50 µm grain, CGIAR-CSI AI for the pedogenic deduction),
+  mean CDR under LiTAS-targeted allocation lands at **3.5 t CO₂/ha**
+  cumulative (was ~2 t/ha) and the per-tonne CDR potential at the
+  reference climate is **88 kg CO₂/t basalt** (was 62 kg/t).
 - The delivered-basalt-price map ranges from $10 per tonne (right at
   the outcrop) to $50 per tonne (the cap), with about half of
   Sub-Saharan-African cropland binding at the cap. This is a strong
   signal that *which country a farm is in* matters far more for ERW
   economics than the literature's standard "uniform $30 per tonne"
-  assumption used by Renforth [9] and similar global-scale work.
+  assumption used in global-scale ERW assessments.
 - Block 6's Bayesian-yield arm is **not yet fitted** --- the
   Bayesian-statistics software has to be installed and run on the
-  curated trial dataset. EcoCrop is in place as the fallback.
-- Block 7 (the profitability function), Block 8 (supply ranking),
-  and Block 9 (sensitivity sweeps) **have not yet been run**. All
-  their *inputs* are ready; what is left is to execute the run.
+  curated trial dataset. EcoCrop is in place as the fallback, now
+  with per-crop max-pH cliffs instead of a flat 5.5.
+- **Block 7 (profitability) and Block 8 (supply ranking) have been
+  re-run end-to-end at the refreshed defaults.** Block 7 wrote 276
+  gross-margin maps (4 allocation rules × 23 crops × 3 regimes); Block
+  8 wrote three supply curves and nine deployment masks. The new
+  headline picture is in §7.0 below — most crops positive on
+  equilibrium; year-1 strongly positive on the high-value crops.
+- Block 9 (sensitivity sweeps) **has not yet been re-run** at the new
+  defaults. Its code is in place but the default-scope sweep takes
+  roughly six to eight hours on a single core (about 14,000
+  profitability evaluations).
+
+## 7.0 Headline numbers (refreshed 2026-05-26)
+
+A round-1 conservatism review (see the change-log in
+`docs/erw-parameters.md`) re-anchored five defaults: **grain size 100 µm
+→ 50 µm**, **MRV $30 → $20/tCO₂**, **year-1 agronomic return now summed
+over the 5-year basalt residency** (was a single-season figure),
+**EcoCrop max-pH cliff** generalised from a flat 5.5 to per-crop
+optima (5.5–8.0), and the **pedogenic deduction** now consumes the
+CGIAR-CSI Global Aridity Index (AI = MAP / PET) when available. These
+fixes flipped the picture from "negative almost everywhere" to a
+strongly positive picture across most crops and most regimes.
+
+**Per-crop, LiTAS-targeted, pixel-mean gross margin ($/ha).** The
+average is across deployed pixels (those passing the per-crop acidity
+filter). Sorted by equilibrium-regime GM; the top eight only:
+
+| Crop | Year-1 (5-yr cum.) | NPV | Equilibrium |
+|---|--:|--:|--:|
+| Potato | **10,560** | 3,017 | **1,984** |
+| Tobacco | **4,884** | 807 | **798** |
+| Sweet potato | 2,867 | 358 | 450 |
+| Lentil | 2,628 | 885 | 491 |
+| Groundnut | 2,216 | 377 | 401 |
+| Cassava | 2,018 | −27 | 170 |
+| Common bean | 1,990 | 286 | 359 |
+| Chickpea | 1,719 | 368 | 299 |
+| Wheat | 1,662 | 74 | 225 |
+
+**Crops with positive pixel-mean GM across all 23 SPAM crops** (out of 23):
+
+| Allocation | Year-1 | NPV | Equilibrium |
+|---|--:|--:|--:|
+| LiTAS-targeted | **12** | **8** | **19** |
+| Uniform 10 t/ha | 7 | 6 | 18 |
+| Uniform 20 t/ha | 3 | 1 | 13 |
+| Uniform 50 t/ha | 0 | 0 | 7 |
+
+Acid-tolerant cereals (sorghum, millet) and coffee/cocoa stay negative
+because the EcoCrop response is already saturated on most of their
+SSA cropland — the agronomic side is structurally small, so the CDR
+revenue alone has to clear the full basalt cost.
+
+**Supply-frontier deployment.** Ranking pixels by gross-margin per
+tonne of basalt (Block 8) and capping at each annual supply level:
+
+| Supply cap (Mt basalt/yr) | Year-1 GM (\$B) | NPV GM (\$B) | Equilib. GM (\$B) | Marginal \$/t basalt (Y1 / NPV / Eq) |
+|---:|--:|--:|--:|--:|
+| 10 | 2.25 | 1.03 | 1.36 | 186 / 86 / 91 |
+| 50 | 7.96 | 3.61 | 3.08 | 117 / 46 / 20 |
+| 100 | **12.7** | **5.02** | 3.14 | 79 / 16 / −14 |
+| 250 | 19.6 | 4.81 | 1.97 | 21 / −16 / −60 |
+| Unconstrained | 18.4 | −1.1 | 1.97 | (tail pixels negative) |
+
+Headline supply-curve readings:
+
+- **Year-1 regime, 100 Mt/yr deployment**: $12.7 billion total gross
+  margin, **26.3 Mt CO₂/yr** removed, marginal pixel earning
+  $79/t basalt — a profitable mid-scale programme. At 250 Mt/yr,
+  GM climbs to $19.6B and CDR to 61 Mt/yr, but the marginal pixel
+  drops to $21/t.
+- **NPV regime, 100 Mt/yr deployment**: $5.0 billion GM, 27.2 Mt
+  CO₂/yr, marginal pixel $16/t. (vs. the pre-refresh $3.8B / 22.7 Mt /
+  $12/t — an across-the-board uplift.) NPV deployment becomes net
+  value-destructive between 250 and 500 Mt/yr.
+- **Equilibrium regime breakeven**: marginal pixel slips negative
+  between 50 Mt/yr (still +$20/t) and 100 Mt/yr (−$14/t) — so the
+  steady-state programme tops out at about 50–75 Mt/yr before adding
+  more basalt destroys value at the margin.
+
+**Unconstrained continental capacity** of the LiTAS-targeted
+allocation is now **443 Mt basalt/yr** for the year-1 / NPV regimes
+and **145 Mt basalt/yr** for equilibrium (down from 626 / 206 Mt/yr
+under the old defaults — the per-crop max_ph extension brings more
+pixels into the targeted footprint but at smaller per-pixel rates).
+The corresponding cumulative CDR is **102 Mt CO₂/yr** and **34 Mt
+CO₂/yr** respectively. Deploying at the unconstrained level is
+net-positive on year-1 ($18.4B) but value-destructive on NPV
+(−$1.1B), confirming that **which pixels you deploy on** still
+matters more than the gross continental capacity.
 
 ## 7.1 Key constants and their sources
 
@@ -413,18 +507,20 @@ Numbers in square brackets refer to the References section (§10).
 | Reactive fraction at reference | 0.20 | calibrated by Lewis et al. [11] |
 | Grain-size exponent $\beta$ | 0.5 | surface-area scaling (Strefler et al. [3]) |
 | Grinding-energy exponent $\alpha$ | 1.2 | Strefler et al. [3] |
-| Pedogenic-carbonate fraction | MAP-binned 0–90 % | UNEP aridity bands [12] |
+| Pedogenic-carbonate fraction | CGIAR-CSI AI when present, else MAP-binned 0–90 % | UNEP aridity bands [12]; Zomer et al. 2022 |
 | Feedstock chemistry (CaO, MgO) | 10 % CaO, 7 % MgO | typical mafic basalt; user-settable |
-| Default grain size | 100 µm | mid-range of published ERW trials |
+| Default grain size | 50 µm | Strefler grinding-curve anchor; cost-minimising once carbon revenue is credited |
 | Quarry-gate basalt price | $10 / t | basalt fines as quarry by-product (industry data) |
 | Truck haulage | $0.04 / min / t | 30-t truck @ $80 / hour (industry data) |
 | Maximum haul distance | 1000 km | beyond cap, truck-diesel LCA erases the credit |
 | Friction surface | MAP 2019 motorised | Weiss et al. [19] |
 | On-farm spreading | $8 / t | industry data |
 | Carbon price | $150 / tCO₂ | 2024–25 mid-market for verified ERW credits |
-| MRV cost | $30 / tCO₂ | sampling + lab + verification + registry (industry data) |
+| MRV cost | $20 / tCO₂ | midpoint of Levy et al. [S32] pilot benchmark and at-scale aggregator-pooled forecast |
 | Discount rate (NPV) | 10 % / yr | conventional infrastructure rate |
 | CDR realisation phasing | 30 / 25 / 20 / 15 / 10 % over 5 yr | trial data [5] |
+| Year-1 agronomic basis | summed undiscounted over project horizon (5 yr) | matches `cdr_tha`'s cumulative basis |
+| EcoCrop max-pH cliff | per-crop EcoCrop optima (5.5–8.0) | EcoCrop database; previously a flat 5.5 |
 
 # 8. Scope of the current work
 
@@ -477,14 +573,13 @@ rough order of how much they constrain the current results.
    have not yet been run end-to-end. All their inputs are in place; what
    remains is to execute the run and publish the resulting profitability
    maps and supply curves.
-4. **The aridity proxy is rough.** The pedogenic-carbonate deduction
-   currently uses mean annual precipitation (MAP) alone, binned into
-   UNEP-1992 categories [12]. The literature standard is the full
-   aridity index $\text{AI} = \text{MAP} / \text{PET}$, which requires a
-   potential-evapotranspiration surface from CGIAR-CSI or computed from
-   WorldClim minimum-and-maximum temperatures. We expect this to be a
-   small-effort, moderate-payoff upgrade.
-5. **MRV cost is a single flat number.** $30/tCO₂ for all pixels and all
+4. **The aridity proxy.** As of 2026-05-26 the pedogenic-carbonate
+   deduction reads the CGIAR-CSI Global Aridity Index (AI = MAP / PET,
+   Zomer et al. 2022) when `data/cgiar_aridity_index.tif` is present;
+   otherwise it falls back to the MAP-only proxy. The CGIAR path is the
+   literature standard; the MAP-only fallback over-deducts in cool
+   highlands where low PET keeps the true AI in the humid band.
+5. **MRV cost is a single flat number.** $20/tCO₂ for all pixels and all
    protocols is a strong simplification. In practice MRV cost is
    scale-dependent and protocol-dependent (Isometric vs Puro vs others),
    and is materially higher in smallholder-dominated systems where
@@ -565,8 +660,8 @@ Desertification.* United Nations Environment Programme, London.
 information based on machine learning. *PLOS One* 12 (2), e0169748.
 doi:10.1371/journal.pone.0169748.
 
-[14] Aramburu Merlos, F. (2022). *limer: Acidic soil management for
-agriculture.* R package, GAIA Africa.
+[14] Aramburu Merlos, F. & Hijmans, R. J. (2024). *limer: Acidic soil
+management for agriculture.* R package, GAIA Africa.
 <https://github.com/gaiafrica/limer>.
 
 [15] Aramburu Merlos, F., Silva, J. V., Baudron, F., Hijmans, R. J.
@@ -609,7 +704,467 @@ The more academic write-up is the *Working Paper*
 (`docs/erw-working-paper.pdf`), which contains the formal equations and
 the full reference list with author lists.
 
-# 12. Glossary
+# 12. Appendix A — A worked example, end to end, on two pixels
+
+> **Note on defaults.** The numbers below were computed against the
+> pre-2026-05-26 parameter set (grain size 100 µm, MRV $30/tCO₂, MAP-only
+> pedogenic deduction, single-season year-1 agronomic accounting, flat
+> EcoCrop max-pH cliff at 5.5). The current defaults differ (see §7.1) —
+> the worked example is preserved here as a *teaching artefact* rather
+> than a live calibration of the current model. The formulas and the
+> structure of the calculation are unchanged; only the numerical inputs
+> are slightly stale.
+
+The sections above describe the *model* in words. This appendix takes
+**two real-looking 1 km² pixels** and pushes them through every
+calculation the pipeline performs, with all the arithmetic written out.
+The aim is that a reader who has never seen the code should be able to
+reproduce the gross-margin number on a pocket calculator.
+
+We deliberately pick two contrasting pixels:
+
+- **Pixel A — Kisumu County, western Kenya** (≈ 0.10° S, 34.75° E).
+  Humid tropical climate, acidic soil, near volcanic outcrops in the
+  Rift. This is a "poster-child" pixel — the kind that should be near
+  the top of the supply-curve ranking. Tied to the real Haque et al.
+  2025 smallholder trial [6].
+- **Pixel B — central Burkina Faso, near Kaya** (≈ 13.10° N, 1.10° W).
+  Hot, semi-arid Sahel; near-neutral sandy soil; hundreds of kilometres
+  from the nearest basalt outcrop. This is a "bad" pixel — useful as a
+  contrast that exposes which terms in the equation are doing the work.
+
+The full set of input numbers, all derived from the project's input
+rasters (SoilGrids-Africa, WorldClim, GLiM, MAP friction, FAOSTAT,
+country electricity tables), is:
+
+| Quantity | Symbol | Pixel A (Kisumu) | Pixel B (Kaya) | Source layer |
+|---|---|---|---|---|
+| Mean annual temperature | $\text{MAT}$ | 23 °C | 28 °C | WorldClim 10′ tavg |
+| Mean annual precipitation | $\text{MAP}$ | 1 400 mm | 580 mm | WorldClim 10′ prec |
+| Topsoil pH (0–30 cm) | $\text{pH}$ | 5.2 | 6.0 | SoilGrids-Africa |
+| Acidity saturation | $\text{hp\_sat}$ | 25 % | 8 % | SoilGrids-Africa |
+| LiTAS lime requirement | $L$ | 2.1 t CaCO₃/ha | (n/a — fails mask) | `limer::limeRate` |
+| Truck-time distance to nearest basalt | $d$ | 150 km | 500 km | MAP friction × GLiM |
+| Country industrial electricity | $p_\text{elec}$ | $0.13/kWh (Kenya) | $0.20/kWh (BF) | `erw-energy-country` |
+| Country grid carbon intensity | $\text{CI}$ | 0.10 kg CO₂/kWh | 0.55 kg CO₂/kWh | `erw-energy-country` |
+| Dominant crop on pixel | — | Maize (MAIZ) | Sorghum (SORG) | SPAM 2017-SSA |
+| Baseline crop yield | $Y_0$ | 1.8 t/ha | 0.8 t/ha | SPAM 2017-SSA |
+| Crop-price (country median) | $p_c$ | $250/t | $200/t | FAOSTAT 2016–2020 |
+
+The two pixels also run under different **allocation rules** for the
+reason explained in §4.5. Pixel A passes the LiTAS-targeted mask
+(its 25 % acidity saturation exceeds maize's 10 % tolerance, so basalt
+is genuinely useful for soil-acidity reasons); we therefore put it on
+the **LiTAS-targeted** rule. Pixel B fails the LiTAS mask (its 8 %
+acidity saturation is below sorghum's 30 % tolerance, so the targeted
+allocation skips it); we therefore put it on the **uniform 20 t/ha**
+rule, which mimics the "spread basalt everywhere" convention used by
+Beerling et al. 2020 [2] and Baek et al. 2023.
+
+## 12.1 Step 0 — Rock chemistry constants (same for every pixel)
+
+These constants are computed *once* by `erw-3-basalt-requirements.R`
+from the default basalt feedstock chemistry and grain size. They are
+then reused for every pixel.
+
+The default basalt has $\text{CaO} = 10 \%$ and $\text{MgO} = 7 \%$ by
+mass, and the default grain size is $d = 100 \,\mu\text{m}$.
+
+**Calcium-carbonate equivalent (CCE), per tonne of basalt.**
+The chemistry says 1 g of CaO neutralises $100.09/56.08 \approx 1.783$ g
+of CaCO₃-equivalent acidity, and 1 g of MgO neutralises
+$100.09/40.30 \approx 2.481$ g of CaCO₃-equivalent acidity. So:
+
+$$\text{CCE} = 0.10 \times 1.783 + 0.07 \times 2.481 = 0.1783 + 0.1737 = 0.3520$$
+
+i.e. a tonne of basalt has the acid-neutralising power of about
+**352 kg of pure agricultural lime**.
+
+**Stoichiometric CDR ceiling.**
+Each mole of divalent cation consumes 2 moles of CO₂ as it makes
+bicarbonate. So 1 g CaO removes $(2 \times 44.01)/56.08 \approx 1.570$
+g CO₂ and 1 g MgO removes $(2 \times 44.01)/40.30 \approx 2.185$ g CO₂:
+
+$$\text{CDR}_\text{max} = (0.10 \times 1.570 + 0.07 \times 2.185) \times 1{,}000 = 157.0 + 152.9 \approx \mathbf{310 \,\text{kg CO}_2 / \text{t basalt}}$$
+
+This is the **upper bound** — what we'd remove if every gram of
+calcium and magnesium reacted completely and all the bicarbonate made
+it to the ocean. The rest of the model is a sequence of haircuts on
+this number.
+
+**Grain-size factor.**
+We anchor everything at $d_\text{ref} = 100 \,\mu\text{m}$, so:
+
+$$f_\text{grain} = \left(\frac{100}{d}\right)^{0.5} = \left(\frac{100}{100}\right)^{0.5} = 1.00$$
+
+At the default 100 µm grain size this factor is exactly one. A 25 µm
+grind would give $f_\text{grain} = (100/25)^{0.5} = 2$ — twice the rate
+but considerably more energy to produce (see grinding-energy step
+below).
+
+**Reference reactive fraction.**
+From the Lewis et al. 2021 [11] calibration, the realised fraction of
+the stoichiometric ceiling at a temperate-humid reference site is
+$\phi_\text{ref} = 0.20$, or **20 %** of the maximum.
+
+**Effective neutralising value at the reference climate.**
+
+$$\text{NV}_\text{eff,ref} = \text{CCE} \times \phi_\text{ref} \times f_\text{grain} = 0.3520 \times 0.20 \times 1.00 = 0.0704$$
+
+So at the reference climate one tonne of basalt does the work of
+$0.0704$ t of pure CaCO₃ — about 70 kg-CaCO₃-equivalent. The
+**basalt-to-lime ratio** is therefore:
+
+$$r_\text{bl} = \frac{1}{0.0704} \approx \mathbf{14.20 \,\text{t basalt} / \text{t CaCO}_3\text{-eq}}$$
+
+i.e. you need roughly fourteen tonnes of crushed basalt to do what one
+tonne of agricultural lime does.
+
+**Effective CDR per tonne basalt at the reference climate.**
+
+$$\text{CDR}_\text{eff,ref} = \text{CDR}_\text{max} \times \phi_\text{ref} \times f_\text{grain} = 310 \times 0.20 \times 1.00 = \mathbf{62 \,\text{kg CO}_2 / \text{t basalt}}$$
+
+This is the number that the per-pixel climate-factor and pH-factor
+calculations in §12.3 below will scale up (for warm-wet-acidic pixels)
+or down (for cool-dry or alkaline pixels).
+
+**Grinding energy and reference grinding cost.**
+The Strefler et al. 2018 [3] energy curve, anchored at 50 µm = 0.07
+GJ/t and α = 1.2, gives:
+
+$$E_\text{grind} = 0.07 \times \left(\frac{50}{100}\right)^{1.2} = 0.07 \times 0.4353 = 0.0305 \,\text{GJ/t}$$
+
+Converting to kWh: $0.0305 \times 277.78 = 8.46 \,\text{kWh/t}$.
+
+At the *reference* global electricity price of $0.10/kWh the grinding
+cost is $0.85/t. In §12.5 below this is overridden by each country's
+own electricity tariff.
+
+## 12.2 Step 1 — Basalt application rate (Block 2)
+
+**Pixel A — LiTAS-targeted maize.**
+The `limer` package, fed the SoilGrids-Africa exchangeable acidity, K,
+Ca, Mg, Na and bulk density at this pixel, computes a year-1 LiTAS
+lime requirement of:
+
+$$L_A = 2.10 \,\text{t CaCO}_3/\text{ha}$$
+
+Converted to basalt at the rock-chemistry rate from §12.1:
+
+$$R_A = L_A \times r_\text{bl} = 2.10 \times 14.20 = \mathbf{29.8 \,\text{t basalt/ha}}$$
+
+This sits squarely in the LiTAS-targeted range of ~30 t/ha quoted in
+§7.0 of the tutorial.
+
+**Pixel B — uniform 20 t/ha sorghum.**
+Because Pixel B fails the LiTAS-targeted mask, the model uses the
+uniform-rate convention:
+
+$$R_B = \mathbf{20.0 \,\text{t basalt/ha}}$$
+
+(Note: under the *targeted* rule Pixel B would receive **0 t/ha**, i.e.
+the model would say "don't bother." The uniform 20 t/ha column is the
+literature-convention sensitivity test, not the model's recommendation.)
+
+## 12.3 Step 2 — CDR yield per pixel (Block 3, file `erw-9-cdr-yield.R`)
+
+This is where the reference-climate per-tonne CDR potential of 62 kg
+CO₂/t basalt gets rescaled by **temperature, precipitation, soil pH,
+and aridity** — the four factors that determine how much of the
+stoichiometric ceiling we actually realise.
+
+**Climate factor — temperature.** Anchored at $T_\text{ref} = 11 \,°\text{C}$:
+
+$$f_\text{MAT} = \text{clamp}\!\left(\tfrac{\text{MAT}}{11}, \, 0.3, \, 3.0\right)$$
+
+- Pixel A: $23 / 11 = 2.091$ → $f_\text{MAT,A} = 2.091$
+- Pixel B: $28 / 11 = 2.545$ → $f_\text{MAT,B} = 2.545$
+
+**Climate factor — precipitation.** Anchored at $P_\text{ref} = 1000 \,\text{mm}$:
+
+$$f_\text{MAP} = \text{clamp}\!\left(\tfrac{\text{MAP}}{1000}, \, 0.3, \, 3.0\right)$$
+
+- Pixel A: $1400/1000 = 1.40$ → $f_\text{MAP,A} = 1.40$
+- Pixel B: $580/1000 = 0.58$ → $f_\text{MAP,B} = 0.58$
+
+**pH factor.** A triangular function peaking at pH 5.0:
+
+$$f_\text{pH}(\text{pH}) = \begin{cases} 0.5 & \text{pH} < 4 \\ 0.5 + 0.5(\text{pH}-4) & 4 \le \text{pH} < 5 \\ 1.0 - 0.25(\text{pH}-5) & 5 \le \text{pH} < 7 \\ 0.5 & \text{pH} \ge 7 \end{cases}$$
+
+- Pixel A: pH 5.2 → $1.0 - 0.25 \times 0.2 = 0.95$
+- Pixel B: pH 6.0 → $1.0 - 0.25 \times 1.0 = 0.75$
+
+**Combined climate factor.**
+
+$$f_\text{clim} = f_\text{MAT} \times f_\text{MAP} \times f_\text{pH}$$
+
+- Pixel A: $2.091 \times 1.40 \times 0.95 = \mathbf{2.781}$
+- Pixel B: $2.545 \times 0.58 \times 0.75 = \mathbf{1.107}$
+
+Pixel A's climate triples the reference reactivity; Pixel B's climate
+barely budges it (the warm temperature is almost cancelled by the
+modest rainfall and the near-neutral pH).
+
+**Pedogenic-carbonate deduction.** From the UNEP aridity bands keyed
+on MAP:
+
+- Pixel A: MAP = 1400 > 600 mm → humid band → $\text{ped} = 0.00$,
+  exported fraction $= 1.00$
+- Pixel B: MAP = 580 < 600 mm (dry sub-humid band) → $\text{ped} = 0.15$,
+  exported fraction $= 0.85$
+
+So at Pixel B we lose 15 % of the alkalinity right in the soil to
+locally-precipitated carbonate.
+
+**Effective reactive fraction at each pixel** (capped at 1.0, since
+nothing can react more than 100 %):
+
+$$\phi_\text{eff} = \min(1.0, \, \phi_\text{ref} \times f_\text{grain} \times f_\text{clim})$$
+
+- Pixel A: $\min(1.0, \, 0.20 \times 1.0 \times 2.781) = \min(1.0, 0.556) = 0.556$
+- Pixel B: $\min(1.0, \, 0.20 \times 1.0 \times 1.107) = 0.221$
+
+**CDR per tonne basalt at each pixel.**
+
+$$\text{CDR}_\text{px} = \text{CDR}_\text{max} \times \phi_\text{eff} \times (1 - \text{ped})$$
+
+- Pixel A: $310 \times 0.556 \times 1.00 = \mathbf{172.4 \,\text{kg CO}_2/\text{t basalt}}$
+- Pixel B: $310 \times 0.221 \times 0.85 = \mathbf{58.3 \,\text{kg CO}_2/\text{t basalt}}$
+
+Pixel A is removing nearly three times as much CO₂ per tonne of rock as
+Pixel B — entirely because of climate.
+
+**Gross CDR per hectare** (multiply by the application rate from §12.2):
+
+- Pixel A: $29.8 \,\text{t/ha} \times 0.1724 \,\text{t CO}_2/\text{t} = \mathbf{5.14 \,\text{t CO}_2/\text{ha}}$ cumulative
+- Pixel B: $20.0 \,\text{t/ha} \times 0.0583 \,\text{t CO}_2/\text{t} = \mathbf{1.17 \,\text{t CO}_2/\text{ha}}$ cumulative
+
+## 12.4 Step 3 — Delivered basalt cost (Block 4, file `erw-basalt-access.R`)
+
+Four cost components stack to give the dollars-per-tonne the farmer
+ultimately pays. The four are: **quarry-gate** (fixed at $10/t),
+**grinding** (kWh per tonne times the local electricity tariff),
+**transport** (cost-distance from the nearest basalt outcrop, priced
+at $0.04/min/t at an effective 30 km/h on the friction surface), and
+**spreading** (fixed at $8/t).
+
+**Grinding cost (pixel-specific via country electricity).**
+
+$$C_\text{grind} = \text{kWh/t} \times p_\text{elec}$$
+
+- Pixel A (Kenya, $0.13/kWh): $8.46 \times 0.13 = \$1.10/t$
+- Pixel B (Burkina Faso, $0.20/kWh): $8.46 \times 0.20 = \$1.69/t$
+
+**Transport cost (pixel-specific via friction surface).**
+The friction surface converts each km of land travel to travel-minutes;
+we use a long-run effective speed of $0.5 \,\text{km/min}$ (= 30 km/h)
+to convert pixel-cumulative travel time back to dollars at the truck
+rate of $0.04/min/t:
+
+$$C_\text{trans} = \frac{d}{0.5} \times 0.04$$
+
+- Pixel A: $\frac{150}{0.5} \times 0.04 = 300 \times 0.04 = \$12.00/t$
+- Pixel B: $\frac{500}{0.5} \times 0.04 = 1000 \times 0.04 = \$40.00/t$
+
+**Delivered cost per tonne basalt.**
+
+$$C_\text{bas} = \$10 + C_\text{grind} + C_\text{trans} + \$8$$
+
+- Pixel A: $10 + 1.10 + 12.00 + 8.00 = \mathbf{\$31.10/t}$
+- Pixel B: $10 + 1.69 + 40.00 + 8.00 = \mathbf{\$59.69/t}$
+
+**Total basalt cost per hectare** (rate × $/t):
+
+- Pixel A: $29.8 \times 31.10 = \mathbf{\$926.78/ha}$
+- Pixel B: $20.0 \times 59.69 = \mathbf{\$1{,}193.80/ha}$
+
+## 12.5 Step 4 — Lifecycle CO₂ emissions of the operation (Block 5/7)
+
+To be honest about the *net* climate benefit, we have to subtract the
+CO₂ emitted by grinding, trucking, and spreading the basalt from the
+gross CDR computed in §12.3. The three components are:
+
+$$\text{LCA}_t = \underbrace{\text{kWh/t} \times \text{CI}}_\text{grinding} + \underbrace{d \times 0.12}_\text{transport} + \underbrace{0.5}_\text{spreading} \quad \text{(kg CO}_2/\text{t basalt)}$$
+
+- Pixel A: $8.46 \times 0.10 + 150 \times 0.12 + 0.5 = 0.85 + 18.0 + 0.5 = \mathbf{19.35 \,\text{kg CO}_2/\text{t}}$
+- Pixel B: $8.46 \times 0.55 + 500 \times 0.12 + 0.5 = 4.65 + 60.0 + 0.5 = \mathbf{65.15 \,\text{kg CO}_2/\text{t}}$
+
+Notice that Pixel B's lifecycle bill is over **three times** Pixel A's,
+because of (a) the dirtier grid mix in West Africa, and (b) the much
+longer truck haul.
+
+**LCA per hectare.**
+
+- Pixel A: $29.8 \times 19.35/1000 = \mathbf{0.58 \,\text{t CO}_2/\text{ha}}$
+- Pixel B: $20.0 \times 65.15/1000 = \mathbf{1.30 \,\text{t CO}_2/\text{ha}}$
+
+## 12.6 Step 5 — Net CDR and CDR revenue
+
+**Net CDR per hectare** is gross CDR (§12.3) minus the LCA (§12.5),
+floored at zero (we don't pay the farmer to *emit*; we just refuse to
+credit a net-negative pixel):
+
+$$\text{CDR}_\text{net} = \max(0, \, \text{CDR}_\text{gross} - \text{LCA})$$
+
+- Pixel A: $\max(0, \, 5.14 - 0.58) = \mathbf{4.56 \,\text{t CO}_2/\text{ha}}$
+- Pixel B: $\max(0, \, 1.17 - 1.30) = \mathbf{0.00 \,\text{t CO}_2/\text{ha}}$
+
+Pixel B's lifecycle emissions actually exceed its gross CDR. The model
+correctly tells us this pixel removes **no net carbon** under the
+operating assumptions — the diesel of trucking the rock 500 km has
+wiped out the climate benefit.
+
+**CDR revenue.** Each net tonne of CO₂ sells at the carbon price minus
+the MRV cost. At defaults ($150 − $30 = $120/tCO₂):
+
+$$\text{Rev}_\text{CDR} = \text{CDR}_\text{net} \times (\text{price}_\text{C} - \text{MRV})$$
+
+- Pixel A: $4.56 \times 120 = \mathbf{\$547.20/ha}$
+- Pixel B: $0.00 \times 120 = \mathbf{\$0/ha}$
+
+## 12.7 Step 6 — Agronomic return (Block 6)
+
+The yield-uplift step asks: *with this much basalt on this soil, how
+much more crop will this farmer harvest, and what is that worth?* In
+the absence of a fitted Bayesian model (the current state of the
+project, see §7), we use the EcoCrop-derived relative-yield curve from
+`erw-5`. The numbers below are illustrative of the EcoCrop branch.
+
+**Pixel A — maize at pH 5.2.**
+Maize is moderately acid-sensitive. EcoCrop's response curve gives a
+~12 % relative yield gain on this soil when the pH is nudged toward 6
+by basalt-derived alkalinity. (For comparison: the published Corn-Belt
+trial [5] reported 12–16 % cumulative uplift; the Kisumu smallholder
+trial [6] reported a much larger 71 % first-year uplift at a 20 t/ha
+nephelinite rate, but on a fresher and more reactive feedstock than
+the basalt assumed here.)
+
+$$\Delta Y_A = Y_0 \times \text{uplift} = 1.8 \times 0.12 = 0.216 \,\text{t/ha}$$
+
+$$\text{Rev}_\text{agro,A} = \Delta Y_A \times p_c = 0.216 \times 250 = \mathbf{\$54.00/ha}$$
+
+**Pixel B — sorghum at pH 6.0.**
+Sorghum is acid-tolerant and the starting pH is already near neutral —
+the EcoCrop response curve gives a much smaller uplift here, around
+3 %.
+
+$$\Delta Y_B = 0.8 \times 0.03 = 0.024 \,\text{t/ha}$$
+
+$$\text{Rev}_\text{agro,B} = 0.024 \times 200 = \mathbf{\$4.80/ha}$$
+
+## 12.8 Step 7 — Putting it all together — gross margin (Block 7)
+
+The gross margin per hectare under the **year-1 regime** is the sum of
+the two revenue streams minus the basalt cost:
+
+$$\text{GM}_\text{y1} = \text{Rev}_\text{agro} + \text{Rev}_\text{CDR} - C_\text{bas}$$
+
+| Term | Pixel A | Pixel B |
+|---|---|---|
+| Agronomic revenue | $54.00 | $4.80 |
+| CDR revenue | $547.20 | $0.00 |
+| Delivered basalt cost | −$926.78 | −$1,193.80 |
+| **Gross margin year-1** | **−$325.58/ha** | **−$1,189.00/ha** |
+| GM per tonne of basalt | **−$10.93/t** | **−$59.45/t** |
+
+Three things to notice:
+
+1. **Both pixels lose money in year 1.** This is consistent with the
+   tutorial's headline §7.0 result: at the default LiTAS rate of ~30
+   t/ha, the upfront basalt cost ($900–$1,300/ha) exceeds the
+   carbon-credit revenue ($400–$600/ha) plus the agronomic uplift
+   ($40–$360/ha). Even the "good" pixel is in the red on year-1
+   accounting.
+2. **Pixel A is an order of magnitude closer to break-even** than
+   Pixel B (−$11/t vs −$59/t). If the supply-curve ranking deploys
+   only the top-decile pixels, Pixel A is the kind of place that
+   *might* make the cut; Pixel B isn't close.
+3. **For Pixel B, the entire CDR side has collapsed.** Lifecycle
+   emissions ate the gross CDR, so the farmer gets only the $4.80 of
+   yield uplift against the full $1,194 basalt cost. This is the
+   model's way of saying *"do not deploy basalt in central Burkina
+   Faso under these assumptions."* The Sahel pixel needs either
+   (a) a local feedstock alternative — industrial alkaline by-products
+   (out of scope at v1, see §9 limitation 1) or (b) a closer outcrop.
+
+## 12.9 The same pixel under the NPV and equilibrium regimes
+
+The year-1 picture above treats the application as a single up-front
+cash flow. Two other regimes are computed in parallel.
+
+**NPV regime.** The agronomic benefit accrues every year and the
+basalt application is repeated periodically. The reapplication
+interval is the year-1 LiTAS rate divided by the maintenance rate:
+
+$$n_\text{reapply} = \text{round}\!\left(\frac{R_\text{y1}}{R_\text{maint}}\right) \approx \text{round}(29.8 / 5.0) = 6 \,\text{years}$$
+
+`limer::NPV_lime` then computes the perpetuity-of-reapplication NPV
+of the annual $54 agronomic benefit at a 10 % discount rate; a typical
+result for the Pixel A parameters is around $260/ha.
+
+The CDR revenue is phased over the 5-year reactive horizon
+(`CDR_PHASING = c(0.30, 0.25, 0.20, 0.15, 0.10)`) and discounted year
+by year, giving an NPV factor of:
+
+$$\text{NPV factor} = \frac{\sum_t f_t / (1.10)^t}{\sum_t f_t} \approx \mathbf{0.79}$$
+
+at 10 % discount. So Pixel A's CDR revenue under the NPV regime is
+$547.20 \times 0.79 = \$432.30/ha$. The basalt cost remains an
+up-front $926.78/ha (paid in year 0):
+
+$$\text{GM}_\text{NPV,A} \approx 260 + 432 - 927 = \mathbf{-\$235/ha}$$
+
+Still negative, but a smaller loss than the year-1 number because the
+agronomic benefit now accrues for the full re-application interval
+instead of one season.
+
+**Equilibrium regime.** This skips the up-front liming entirely and
+applies only the *maintenance* rate, which just keeps pace with
+re-acidification. For Pixel A the maintenance rate from the LiTAS
+calibration is around 5 t basalt/ha/yr. With everything else held
+fixed:
+
+| Term | Equilibrium Pixel A |
+|---|---|
+| Maintenance basalt rate | 5.0 t/ha/yr |
+| Gross CDR | $5.0 \times 0.1724 = 0.86 \,\text{t CO}_2/\text{ha}$ |
+| LCA | $5.0 \times 19.35/1000 = 0.10 \,\text{t CO}_2/\text{ha}$ |
+| Net CDR | 0.76 t CO₂/ha |
+| CDR revenue | $0.76 \times 120 = \$91.20/ha$ |
+| Basalt cost | $5.0 \times 31.10 = \$155.50/ha$ |
+| Agronomic revenue | $54.00/ha (unchanged) |
+| **Gross margin (equilibrium)** | $54 + 91 - 156 = \mathbf{-\$11/ha}$ |
+
+In equilibrium the pixel is essentially break-even. This is exactly
+the regime in which the model's only positive headline number sits —
+the equilibrium-regime LiTAS-targeted application on **wheat**, at
+about +$57/ha (§7.0), because wheat's higher unit price ($/t) shifts
+the agronomic-revenue line above the small basalt-cost line.
+
+## 12.10 What the worked example tells us about the model
+
+Three structural lessons fall out of the arithmetic above:
+
+1. **The basalt cost dominates.** In Pixel A, $927/ha of basalt cost
+   has to be earned back by $547 of CDR plus $54 of agronomy.
+   Anything that moves the cost (a 50 % shorter haul, a 50 % cheaper
+   electricity tariff, a lower spreading rate, a finer grind for a
+   higher CDR-per-tonne yield) moves the answer materially. This is
+   why **§4.5's six dials** are all on the cost side or on the
+   reactivity side.
+2. **Climate is the second-largest lever.** Pixel A's tropical
+   climate factor of 2.8 turned the reference 62 kg CO₂/t into 172
+   kg CO₂/t — a near-tripling. That is the entire reason Sub-Saharan
+   Africa is interesting for ERW: the same tonne of basalt does
+   three times more carbon work here than in the temperate reference.
+3. **Picking the right pixel matters more than the average price of
+   basalt.** Even at *identical* model parameters, Pixel A is
+   −$11/t while Pixel B is −$59/t — a factor-of-five spread. The
+   supply-curve ranking exploits exactly this spread: deploying the
+   top-decile pixels yields a profitable programme even though the
+   continent-wide pixel-mean is negative (§7.0).
+
+# 13. Glossary
 
 **Allocation rule** — How we decide which fields get basalt. Either
 *LiTAS-targeted* (only fields where the soil acidity is high enough to
@@ -687,7 +1242,8 @@ this for the cost-distance calculation in Block 4.
 **MRV** — Measurement, reporting, and verification: the protocols
 that a carbon-credit buyer requires to be convinced that the carbon
 removal they are paying for actually happened. Default cost in our
-model: $30 per tonne of CO₂.
+model: $20 per tonne of CO₂ (lowered from $30 in the 2026-05-26
+refresh; midpoint of Levy et al. 2024 pilot and at-scale forecast).
 
 **NPV** — Net present value. The discounted sum of a stream of
 future cash flows. Used here when we want to compare an ERW

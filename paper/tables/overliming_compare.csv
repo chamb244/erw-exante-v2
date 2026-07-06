@@ -1,0 +1,17 @@
+alloc,accounting,env,area,priv,pub,cost,cdr
+targeted,base,Private,4.31,3496,929,1743,7.1
+targeted,base,Combined,6.85,4311,1418,2788,10.9
+targeted,over-lime,Private,4.12,3328,876,1653,6.7
+targeted,over-lime,Combined,6.59,4086,1355,2638,10.4
+uniform_10,base,Private,3.52,3277,710,1432,5.5
+uniform_10,base,Combined,7.09,4018,1567,2667,12.1
+uniform_10,over-lime,Private,3.37,3142,669,1365,5.1
+uniform_10,over-lime,Combined,6.86,3825,1508,2532,11.6
+uniform_20,base,Private,1.29,1876,702,849,5.4
+uniform_20,base,Combined,5.13,2973,2758,3165,21.2
+uniform_20,over-lime,Private,1.22,1774,660,790,5.1
+uniform_20,over-lime,Combined,4.96,2762,2674,2990,20.6
+uniform_50,base,Private,0.45,997,796,519,6.1
+uniform_50,base,Combined,3.84,1827,6020,4632,46.3
+uniform_50,over-lime,Private,0.36,814,654,402,5.0
+uniform_50,over-lime,Combined,3.63,1176,5714,4212,44.0

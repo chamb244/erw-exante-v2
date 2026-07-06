@@ -166,12 +166,16 @@ for (r_f in REGIMES) {
       new_grain_factor   <- (GRAIN_REF_UM / gs) ^ GRAIN_BETA
       reactivity_ratio   <- new_grain_factor / ref_grain_factor
       new_grinding_kWh   <- (50 / gs) ^ GRIND_ALPHA * 0.07 * 277.78    # GJ→kWh at 50µm anchor
-      new_grinding_usd   <- new_grinding_kWh * ELECTRICITY_USD_KWH
+      # erw-7 now uses per-pixel electricity + grid CI rasters, so the
+      # reference grinding cost and LCA must be subtracted per-pixel too.
+      ref_grinding_usd_px <- ref_grinding_kWh * electricity_raster
+      new_grinding_usd_px <- new_grinding_kWh * electricity_raster
+      ref_grinding_lca_px <- ref_grinding_kWh * grid_ci_raster
+      new_grinding_lca_px <- new_grinding_kWh * grid_ci_raster
       # adjusted cost per t basalt = swap out only the grinding component
-      cost_adj <- basalt_cost_per_t - ref_grinding_usd + new_grinding_usd
+      cost_adj <- basalt_cost_per_t - ref_grinding_usd_px + new_grinding_usd_px
       # adjusted LCA per t basalt = swap out only the grinding component
-      lca_adj  <- lca_kg_per_t_basalt - ref_grinding_kWh * GRID_CI_KG_PER_KWH +
-                                       new_grinding_kWh * GRID_CI_KG_PER_KWH
+      lca_adj  <- lca_kg_per_t_basalt - ref_grinding_lca_px + new_grinding_lca_px
 
       # CDR scaling: profit() multiplies CDR_stack internally; for the sweep,
       # multiply the carbon price by reactivity_ratio so that the net effect

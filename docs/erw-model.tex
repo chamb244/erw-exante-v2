@@ -85,6 +85,7 @@
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs,array}
+\newcounter{none} % for unnumbered tables
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -94,17 +95,42 @@
 % Allow footnotes in longtable head/foot
 \IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
 \makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 % Header includes for docs/erw-model.tex (injected by build-erw-model.sh).
 % Tighten longtable layout so wide tables with monospace cells fit on A4.
 \usepackage{etoolbox}
-\AtBeginEnvironment{longtable}{\footnotesize}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.05}
 % Allow line breaks inside long \texttt{} strings (filenames, paths)
 \usepackage{seqsplit}
+% Inside longtable cells: shrink font and let \texttt{} break anywhere so long
+% filenames (e.g. cdr_{climate_factor,pedogenic_fraction,per_t_basalt}.tif)
+% wrap inside narrow columns instead of overflowing the page. seqsplit only
+% inserts breakpoints — no visual effect unless a break is actually needed.
+\protected\def\erwBreakableTexttInTables{%
+  \let\origtexttt\texttt
+  \def\texttt##1{\origtexttt{\seqsplit{##1}}}%
+}
+\AtBeginEnvironment{longtable}{\footnotesize\erwBreakableTexttInTables}
+% Give the paragraph builder room to stretch before resorting to overfull lines.
+\setlength{\emergencystretch}{3em}
 \usepackage{bookmark}
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \urlstyle{same}
@@ -125,7 +151,7 @@
 \makeatother
 \subtitle{Geospatial profitability model for Enhanced Rock Weathering with basalt in Sub-Saharan Africa}
 \author{}
-\date{2026-05-15}
+\date{2026-05-26}
 
 \begin{document}
 \maketitle
@@ -147,6 +173,7 @@ output under §7.
 
 Companion documents that this file points to (do not duplicate):
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
@@ -175,19 +202,25 @@ figure --- how the code implements the framework. \\
 currently). \\
 \texttt{flows.html} & Browser-rendered view of this whole thing. \\
 \end{longtable}
+}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
 \subsection{0. Status at a glance}\label{status-at-a-glance}
 
-\textbf{Last updated:} 2026-05-15 \textbf{Geographic scope:} Sub-Saharan
+\textbf{Last updated:} 2026-05-26 \textbf{Geographic scope:} Sub-Saharan
 Africa, 47 countries, GADM v4 boundaries \textbf{Working grid:}
 SoilGrids-Africa 30 arc-sec aggregated 10× → \textasciitilde0.083° (≈9
 km) --- 746 × 828 cells \textbf{Currency:} USD; \textbf{CO₂ in tonnes;
-year-1 / NPV @ 10\% / equilibrium regimes}
+year-1 / NPV @ 10\% / equilibrium regimes} \textbf{Defaults (refreshed
+2026-05-26):} grain size \textbf{50 µm}, MRV \textbf{\$20 / tCO₂},
+year-1 agronomic return \textbf{summed over 5-yr basalt residency},
+pedogenic deduction via \textbf{CGIAR-CSI Global Aridity Index}, EcoCrop
+max-pH cliff \textbf{per-crop optima (5.5--8.0)}.
 
 \subsubsection{Pipeline-block status}\label{pipeline-block-status}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -212,29 +245,37 @@ SoilGrids properties + SPAM v2 (23 crops) co-registered on the 10×
 grid \\
 B2. Basalt rate & \texttt{erw-3} & \textbf{REAL} & LiTAS / Kamprath /
 Cochrane / maintenance + uniform 10/20/50 t·ha⁻¹ \\
-B3. CDR surface & \texttt{erw-9} & \textbf{REAL} & Climate × pH ×
-pedogenic-C deduction; CDR-per-tonne + CDR-per-ha rasters \\
+B3. CDR surface & \texttt{erw-9} & \textbf{REAL} (refreshed 2026-05-26)
+& Climate × pH × pedogenic-C deduction; now consumes CGIAR-CSI AI when
+present (else MAP fallback); 50 µm grain default; mean cumulative CDR
+under LiTAS-targeted 3.5 t CO₂/ha. \\
 B4. Logistics & \texttt{erw-basalt-access} & \textbf{REAL} (since
 2026-05-15) & Friction surface fetched, mask expanded to vb+pb,
 end-to-end delivered price computed \\
 B5. Energy & \texttt{erw-energy-country} & \textbf{REAL} & Country
 tariff + grid CI rasters \\
 B6. Crop response --- EcoCrop & \texttt{erw-4}, \texttt{erw-5} &
-\textbf{REAL} & Per-crop pH and acidity-saturation suitability rasters
-for 23 crops \\
+\textbf{REAL} (refreshed 2026-05-26) & Per-crop max\_ph cliffs (5.5 tea
+→ 8.0 chickpea, was flat 5.5); all 23 crops × 2 responses \\
 B6. Crop response --- Bayesian & \texttt{erw-yield-fit},
 \texttt{erw-yield-predict} & \textbf{NOT RUN} & Trial-anchored brms
 model not fit; erw-7 falls back to EcoCrop \\
-B7. Profitability & \texttt{erw-7} & \textbf{NOT RUN} & All inputs are
-ready; gross-margin rasters not yet generated \\
-B8. Supply ranking & \texttt{erw-supply} & \textbf{NOT RUN} & Depends on
-B7 \\
-B9. Sensitivity & \texttt{erw-8} & \textbf{NOT RUN} & Depends on B7 \\
+B7. Profitability & \texttt{erw-7} & \textbf{REAL} (refreshed
+2026-05-26) & 276 gross-margin rasters; year-1 regime now sums agronomic
+return over 5-yr horizon; MRV \$30 → \$20 \\
+B8. Supply ranking & \texttt{erw-supply} & \textbf{REAL} (refreshed
+2026-05-26) & Three supply curves + nine deployment masks; year-1 peak
+GM \$19.6B @ 250 Mt/yr; NPV peak \$5.0B @ 100 Mt/yr \\
+B9. Sensitivity & \texttt{erw-8} & \textbf{READY} & Variable-name bug
+patched 2026-05-19; not yet re-run at the new defaults; default-scope
+sweep is ≈6--8 h wall time \\
 \end{longtable}
+}
 
 \subsubsection{Headline numbers (current
 run)}\label{headline-numbers-current-run}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -245,24 +286,108 @@ Metric
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
 Value
 \end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Source raster
+Source raster / table
 \end{minipage} \\
 \midrule\noalign{}
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-Mafic source pixels (vb+pb in SSA) & \textbf{1,399,005} (1.9\% of SSA
+Mafic source pixels (vb+pb in SSA) & \textbf{1,399,005} (1.9 \% of SSA
 cropland-context cells) & \texttt{basalt\_source\_mask.tif} \\
 Mean delivered basalt price & \textbf{\$40.8 / t} (range \$10 -- \$50,
 cap binds for \textasciitilde half of pixels) &
 \texttt{basalt\_delivered\_price\_usd\_t.tif} \\
 Mean travel time to source & \textbf{815 min} (capped at 1000 min ≈ 1000
 km @ 60 km/h) & \texttt{basalt\_traveltime\_min.tif} \\
-CDR per tonne basalt & computed pixel-wise &
-\texttt{cdr\_per\_t\_basalt.tif} \\
-CDR yield (LiTAS year-1) & computed pixel-wise; strongest in humid
-tropics & \texttt{cdr\_yield\_merlos.tif} \\
+Delivered basalt incl.~grinding + spreading &
+\textbf{\textasciitilde\$53 / t mean} (slightly higher than 100 µm due
+to grinding cost +\$1/t) & \texttt{erw-7} setup print \\
+Per-tonne CDR at reference climate & \textbf{88 kg CO₂ / t basalt} (was
+62 at 100 µm) & \texttt{basalt\_feedstock\_chemistry.csv} \\
+Mean cumulative CDR (LiTAS-targeted, TAS=0) & \textbf{3.52 t CO₂ / ha}
+(was 2.02 t/ha; +74 \%) & \texttt{cdr\_yield\_merlos.tif} \\
+Best pixel-mean profitability cell & \textbf{POTA equilibrium targeted
++\$1,984 / ha}; POTA year-1 \$10,560 / ha &
+\texttt{economics\_erw/targeted/POTA\_*.tif} \\
+Crops with positive pixel-mean GM, targeted & \textbf{Year-1 12/23; NPV
+8/23; Equilibrium 19/23} & per-crop summary \\
+Break-even supply cap (year-1) & \textbf{≈250 Mt basalt / yr} (marginal
+pixel +\$21 / t) & \texttt{supply\_curve\_year1.csv} \\
+Break-even supply cap (NPV) & \textbf{≈100 Mt basalt / yr} (marginal
+pixel +\$16 / t) & \texttt{supply\_curve\_npv.csv} \\
+Break-even supply cap (equilibrium) & \textbf{between 50 and 100 Mt /
+yr} (slips +\$20 / t → −\$14 / t) &
+\texttt{supply\_curve\_equilibrium.csv} \\
+Peak total gross margin (year-1) & \textbf{\$19.6 B at 250 Mt/yr cap}
+with 61.0 Mt CDR/yr & \texttt{supply\_curve\_year1.csv} \\
+Peak total gross margin (NPV) & \textbf{\$5.0 B at 100 Mt/yr cap} with
+27.2 Mt CDR/yr & \texttt{supply\_curve\_npv.csv} \\
+Unconstrained SSA capacity (targeted) & \textbf{443 Mt basalt/yr}
+(year-1, NPV) / \textbf{145 Mt/yr} (equilibrium maintenance) &
+\texttt{supply\_curve\_*.csv} (row \texttt{Inf}) \\
 \end{longtable}
+}
+
+\subsubsection{Supply curves at a glance --- marginal \$/t basalt vs
+annual cap (refreshed
+2026-05-26)}\label{supply-curves-at-a-glance-marginal-t-basalt-vs-annual-cap-refreshed-2026-05-26}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 20\tabcolsep) * \real{0.0909}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Regime
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+1 Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+5 Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+10 Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+25 Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+50 Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{100 Mt}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+\textbf{250 Mt}
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+500 Mt
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Peak total GM (M\$)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Peak CDR (Mt)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+year-1 & +292 & +215 & +186 & +145 & +117 & \textbf{+79} & \textbf{+21}
+& −60 & \textbf{19,648 (@250 Mt)} & 61.0 \\
+NPV @ 10 \% & +117 & +103 & +86 & +68 & +46 & \textbf{+16} & −16 & −61 &
+\textbf{5,018 (@100 Mt)} & 27.2 \\
+equilibrium & +197 & +124 & +91 & +45 & +20 & \textbf{−14} & −60 & −60 &
+\textbf{3,145 (@100 Mt)} & 24.3 \\
+\end{longtable}
+}
+
+Values are the marginal pixel's GM per tonne basalt at each supply cap;
+bold columns flag the most profitable supply level for each regime. The
+year-1 regime now peaks at the 250 Mt/yr cap (\textasciitilde5× the old
+peak of \$2 B) thanks to the horizon-summed agronomic return.
+Equilibrium saturates at 145 Mt/yr (the targeted-deployable-cropland
+ceiling at maintenance rate).
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -270,6 +395,124 @@ tropics & \texttt{cdr\_yield\_merlos.tif} \\
 
 Reverse chronological. One bullet per material change. Reference the
 block(s) affected so it is obvious which section under §6 also moved.
+
+\subsubsection{2026-05-26 --- Round-1 conservatism review; five defaults
+re-anchored; B3 / B6 / B7 / B8
+re-run}\label{round-1-conservatism-review-five-defaults-re-anchored-b3-b6-b7-b8-re-run}
+
+Outcome of a structural review of the model's conservatism (see also the
+``Why we were under-estimating profit'' review below in §8). Five fixes
+landed, all backed by the parameter audit and the cited literature:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{B2 / B3 grain size} \texttt{erw/erw-3-basalt-requirements.R}:
+  \texttt{grain\_size\_um} 100 → \textbf{50 µm} (Strefler 2018
+  grinding-curve anchor). Per-tonne CDR at the reference climate rose
+  from 62 → \textbf{88 kg CO₂ / t basalt}; effective NV from 0.0704 →
+  0.10; basalt-to-lime ratio from 14.20 → 10.04 t/t.
+\item
+  \textbf{B6 EcoCrop max-pH cliff} \texttt{erw/erw-4-crop-parameters.R}:
+  was a hard-coded flat 5.5 for every crop; now per-crop EcoCrop optima
+  (5.5 tea / 6.0 cocoa / 6.5 acid-loving / 7.0--8.0 cereals \& legumes).
+  This unlocks non-zero agronomic credit across the pH 5.5--7.0 belt
+  covering most SSA savanna / Sahel cropland; previously the model
+  returned exactly zero agronomic uplift on those pixels.
+\item
+  \textbf{B7 year-1 regime} \texttt{erw/erw-7-profitability-function.R}:
+  agronomic return now scaled by \texttt{PROJECT\_HORIZON\_YR} (5 yr) to
+  put it on the same cumulative basis as \texttt{cdr\_tha}. Prior
+  behaviour silently credited a single season of agronomy against five
+  years of CDR --- a unit mismatch dragging year-1 GM artificially
+  negative.
+\item
+  \textbf{B7 MRV cost} \texttt{erw/erw-7-profitability-function.R}:
+  \texttt{MRV\_COST\_USD\_T\_CO2} 30 → \textbf{20 \$/tCO₂}. Midpoint of
+  Levy et al.~2024 first-of-kind pilot benchmark and the at-scale
+  aggregator-pooled forecast.
+\item
+  \textbf{B3 pedogenic deduction} \texttt{erw/erw-9-cdr-yield.R}: now
+  consumes the CGIAR-CSI Global Aridity Index (Zomer et al.~2022,
+  \texttt{ai\_v31\_yr.tif} or \texttt{cgiar\_aridity\_index.tif}) when
+  present; with 65535-as-nodata masking and auto-detected integer
+  scaling. Falls back to the MAP-only proxy otherwise. The CGIAR path
+  relieves cool highlands (Ethiopia, Kenya, Rwanda, Burundi) where the
+  MAP proxy over-deducted.
+\end{itemize}
+
+\textbf{Headline effect:} under LiTAS-targeted allocation, the number of
+crops with positive pixel-mean gross margin rose from \textbf{1 → 12} in
+year-1, \textbf{0 → 8} in NPV, and \textbf{1 → 19} in equilibrium.
+Year-1 supply peak total GM rose from \textbf{\$2.0 B → \$19.6 B} (at
+the 250 Mt/yr cap). The deep-tail picture also became more honest: NPV
+at unconstrained deployment is now −\$1.1 B (was −\$9.8 B), still
+net-negative but no longer catastrophic. See §0 status, §6 block
+descriptions, and §7 outputs for the refreshed numbers.
+
+\subsubsection{2026-05-19 --- B7 / B8 first end-to-end run; B6 + B3
+refreshed; B9
+patched}\label{b7-b8-first-end-to-end-run-b6-b3-refreshed-b9-patched}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{B7} First end-to-end run of
+  \texttt{erw/erw-7-profitability-function.R}. Wrote 276 gross-margin
+  rasters:
+  \texttt{data/economics\_erw/\{targeted,uniform\_10,uniform\_20,uniform\_50\}/\{crop\}\_\{year1,npv,equilibrium\}.tif}.
+  Mean delivered basalt cost \$52 / t (range \$18 -- \$61); mean LCA
+  52.8 kg CO₂ / t basalt. Pixel-mean gross margin is negative everywhere
+  except \textbf{equilibrium / targeted / WHEA} at \textbf{+\$57 / ha}
+  --- basalt cost (\$1.3 -- \$2.7 k / ha at the LiTAS rate) swamps the
+  carbon credit and agronomic uplift at the pixel mean.
+\item
+  \textbf{B8} First end-to-end run of \texttt{erw/erw-supply.R}. Wrote
+  three supply curves and nine deployment masks. Break-even marginal
+  pixel sits at \textbf{≈100 Mt / yr} for year-1 and NPV, \textbf{≈50 Mt
+  / yr} for equilibrium. Peak total gross margin \textbf{\$3.8 B} at the
+  100 Mt/yr NPV cap with 22.7 Mt CDR/yr. The model finds
+  \textbf{profitable top-decile pixels} even though the SSA-wide mean is
+  negative.
+\item
+  \textbf{Fix}
+  \texttt{erw/erw-7-profitability-function.R:114–117,\ 134–137}: removed
+  redundant \texttt{terra::aggregate(...,\ 10,\ ...)} on
+  \texttt{electricity\_usd\_kWh.tif},
+  \texttt{grid\_CI\_kg\_per\_kWh.tif},
+  \texttt{basalt\_transport\_cost\_usd\_t.tif},
+  \texttt{basalt\_transport\_km.tif}. Those four are already at the
+  working 0.0833° grid; the extra factor-10 aggregation collapsed them
+  to 0.833° on a slightly shifted extent and threw
+  \texttt{extents\ do\ not\ match} on the first crop of the main loop.
+\item
+  \textbf{Fix} \texttt{erw/erw-8-sensitivity-analysis.R:166–174}: grain
+  sweep referenced scalar \texttt{ELECTRICITY\_USD\_KWH} /
+  \texttt{GRID\_CI\_KG\_PER\_KWH}, which do not exist in \texttt{erw-7}
+  (the per-pixel rasters are \texttt{electricity\_raster} /
+  \texttt{grid\_ci\_raster}, the fallback constants are the
+  \texttt{*\_FB} suffixed). Rewired both the cost-side and LCA-side
+  grinding swap to use the per-pixel rasters. Script not run end-to-end
+  yet --- default-scope sweep is ≈6--8 h wall time (≈14k
+  \texttt{profit()} calls).
+\item
+  \textbf{B6 (EcoCrop)} Re-ran
+  \texttt{erw/erw-5-crop-yield-loss-function.R} after the user populated
+  \texttt{data/ecocrop\_parameters\_hp.csv} with all 23 crops
+  (previously only MAIZ + SORG had \texttt{ac\_sat} /
+  \texttt{max\_ac\_sat} rows). Now 46 rasters under
+  \texttt{data/ecocrop\_f/} --- \texttt{hp\_*} and \texttt{ph\_*} for
+  each of the 23 crops.
+\item
+  \textbf{B3} Re-ran \texttt{erw/erw-9-cdr-yield.R}. The previous
+  \texttt{cdr\_yield\_*.tif} files predated the latest
+  \texttt{basalt\_*.tif} write (16:50 vs 18:00 on 2026-05-13), so layers
+  5--9 of \texttt{cdr\_yield\_merlos.tif} (the LiTAS variants with
+  \texttt{ac\_sat\ ≥\ 20}, i.e.~most crops) were silently all zero.
+  Refreshed against the latest basalt rasters; mean CDR yield now
+  non-zero on every layer (e.g.~\texttt{merlos\_20} mean 1.38 t CO₂ /
+  ha). Downloaded WorldClim v2 tavg + prec to \texttt{data/worldclim/}.
+\end{itemize}
 
 \subsubsection{2026-05-15 --- B4 logistics first end-to-end run;
 feedstock filter
@@ -480,13 +723,13 @@ Six dials are exposed at the framework boundary and propagate inwards:
 \item
   Feedstock chemistry --- CaO + MgO mass fractions.
 \item
-  Grain size --- 10 -- 500 µm.
+  Grain size --- 10 -- 500 µm (default \textbf{50 µm}).
 \item
   Allocation rule --- LiTAS-targeted vs uniform 10 / 20 / 50 t ha⁻¹.
 \item
   Carbon price --- default \$150 / tCO₂.
 \item
-  MRV cost --- default \$30 / tCO₂.
+  MRV cost --- default \textbf{\$20 / tCO₂}.
 \item
   Discount rate --- default 10 \% (NPV regime only).
 \end{enumerate}
@@ -544,6 +787,7 @@ See \texttt{docs/erw-pipeline-flow.svg} for the figure. In words:
 Located under \texttt{data/}. File sizes reflect SSA-clipped rasters at
 the working resolution.
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -597,10 +841,12 @@ doi:10.1594/PANGAEA.788537 --- GLiM v1 global lithology \\
 \texttt{data/ecocrop\_f/\{hp,ph\}\_crop\_suitability\_*\_0.tif} & small
 & computed by \texttt{erw-5}; 23 crops × 2 responses \\
 \end{longtable}
+}
 
 \subsubsection{5.2 External datasets
 (provenance)}\label{external-datasets-provenance}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -643,6 +889,7 @@ CSV in \texttt{erw-energy-country.R} & erw-energy-country \\
 ERW trial dataset & curated by Bisrat & \texttt{erw/erw-trial-data.csv}
 (\textasciitilde14 rows) & erw-yield-fit \\
 \end{longtable}
+}
 
 \subsubsection{5.3 Not represented (gaps)}\label{not-represented-gaps}
 
@@ -684,8 +931,9 @@ harvested-area / production / yield for 23 crops resampled to the 10×
 working grid. ECEC and acidity-saturation surfaces derived inline.
 
 \textbf{Where to look:} \texttt{erw/erw-1-layers-soilgrids.R},
-\texttt{erw/erw-2-layers-spam.R}, \texttt{docs/erw-parameters.md} §1
-(depth-weighting recipe).
+\texttt{erw/erw-2-layers-spam.R} (parameters for \texttt{erw-1} /
+\texttt{erw-2} are not catalogued in \texttt{docs/erw-parameters.md};
+see the script headers for the depth-weighting recipe).
 
 \subsubsection{\texorpdfstring{B2. Basalt rate --- \texttt{erw-3} ---
 \textbf{REAL}}{B2. Basalt rate --- erw-3 --- REAL}}\label{b2.-basalt-rate-erw-3-real}
@@ -698,6 +946,7 @@ lever. Uniform 10 / 20 / 50 t ha⁻¹ counterfactuals computed in parallel.
 
 \textbf{Key constants}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -716,17 +965,20 @@ Notes
 \endlastfoot
 \texttt{CaO\_frac} & 0.10 & Mass fraction of CaO in feedstock. \\
 \texttt{MgO\_frac} & 0.07 & Mass fraction of MgO in feedstock. \\
-\texttt{grain\_size\_um} & 100 µm & Sweeps 10 -- 500 µm in
-\texttt{erw-8}. \\
+\texttt{grain\_size\_um} & \textbf{50 µm} & Sweeps 10 -- 500 µm in
+\texttt{erw-8}. Default lowered from 100 µm on 2026-05-26 --- Strefler
+grinding-curve anchor, cost-minimising once carbon revenue is
+credited. \\
 \texttt{reactive\_fraction\_ref} & 0.20 & Lewis 2021 calibration at
 reference grain × climate. \\
 \texttt{GRAIN\_BETA} & 0.5 & Surface-area exponent for the grain-size
 factor. \\
 \texttt{GRIND\_ALPHA} & 1.2 & Strefler 2018 grinding-energy exponent. \\
 \end{longtable}
+}
 
 \textbf{Where to look:} \texttt{erw/erw-3-basalt-requirements.R},
-\texttt{docs/erw-parameters.md} §2.
+\texttt{docs/erw-parameters.md} §1.
 
 \subsubsection{\texorpdfstring{B3. CDR surface --- \texttt{erw-9} ---
 \textbf{REAL}}{B3. CDR surface --- erw-9 --- REAL}}\label{b3.-cdr-surface-erw-9-real}
@@ -739,6 +991,7 @@ precipitating locally.
 
 \textbf{Key constants}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -759,12 +1012,16 @@ Notes
 \texttt{P\_ref} & 1000 mm & Reference MAP anchor. \\
 \texttt{f\_pH} & triangular peak at pH ≈ 5.0 & Acid-catalysed
 dissolution scaling. \\
-\texttt{pedogenic\_frac} & MAP-binned 0 -- 90 \% & UNEP 1992 aridity
-bands using MAP as v1 proxy for AI = P / PET. \\
+\texttt{pedogenic\_frac} & CGIAR-CSI AI-binned 0 -- 90 \% (MAP-only
+fallback) & Primary path: UNEP 1992 aridity bands keyed on the CGIAR-CSI
+Global Aridity Index \texttt{data/cgiar\_aridity\_index.tif} (or
+\texttt{ai\_v31\_yr.tif}); auto-detects integer scaling and masks 65535
+nodata. Fallback path: MAP-only proxy when the AI raster is absent. \\
 \end{longtable}
+}
 
 \textbf{Where to look:} \texttt{erw/erw-9-cdr-yield.R},
-\texttt{docs/erw-parameters.md} §3.
+\texttt{docs/erw-parameters.md} §2.
 
 \subsubsection{\texorpdfstring{B4. Logistics ---
 \texttt{erw-basalt-access} --- \textbf{REAL} (since
@@ -793,6 +1050,7 @@ quarry-gate.
 
 \textbf{Key constants}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -818,11 +1076,12 @@ distance approximation. \\
 \texttt{MAX\_HAUL\_KM} & 1000 km & Cap beyond which lifecycle emissions
 erase the credit. \\
 \end{longtable}
+}
 
 \textbf{Where to look:} \texttt{erw/erw-basalt-access.R},
 \texttt{erw/erw-build-basalt-mask.R},
 \texttt{erw/erw-fetch-friction-surface.R},
-\texttt{docs/erw-parameters.md} §4.
+\texttt{docs/erw-parameters.md} §3.
 
 \subsubsection{\texorpdfstring{B5. Energy ---
 \texttt{erw-energy-country} ---
@@ -844,7 +1103,8 @@ RUN}}{B6. Crop response --- EcoCrop arm (erw-4, erw-5) --- REAL; Bayesian arm (e
 EcoCrop arm runs: per-crop pH and acidity-saturation tolerance tables
 (23 crops × 2 responses) feed a Recocrop relative-yield surface clamped
 to {[}0.2, 1{]}. Output:
-\texttt{ecocrop\_f/\{hp,ph\}\_crop\_suitability\_\textless{}crop\textgreater{}\_0.tif}.
+\texttt{\{hp,ph\}\_crop\_suitability\_\textless{}crop\textgreater{}\_0.tif}
+(46 rasters, one pair per crop) under \texttt{data/ecocrop\_f/}.
 
 Bayesian arm is unfit: needs \texttt{brms} + Stan + the
 \textasciitilde14-row trial dataset. When fit, \texttt{erw-7} prefers
@@ -857,8 +1117,8 @@ surface is NA.
 \texttt{erw/erw-trial-data.csv}.
 
 \subsubsection{\texorpdfstring{B7. Profitability --- \texttt{erw-7} ---
-\textbf{NOT
-RUN}}{B7. Profitability --- erw-7 --- NOT RUN}}\label{b7.-profitability-erw-7-not-run}
+\textbf{REAL} (first end-to-end run
+2026-05-19)}{B7. Profitability --- erw-7 --- REAL (first end-to-end run 2026-05-19)}}\label{b7.-profitability-erw-7-real-first-end-to-end-run-2026-05-19}
 
 Cost side: quarry + grinding + transport + spreading. Credit side:
 \(\mathrm{CDR} \times p_{\mathrm{CO}_2} - \mathrm{MRV}\). Yield side:
@@ -866,8 +1126,25 @@ Cost side: quarry + grinding + transport + spreading. Credit side:
 10\%, equilibrium) with a 30 / 25 / 20 / 15 / 10 \% CDR phasing over
 five years.
 
+\textbf{Headline result (refreshed 2026-05-26).} At the new defaults
+(\$150/tCO₂ credit, **\(20/tCO₂** MRV, **50 µm** grain, year-1 agronomic
+return now summed over the 5-yr basalt residency, CGIAR-CSI AI for the
+pedogenic deduction, per-crop EcoCrop max-pH cliffs 5.5–8.0), the
+pixel-mean gross margin under LiTAS-targeted allocation flips to
+**positive for 12 / 23 crops in year-1, 8 / 23 in NPV, and 19 / 23 in
+equilibrium**. Top performers by mean GM (\)/ha across deployed pixels):
+potato (\$10,560 y1 / \$3,017 NPV / \$1,984 eq.), tobacco (\$4,884 /
+\$807 / \$798), sweet potato, lentil, groundnut, cassava, common bean,
+chickpea, wheat (all positive on year-1 and equilibrium). Acid-tolerant
+cereals (sorghum, pearl millet) and coffee/cocoa stay negative because
+the EcoCrop response is already saturated on most of their SSA cropland
+--- the agronomic side is structurally small and CDR alone has to clear
+the full basalt cost. The picture sharpens once pixels are supply-ranked
+and capped --- see B8.
+
 \textbf{Key constants}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -892,35 +1169,77 @@ country raster missing. \\
 \texttt{TRUCK\_KGCO2\_PER\_T\_KM} & 0.12 & Diesel heavy truck. \\
 \texttt{CARBON\_PRICE\_USD\_T} & \$150 / tCO₂ & Mid of 2024--25 ERW
 credit market. \\
-\texttt{MRV\_COST\_USD\_T\_CO2} & \$30 / tCO₂ & Sampling + lab +
-verification + registry. \\
+\texttt{MRV\_COST\_USD\_T\_CO2} & \textbf{\$20 / tCO₂} & Sampling + lab
++ verification + registry. Lowered from \$30 on 2026-05-26 --- midpoint
+of Levy et al.~2024 pilot benchmark and at-scale forecast. \\
 \texttt{DISCOUNT\_RATE\_PCT} & 10 \% & NPV regime. \\
 \texttt{CDR\_PHASING} & 30 / 25 / 20 / 15 / 10 \% over 5 yr &
 Time-resolved CDR realisation. \\
 \end{longtable}
+}
 
 \textbf{Where to look:} \texttt{erw/erw-7-profitability-function.R},
 \texttt{docs/erw-parameters.md} §5.
 
 \subsubsection{\texorpdfstring{B8. Supply ranking ---
-\texttt{erw-supply} --- \textbf{NOT
-RUN}}{B8. Supply ranking --- erw-supply --- NOT RUN}}\label{b8.-supply-ranking-erw-supply-not-run}
+\texttt{erw-supply} --- \textbf{REAL} (refreshed
+2026-05-26)}{B8. Supply ranking --- erw-supply --- REAL (refreshed 2026-05-26)}}\label{b8.-supply-ranking-erw-supply-real-refreshed-2026-05-26}
 
 Pixels ranked descending by gross margin per tonne basalt --- the LP
 dual on the basalt-supply constraint. Produces supply curves and
 deployment masks at 1 / 5 / 10 / 25 / 50 / 100 / 250 / 500 Mt yr⁻¹ caps,
 plus an unconstrained reference.
 
-\textbf{Where to look:} \texttt{erw/erw-supply.R}.
+\textbf{Headline result (post-refresh).} With the new defaults, year-1
+deployment is profitable out to 250 Mt yr⁻¹ and NPV out to
+\textasciitilde150 Mt yr⁻¹. Marginal \$/t basalt by regime:
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{year-1:} +\$292 → +\$117 → \textbf{+\$79} → +\$21 → −\$60 over
+  1 / 50 / \textbf{100} / 250 / 500 Mt yr⁻¹. Peak total gross margin
+  \textbf{\$19.6 B at 250 Mt yr⁻¹} with 61.0 Mt CDR yr⁻¹.
+\item
+  \textbf{NPV @ 10 \%:} +\$117 → +\$46 → \textbf{+\$16} → −\$16 over the
+  same ladder. Peak total gross margin \textbf{\$5.0 B at 100 Mt yr⁻¹}
+  with 27.2 Mt CDR yr⁻¹ --- vs.~the pre-refresh \$3.8 B and 22.7 Mt CDR
+  at the same cap.
+\item
+  \textbf{Equilibrium (maintenance rate):} +\$197 → +\$20 →
+  \textbf{−\$14} → −\$60 over 1 / 50 / \textbf{100} / 250 Mt yr⁻¹.
+  Marginal pixel slips negative between 50 and 100 Mt yr⁻¹; peak total
+  GM \textbf{\$3.1 B at 100 Mt yr⁻¹} with 24.3 Mt CDR yr⁻¹.
+\end{itemize}
+
+Unconstrained SSA capacity tops out at 443 Mt basalt yr⁻¹ (year-1, NPV)
+or 145 Mt yr⁻¹ (equilibrium maintenance), with cumulative CDR of 102 Mt
+and 34 Mt respectively. The unconstrained NPV total is now
+\textbf{−\$1.1 B} (was −\$9.8 B before the refresh) --- still
+net-negative because deep-tail pixels have basalt costs exceeding both
+credit and agronomy, but a much smaller value-destructive zone. Ranking
++ cap still matters as much as the input parameters.
+
+\textbf{Where to look:} \texttt{erw/erw-supply.R},
+\texttt{data/supply\_curve\_\{year1,npv,equilibrium\}.csv},
+\texttt{data/gm\_per\_t\_basalt\_\{regime\}.tif},
+\texttt{data/deployment\_under\_\{10,50,250\}\_Mt\_\{regime\}.tif}.
 
 \subsubsection{\texorpdfstring{B9. Sensitivity --- \texttt{erw-8} ---
-\textbf{NOT
-RUN}}{B9. Sensitivity --- erw-8 --- NOT RUN}}\label{b9.-sensitivity-erw-8-not-run}
+\textbf{READY} (patched 2026-05-19; not yet
+executed)}{B9. Sensitivity --- erw-8 --- READY (patched 2026-05-19; not yet executed)}}\label{b9.-sensitivity-erw-8-ready-patched-2026-05-19-not-yet-executed}
 
 Five sweeps: (i) crop × basalt × carbon-price grid; (ii) yield uplift
 1.0 -- 2.5×; (iii) MRV 0 -- 80 \$/tCO₂; (iv) grain size 10 / 30 / 50 /
 100 / 200 / 500 µm; (v) allocation rule (LiTAS-targeted + uniform 10 /
 20 / 50). All sweeps run across the three regimes and 23 crops.
+
+\texttt{erw-8} \texttt{source()}s \texttt{erw-7}, so it picked up the
+2026-05-19 extent-mismatch fix automatically. A second bug was patched
+at the same time --- see §1 changelog. End-to-end runtime is ≈6--8 h on
+a single core (≈14k \texttt{profit()} calls); not executed in the
+2026-05-19 run. Once run, headline numbers should be added here and at
+§0.
 
 \textbf{Where to look:} \texttt{erw/erw-8-sensitivity-analysis.R}.
 
@@ -933,6 +1252,7 @@ Twelve indicator maps are rendered into \texttt{docs/maps/} by
 \texttt{erw/erw-plot-maps.R}. The HTML page embeds them in a gallery
 alongside the conceptual-framework and pipeline-architecture figures.
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -965,17 +1285,148 @@ ha) & B3 \\
 06 & \texttt{06-pedogenic-fraction.png} & Aridity-band pedogenic-C
 deduction & B3 \\
 07 & \texttt{07-electricity-price.png} & Country industrial-electricity
-tariff (\(/kWh) | B5 |
-| 08 | `08-grid-CI.png` | Country grid carbon intensity (kg CO₂ / kWh) | B5 |
-| 09 | `09-basalt-sources.png` | GLiM vb + pb source mask | B4 |
-| 10 | `10-basalt-traveltime.png` | Travel time to nearest source (min) | B4 |
-| 11 | `11-basalt-delivered-price.png` | Delivered feedstock price (\) /
-t) & B4 \\
+tariff (\$/kWh) & B5 \\
+08 & \texttt{08-grid-CI.png} & Country grid carbon intensity (kg CO₂ /
+kWh) & B5 \\
+09 & \texttt{09-basalt-sources.png} & GLiM vb + pb source mask & B4 \\
+10 & \texttt{10-basalt-traveltime.png} & Travel time to nearest source
+(min) & B4 \\
+11 & \texttt{11-basalt-delivered-price.png} & Delivered feedstock price
+(\$ / t) & B4 \\
 12 & \texttt{12-feedstock-class.png} & Source mask split by GLiM class &
 B4 \\
 \end{longtable}
+}
 
 Add a row when a new map is rendered; remove when one is dropped.
+
+\subsubsection{7.1 Profitability outcome maps
+(B7)}\label{profitability-outcome-maps-b7}
+
+\texttt{erw/erw-10-profitability-maps-tables.R} renders outcome maps
+derived from the 276 economics rasters: continent-wide crop-weighted GM,
+per-crop GM for the five highest-acreage crops, profitable-pixel masks,
+and per-pixel breakeven carbon-price surfaces. All assumption
+combinations (3 regimes × 4 allocations) are covered. The full panel
+lives in \texttt{docs/erw-results.pdf}; the most useful four panels for
+this document are below.
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
+  >{\centering\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\centering
+Crop-weighted GM (\$/ha, NPV, targeted)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\centering
+Profitable mask (NPV, targeted)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\includegraphics[width=2.6in,height=\textheight,keepaspectratio]{maps/profitability/ssa_gm_npv_targeted.png}
+&
+\includegraphics[width=2.6in,height=\textheight,keepaspectratio]{maps/profitability/profitable_mask_npv_targeted.png} \\
+\textbf{Breakeven carbon price (NPV, targeted)} & \textbf{Crop-weighted
+GM (NPV, uniform 20 t/ha)} \\
+\includegraphics[width=2.6in,height=\textheight,keepaspectratio]{maps/profitability/breakeven_carbon_npv_targeted.png}
+&
+\includegraphics[width=2.6in,height=\textheight,keepaspectratio]{maps/profitability/ssa_gm_npv_uniform_20.png} \\
+\end{longtable}
+}
+
+\subsubsection{7.2 SSA-wide totals under different assumptions
+(refreshed
+2026-05-26)}\label{ssa-wide-totals-under-different-assumptions-refreshed-2026-05-26}
+
+Source: \texttt{docs/tables/output-ssa-summary.csv} --- one row per
+regime × allocation. Refreshed 2026-05-26 after the round-1 conservatism
+review landed (grain 50 µm, MRV \$20/tCO₂, year-1 agronomic summed over
+5-yr horizon, CGIAR-CSI Global Aridity Index, per-crop EcoCrop max-pH).
+
+\begin{small}
+
+{\def\LTcaptype{none} % do not increment counter
+\begin{longtable}[]{@{}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
+  >{\raggedleft\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}@{}}
+\toprule\noalign{}
+\begin{minipage}[b]{\linewidth}\raggedright
+Regime
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
+Allocation
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Total GM (M\$)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Agro (M\$)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Basalt (M\$)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+CDR rev. (M\$)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+CDR (Mt)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+Profitable (Mha)
+\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedleft
+CDR on profitable (Mt)
+\end{minipage} \\
+\midrule\noalign{}
+\endhead
+\bottomrule\noalign{}
+\endlastfoot
+\textbf{year-1} & \textbf{targeted} & \textbf{+18,440} & 30,220 & 21,545
+& 10,566 & 81.3 & 137.9 & 58.4 \\
+NPV & targeted & −1,107 & 12,030 & 21,545 & 8,391 & 81.3 & 132.4 &
+37.4 \\
+\textbf{equilibrium} & \textbf{targeted} & \textbf{+1,965} & 6,044 &
+7,364 & 3,442 & 26.5 & 134.9 & 13.6 \\
+\textbf{year-1} & \textbf{uniform 10} & \textbf{+19,950} & 30,220 &
+75,918 & 13,742 & 105.7 & 127.1 & 81.6 \\
+NPV & uniform 10 & −6,106 & 5,495 & 75,918 & 10,914 & 105.7 & 119.2 &
+68.3 \\
+equilibrium & uniform 10 & −4,200 & 6,044 & 75,918 & 13,742 & 105.7 &
+120.6 & 71.0 \\
+\textbf{year-1} & \textbf{uniform 20} & \textbf{+9,712} & 30,220 &
+151,836 & 27,485 & 211.4 & 124.1 & 153.7 \\
+NPV & uniform 20 & −17,701 & 5,495 & 151,836 & 21,827 & 211.4 & 117.4 &
+130.4 \\
+equilibrium & uniform 20 & −14,439 & 6,044 & 151,836 & 27,485 & 211.4 &
+118.6 & 135.4 \\
+year-1 & uniform 50 & −21,002 & 30,220 & 379,591 & 68,712 & 528.6 &
+120.6 & 355.1 \\
+NPV & uniform 50 & −52,486 & 5,495 & 379,591 & 54,567 & 528.6 & 116.1 &
+314.6 \\
+equilibrium & uniform 50 & −45,153 & 6,044 & 379,591 & 68,712 & 528.6 &
+117.1 & 325.4 \\
+\end{longtable}
+}
+
+\end{small}
+
+Read across: the \textbf{year-1 targeted} row now leads at
+\textbf{\$18.4 B} total SSA-wide GM (up from −\$13.9 B pre-refresh) on
+137.9 Mha profitable area --- the horizon-summed agronomic side now
+scales with 5× annual agronomic returns. \textbf{Year-1 uniform 10} is
+the highest absolute total (\$20.0 B) because basalt is applied across
+all cropland regardless of acidity, and the new max-pH cliffs make most
+of that cropland agronomically responsive. The \textbf{NPV-targeted} row
+is now only mildly negative (−\$1.1 B vs.~−\$9.8 B before) --- most of
+the headline gap closed once the unit mismatch in year-1 was fixed; the
+residual −\$1 B reflects the 10 \% discount rate eating into both
+revenue streams. \textbf{Equilibrium-targeted} is solidly positive (+\$2
+B) at a 26.5 Mt CDR footprint. Uniform-50 stays negative across all
+regimes --- 50 t/ha on every cropland pixel is excess basalt where it
+isn't needed, and the deep-tail cost dominates. The full per-country and
+per-crop breakdowns are in \texttt{docs/erw-results.pdf}. The same CSVs
+feed \texttt{erw-supply.R}'s ranking.
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -989,6 +1440,7 @@ authoritative for everything else.
 Quick reference of the six \textbf{decision variables} (the only knobs
 swept by \texttt{erw-8}):
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -1010,17 +1462,18 @@ Sweep range
 \endlastfoot
 \texttt{CaO\_frac}, \texttt{MgO\_frac} (feedstock) & 0.10 / 0.07 &
 \texttt{erw-3} & not currently swept \\
-\texttt{grain\_size\_um} & 100 µm & \texttt{erw-3} & 10 / 30 / 50 / 100
-/ 200 / 500 µm \\
+\texttt{grain\_size\_um} & \textbf{50 µm} & \texttt{erw-3} & 10 / 30 /
+50 / 100 / 200 / 500 µm \\
 \texttt{allocation} & LiTAS-targeted & \texttt{erw-7}, \texttt{erw-8} &
 + uniform 10 / 20 / 50 \\
 \texttt{CARBON\_PRICE\_USD\_T} & \$150 / tCO₂ & \texttt{erw-7},
 \texttt{erw-8} & swept jointly with crop + basalt price \\
-\texttt{MRV\_COST\_USD\_T\_CO2} & \$30 / tCO₂ & \texttt{erw-7},
+\texttt{MRV\_COST\_USD\_T\_CO2} & \textbf{\$20 / tCO₂} & \texttt{erw-7},
 \texttt{erw-8} & 0 -- 80 \$ / tCO₂ \\
 \texttt{DISCOUNT\_RATE\_PCT} & 10 \% & \texttt{erw-7} & NPV regime
 only \\
 \end{longtable}
+}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -1051,6 +1504,7 @@ sanity-checked}\label{what-has-been-sanity-checked}
 
 \subsubsection{Open issues}\label{open-issues}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\raggedright\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -1093,6 +1547,7 @@ trials) \\
 Single-currency model & low & all & USD throughout; not a problem for
 ex-ante analysis \\
 \end{longtable}
+}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -1140,16 +1595,25 @@ LaTeX is needed only for the framework + pipeline figures
 \ExtensionTok{Rscript}\NormalTok{ erw/erw{-}supply.R}
 \ExtensionTok{Rscript}\NormalTok{ erw/erw{-}8{-}sensitivity{-}analysis.R}
 
-\CommentTok{\# 7. render maps and rebuild figures}
-\ExtensionTok{Rscript}\NormalTok{ erw/erw{-}plot{-}maps.R}
-\ExtensionTok{pdflatex}\NormalTok{ docs/erw{-}pipeline{-}flow.tex      }\KeywordTok{\&\&} \ExtensionTok{pdftocairo} \AttributeTok{{-}svg}\NormalTok{ docs/erw{-}pipeline{-}flow.pdf      docs/erw{-}pipeline{-}flow.svg}
-\ExtensionTok{pdflatex}\NormalTok{ docs/erw{-}conceptual{-}framework.tex }\KeywordTok{\&\&} \ExtensionTok{pdftocairo} \AttributeTok{{-}svg}\NormalTok{ docs/erw{-}conceptual{-}framework.pdf docs/erw{-}conceptual{-}framework.svg}
+\CommentTok{\# 7. render maps, results, and rebuild figures}
+\ExtensionTok{Rscript}\NormalTok{ erw/erw{-}plot{-}maps.R                      }\CommentTok{\# 12 indicator maps}
+\ExtensionTok{Rscript}\NormalTok{ erw/erw{-}10{-}profitability{-}maps{-}tables.R   }\CommentTok{\# profitability maps + 3 CSV tables}
+\ExtensionTok{pdflatex}\NormalTok{ docs/erw{-}pipeline{-}flow.tex }\DataTypeTok{\textbackslash{}}
+  \KeywordTok{\&\&} \ExtensionTok{pdftocairo} \AttributeTok{{-}svg}\NormalTok{ docs/erw{-}pipeline{-}flow.pdf docs/erw{-}pipeline{-}flow.svg}
+\ExtensionTok{pdflatex}\NormalTok{ docs/erw{-}conceptual{-}framework.tex }\DataTypeTok{\textbackslash{}}
+  \KeywordTok{\&\&} \ExtensionTok{pdftocairo} \AttributeTok{{-}svg}\NormalTok{ docs/erw{-}conceptual{-}framework.pdf docs/erw{-}conceptual{-}framework.svg}
+
+\CommentTok{\# 8. rebuild documentation PDFs}
+\FunctionTok{bash}\NormalTok{ docs/build{-}erw{-}model.sh}
+\FunctionTok{bash}\NormalTok{ docs/build{-}erw{-}results.sh}
+\FunctionTok{bash}\NormalTok{ docs/build{-}erw{-}tutorial.sh}
 \end{Highlighting}
 \end{Shaded}
 
 \subsubsection{10.3 Expected runtimes (Apple Silicon, single
 core)}\label{expected-runtimes-apple-silicon-single-core}
 
+{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 2\tabcolsep) * \real{0.5000}}@{}}
@@ -1171,7 +1635,10 @@ Time
 \texttt{erw-7}, \texttt{erw-8} & minutes -- hours depending on sweep
 depth \\
 \texttt{erw-plot-maps} (12 maps) & \textasciitilde15 min \\
+\texttt{erw-10-profitability-maps-tables} (48 maps + 3 CSVs) &
+\textasciitilde5 min \\
 \end{longtable}
+}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -1188,8 +1655,8 @@ month)}\label{near-term-within-current-month}
   \texttt{brms} + Stan are installed locally.
 \item
   Run \texttt{erw-7} end-to-end to produce the 276-raster profitability
-  stack
-  (\texttt{economics\_erw/\{allocation\}/\{crop\}\_\{regime\}.tif}).
+  stack \texttt{\{crop\}\_\{regime\}.tif} under
+  \texttt{economics\_erw/\{allocation\}/}.
 \item
   Run \texttt{erw-supply} and \texttt{erw-8} and render their headline
   figures.
@@ -1259,30 +1726,53 @@ load-bearing citations are:
   034010.
 \item
   Lewis, A. L. et al.~(2021). \emph{Effects of mineralogy, chemistry and
-  climatic regime on rates of basalt weathering.} (Reference for the
+  physical properties of basalts on carbon capture potential and
+  plant-nutrient element release via enhanced weathering.}
+  \textbf{Applied Geochemistry} 132, 105023.
+  doi:10.1016/j.apgeochem.2021.105023. (Reference for the
   reactive-fraction calibration used in \texttt{erw-3}.)
 \item
   Hartmann, J. \& Moosdorf, N. (2012). \emph{The new global lithological
   map database GLiM.} PANGAEA doi:10.1594/PANGAEA.788537.
 \item
-  Weiss, D. J. et al.~(2018, 2020). \emph{Global maps of travel time to
-  healthcare facilities.} Malaria Atlas Project --- friction surface
-  2019.
+  Weiss, D. J. et al.~(2018). \emph{A global map of travel time to
+  cities to assess inequalities in accessibility in 2015.}
+  \textbf{Nature} 553, 333--336. doi:10.1038/nature25181.
 \item
-  Aramburu-Merlos, F. et al.~(2024). \emph{LiTAS: lime-targeted
-  application strategy for tropical acid soils.} (Reference for the
-  LiTAS lime-equivalence recipe used in \texttt{erw-3}.)
+  Weiss, D. J. et al.~(2020). \emph{Global maps of travel time to
+  healthcare facilities.} \textbf{Nature Medicine} 26, 1835--1838.
+  doi:10.1038/s41591-020-1059-1. (Source of the Malaria Atlas Project
+  2019 motorised friction surface used in \texttt{erw-basalt-access}.)
 \item
-  Kanzaki, Y. et al.~(2024). \emph{Soil-pH-driven controls on
-  enhanced-weathering CDR rates.} \textbf{Nature}.
+  Aramburu Merlos, F., Silva, J. V., Baudron, F. \& Hijmans, R. J.
+  (2023). \emph{Estimating lime requirements for tropical soils: Model
+  comparison and development.} \textbf{Geoderma} 432,
+
+  \begin{enumerate}
+  \def\labelenumi{\arabic{enumi}.}
+  \setcounter{enumi}{116420}
+  \tightlist
+  \item
+    (Reference for the LiTAS lime-equivalence recipe used in
+    \texttt{erw-3}.)
+  \end{enumerate}
 \item
-  Beerling group, US Corn Belt field trials (2024 PNAS).
+  Kanzaki, Y., Planavsky, N. J. \& Reinhard, C. T. (2023). \emph{New
+  estimates of the storage permanence and ocean co-benefits of enhanced
+  rock weathering.} \textbf{PNAS Nexus} 2 (4), pgad059.
 \item
-  Flux × UNCCD Kisumu County trial (2024).
+  Beerling, D. J. et al.~(2024). \emph{Enhanced weathering in the US
+  Corn Belt delivers carbon removal with agronomic benefits.}
+  \textbf{PNAS} 121 (9), e2319436121.
 \item
-  Amann, T. et al.~(2025). \emph{Swiss vineyard ERW trial: low CDR rates
-  in cool-alkaline systems.} \textbf{Environmental Science \&
-  Technology}.
+  Haque, F. et al.~(2025). \emph{Agronomic Performance of Enhanced Rock
+  Weathering in a Tropical Smallholder System: A Maize Trial in Kenya.}
+  CDRXIV preprint 410 (Flux Carbon / UNCCD).
+\item
+  Dupla, X., Bertagni, M. B. \& Grand, S. (2025). \emph{Three Years of
+  Field Trials Indicate a Sustained Enhanced Rock Weathering Signal with
+  Limited CO₂ Removal.} \textbf{Environmental Science \& Technology} 59
+  (48), 25751--25764.
 \end{itemize}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}

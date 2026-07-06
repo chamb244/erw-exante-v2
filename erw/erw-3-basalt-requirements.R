@@ -61,7 +61,10 @@ basalt <- list(
   Cr_ppm    = 200,
 
   # grain-size lever (the dominant decision variable in ERW economics)
-  grain_size_um = 100,              # default — moderate cost, moderate reactivity
+  # 50 µm = Strefler grinding-curve anchor; ~√2 × reactivity of 100 µm at
+  # ~2× the kWh/t (still <$3/t in cost terms). The sensitivity sweep shows
+  # this is the cost-minimising default once the carbon side is credited.
+  grain_size_um = 50,
 
   # Lewis-2021-calibrated effective neutralising fraction at the reference
   # grain size (100 µm) and reference climate (Corn Belt). Tropical climate

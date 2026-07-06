@@ -24,6 +24,8 @@
 # (anchored by the .here marker at the repo root)
 library(here)
 input_path <- paste0(here::here('data'), '/')
+# above not working from me; hard coding directory with next line:
+input_path <- c("~/Dropbox/erw-exante-v2/data")
 
 # ------------------------------------------------------------------------------
 

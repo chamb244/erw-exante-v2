@@ -49,7 +49,7 @@ version.
 
 | Code path | Default | Units | Source |
 |---|---|---|---|
-| `basalt$grain_size_um` | 100 | µm | Decision variable. Sweeps 10–500 µm in `erw-8`. |
+| `basalt$grain_size_um` | 50 | µm | Decision variable. Sweeps 10–500 µm in `erw-8`. Default lowered from 100 µm on 2026-05-26 — coincides with the Strefler 2018 [S4] grinding-energy anchor and roughly √2× the reactivity of 100 µm at ~2× the kWh/t. Sensitivity sweep shows this is the cost-minimising default once carbon revenue is credited. |
 | `GRAIN_REF_UM`         | 100 | µm | Anchor grain size at which the reference reactive fraction was calibrated. |
 | `GRAIN_BETA`           | 0.5 | dimensionless | Surface-area exponent in $(d_{\text{ref}}/d)^\beta$. Square-root-of-surface-area midpoint, defensible without an extra free parameter. Lewis 2021 grain sensitivity [S1]; Strefler 2018 [S4]. |
 
@@ -104,7 +104,7 @@ pedogenic deduction lives in `erw-9`).
 |---|---|---|
 | `basalt_uniform_10` | 10 | Beerling et al. 2020 Nature [S2]; Baek et al. 2023 [S5] |
 | `basalt_uniform_20` | 20 | Common pilot rate; Eufrasio et al. 2022 [S6] |
-| `basalt_uniform_50` | 50 | Kantola et al. 2024 [S7]; Lewis 2021 mesocosm rate [S1] |
+| `basalt_uniform_50` | 50 | Kantola et al. 2023 [S7]; Lewis 2021 mesocosm rate [S1] |
 
 These three uniform-rate rasters complement the LiTAS-targeted rate, giving four
 allocation rules in `erw-7`.
@@ -122,7 +122,7 @@ allocation rules in `erw-7`.
 
 **Notes.** The reference reactive fraction in `erw-3` (0.20) is anchored to this
 temperate-humid climate. Tropical sites with MAT ≈ 25 °C and MAP ≈ 1500 mm push the
-multiplicative climate factor toward ~3, consistent with the Kisumu and InPlanet field
+multiplicative climate factor toward ~3, consistent with the Sabah and InPlanet field
 weathering rates [S8, S9].
 
 ### 2.2 Climate-factor functional form
@@ -135,8 +135,8 @@ f_climate = clamp(MAT / T_ref, 0.3, 3.0)
 
 Clamp bounds prevent runaway scaling at extreme grid cells and reflect the
 empirical range over which the linear-multiplier approximation holds. Source: Kanzaki et
-al. 2024 Nature reactive-transport surrogates [S10]; this is a v1 proxy and should be
-replaced by the Kanzaki form when calibration data permits.
+al. 2023 PNAS Nexus reactive-transport surrogates [S10]; this is a v1 proxy and should be
+replaced by the full Kanzaki form when calibration data permits.
 
 ### 2.3 pH factor (triangular, peak ≈ 5.0)
 
@@ -154,7 +154,24 @@ magnitude lower.
 
 ### 2.4 Pedogenic-carbonate deduction
 
-Aridity-index bands using MAP as a v1 proxy for AI = P/PET:
+**Primary path (added 2026-05-26):** if `data/cgiar_aridity_index.tif` is
+present (CGIAR-CSI Global Aridity Index, Zomer et al. 2022 [S37], 1 km, AI =
+MAP / PET, integer-scaled by 10 000), `erw-9` keys the deduction directly on
+AI and the integer scaling is auto-detected. Aridity bands (UNEP 1992 [S13]):
+
+| AI = MAP/PET | Aridity class | `pedogenic_frac` |
+|---|---|---|
+| < 0.05 | Hyperarid | 0.90 |
+| 0.05–0.20 | Arid | 0.70 |
+| 0.20–0.50 | Semi-arid | 0.40 |
+| 0.50–0.65 | Dry sub-humid | 0.15 |
+| > 0.65 | Humid | 0.00 |
+
+**Fallback path (used when the AI raster is absent):** MAP-only proxy. Same
+class boundaries below, keyed on mean annual precipitation rather than AI.
+This proxy over-deducts in cool highlands (Ethiopian/Kenyan highlands, Rwanda,
+Burundi, Lesotho) where low PET keeps the true AI in the humid band even at
+modest MAP.
 
 | MAP (mm)      | Aridity class (UNEP 1992 [S13]) | `pedogenic_frac` |
 |---|---|---|
@@ -168,9 +185,10 @@ Aridity-index bands using MAP as a v1 proxy for AI = P/PET:
 
 - Beerling et al. 2020 Nature — pedogenic-carbonate caveat in SI [S2]
 - Renforth 2019 Nature Communications [S15]
-- Kanzaki et al. 2024 Nature [S10]
-- "Are ERW rates overestimated?" Frontiers in Climate 2024 [S16]
+- Kanzaki et al. 2023 PNAS Nexus [S10]
+- Reershemius & Suhrhoff 2024 GCB — uncertainty in ERW CDR-rate calculations [S16]
 - UNEP 1992 aridity classification [S13]
+- Zomer, Xu & Trabucco 2022 — Global Aridity Index v3 (CGIAR-CSI) [S37]
 
 **Notes.** In semi-arid soils a substantial fraction of the alkalinity released by
 silicate dissolution precipitates locally as CaCO₃/MgCO₃ rather than exporting as
@@ -202,7 +220,7 @@ The full per-pixel reactive fraction is capped at 1.0 (nothing reacts more than 
 | `USD_PER_MIN_PER_T`     | 0.04 | $/min/t | 30-t truck at $80/hr operating cost (van Essen 2019 EU truck CBA [S18]; AfDB rural-road operating-cost study 2020 [S19]). |
 | `MAX_HAUL_KM`           | 1000 | km | Cap beyond which lifecycle emissions erode the CDR credit (Beerling 2020 SI [S2]; Beerling 2018 Nat. Plants [S20]). |
 | `KM_PER_HOUR_FREE`      | 60   | km/h | Free-flow speed used only for the haul-distance cap. |
-| `EFFECTIVE_KM_PER_MIN`  | 0.5  | km/min (≈30 km/h) | Avg effective speed for friction-surface-routed haulage (Weiss et al. 2018 MAP friction methodology [S21]). |
+| `EFFECTIVE_KM_PER_MIN`  | 0.5  | km/min (≈30 km/h) | Avg effective speed for friction-surface-routed haulage (Weiss et al. 2020 MAP friction methodology [S21]). |
 
 **External data sources.**
 
@@ -219,7 +237,7 @@ update.
 
 **Sources.**
 
-- Grid carbon intensity: Ember Climate Data Explorer 2023 [S23]; IEA Africa Energy Outlook 2024 [S24].
+- Grid carbon intensity: Ember Climate Data Explorer 2023 [S23]; IEA Africa Energy Outlook 2022 [S24].
 - Electricity tariffs: GET.invest tariff database 2022–2024 [S25]; AfDB country tariff snapshots 2024 [S19].
 
 **Notes on the range.**
@@ -245,7 +263,7 @@ against latest IEA / Ember snapshots for a production run.
 | `QUARRY_GATE_USD_T`      | 10   | $/t basalt | Strefler 2018 [S4]; Beerling 2020 SI [S2]; mid-range global aggregate-fines market. |
 | `SPREADING_USD_T`        | 8    | $/t basalt | Beerling 2018 Nat. Plants [S20]; Eufrasio 2022 [S6]; reflects mechanised broadcast spreader. |
 | `ELECTRICITY_USD_KWH_FB` | 0.10 | $/kWh | Fallback when `erw-energy-country` raster absent. World Bank 2022 industrial-tariff median for low-income countries [S26]. |
-| `GRID_CI_KG_PER_KWH_FB`  | 0.60 | kg CO₂ / kWh | Fallback when `erw-energy-country` raster absent. Global coal-mix proxy (IEA 2023 [S24]). |
+| `GRID_CI_KG_PER_KWH_FB`  | 0.60 | kg CO₂ / kWh | Fallback when `erw-energy-country` raster absent. Global coal-mix proxy (IEA 2022 [S24]). |
 | `TRANSPORT_FLAT_USD_T`   | 20   | $/t basalt | Fallback at 100 km equivalent; matches Strefler 2018 [S4] mid-range. |
 | `TRANSPORT_FLAT_KM`      | 100  | km | Fallback haul distance for LCA when access raster absent. |
 
@@ -269,14 +287,14 @@ LCA(px) = grinding_kWh × grid_CI(px)
 | Code path | Default | Units | Source |
 |---|---|---|---|
 | `CARBON_PRICE_USD_T`   | 150 | $/t CO₂ | Mid of 2024–25 ERW credit market — Frontier Climate offtake [S30]; CDR.fyi public-price index 2025 [S31]. Range $80–500/tCO₂. |
-| `MRV_COST_USD_T_CO2`   | 30  | $/t CO₂ | Sampling + lab + verification + registry. Sutherland et al. 2024 ERW MRV review [S32]; Isometric Standard 2024 [S14]. |
-| `DISCOUNT_RATE_PCT`    | 10  | %       | Standard ag-investment discount in SSA (FAO 2017 [S33]). |
+| `MRV_COST_USD_T_CO2`   | 20  | $/t CO₂ | Sampling + lab + verification + registry. Levy et al. 2024 [S32] benchmarks $25–40/tCO₂ for current pilots; Isometric / Puro forecast $10–15/tCO₂ at scale once aggregator-pooled protocols industrialise. Default lowered from $30 → $20 on 2026-05-26 as a midpoint between "first-of-kind" and "at-scale 2027+". |
+| `DISCOUNT_RATE_PCT`    | 10  | %       | Project-level assumption; not citation-backed. 10% is the conventional rate used in multilateral ag-investment appraisal but no single authoritative source is claimed here. |
 
 ### 5.4 Time-resolved CDR phasing
 
 | Code path | Default | Units | Source |
 |---|---|---|---|
-| `CDR_PHASING` | c(.30, .25, .20, .15, .10) | year fractions | First-order-kinetics-shaped, 5-yr horizon, ~80% by year 5. Kanzaki et al. 2024 [S10]; Beerling 2020 SI [S2]. |
+| `CDR_PHASING` | c(.30, .25, .20, .15, .10) | year fractions | First-order-kinetics-shaped, 5-yr horizon, ~80% by year 5. Kanzaki et al. 2023 [S10]; Beerling 2020 SI [S2]. |
 | `CDR_NPV_FACTOR` | derived (≈0.79 at 10% discount, 5-yr) | dimensionless | $\sum f_t / (1+r)^t \big/ \sum f_t$ — NPV adjustment vs upfront treatment. |
 
 **Notes.** Used only in the `npv` regime, this factor captures the time-value loss of
@@ -295,7 +313,7 @@ treat all cropland identically (matches Beerling/Baek/Kantola modelling conventi
 
 | Regime | What it computes |
 |---|---|
-| `year1`       | Single-year application, no discount. Suitable for short-horizon screening. |
+| `year1`       | One up-front application, agronomic return accumulated **undiscounted over the project horizon** (`project_horizon_yr`, default 5 yr) to match the cumulative basis on which `cdr_tha` already sits. Suitable as the simple "did this pay back over basalt residency" screen. Fix landed 2026-05-26 — prior behaviour credited a single season's agronomy against five years of CDR. |
 | `npv`         | Agronomic return via `limer::NPV_lime` at 10% discount; CDR revenue × `CDR_NPV_FACTOR`. Reapplication interval = round(year1_rate / maintenance_rate). |
 | `equilibrium` | Steady-state maintenance rate only; no NPV adjustment (steady-state assumption). |
 
@@ -308,9 +326,9 @@ equilibrium) and all 23 SPAM crops.
 
 | Sweep | Range / values | Source |
 |---|---|---|
-| **Prices**     | crop_mult × basalt_mult × carbon_price grid: each of {0.5, 0.75, 1, 1.25, 1.5, 2}; carbon ∈ {0, 50, 100, 150, 250} $/tCO₂ | Frontier offtake price range [S30]; FAOSTAT historical price volatility [S34] |
-| **Yields**     | yield-factor ∈ seq(1, 2.5, 0.25)             | World Bank yield-gap closure scenarios [S35] |
-| **MRV**        | MRV cost ∈ {0, 15, 30, 50, 80} $/tCO₂        | Sutherland et al. 2024 [S32] |
+| **Prices**     | crop_mult × basalt_mult × carbon_price grid: each of {0.5, 0.75, 1, 1.25, 1.5, 2}; carbon ∈ {0, 50, 100, 150, 250} $/tCO₂ | Frontier offtake price range [S30]; FAOSTAT historical price volatility [S33] |
+| **Yields**     | yield-factor ∈ seq(1, 2.5, 0.25)             | Yield-gap closure scenarios — Mueller et al. 2012 Nature [S34] |
+| **MRV**        | MRV cost ∈ {0, 15, 30, 50, 80} $/tCO₂        | Levy et al. 2024 [S32] |
 | **Grain size** | {10, 30, 50, 100, 200, 500} µm                | Strefler 2018 [S4]; Lewis 2021 [S1] |
 | **Allocation** | {targeted, uniform_10, uniform_20, uniform_50} | This pipeline (matches Beerling 2020 [S2] and the four `erw-3` branches) |
 
@@ -337,7 +355,7 @@ standard error (measurement-error syntax via `brms::se()`).
 
 | Prior | Distribution | Source / rationale |
 |---|---|---|
-| Intercept   | Normal(0.10, 0.20)  | ~10% baseline uplift, weakly informative. Aramburu Merlos 2023 [S36]. |
+| Intercept   | Normal(0.10, 0.20)  | ~10% baseline uplift, weakly informative. Aramburu Merlos 2023 [S35]. |
 | `log_rate`  | Normal(0.05, 0.05)  | A doubling of rate → ~3.5% extra uplift. Beerling 2018 Nat. Plants [S20]. |
 | `pH_baseline` | Normal(0, 0.05)   | Near zero on log scale per unit pH; small effect expected. |
 | `MAT_C`     | Normal(0, 0.005)    | Per-°C effect; small. |
@@ -345,14 +363,16 @@ standard error (measurement-error syntax via `brms::se()`).
 | `log_grain` | Normal(−0.05, 0.05) | Negative — finer grain → more uplift. Strefler 2018 [S4]. |
 | Group SDs   | Exponential(5)      | Weakly regularising. |
 
-**Methodological references.** Aramburu Merlos et al. 2023 Geoderma [S36] — meta-regression structure; Beerling et al. 2018 Nat. Plants [S20] — log-ratio response; Bürkner 2017 [S37] — `brms` hierarchical modelling.
+**Methodological references.** Aramburu Merlos et al. 2023 Geoderma [S35] — meta-regression structure; Beerling et al. 2018 Nat. Plants [S20] — log-ratio response; Bürkner 2017 [S36] — `brms` hierarchical modelling.
 
-**Trial dataset (`erw/erw-trial-data.csv`).** ~14 rows at v1, from Kisumu Kenya
-(Lewis 2021 [S1]), US Corn Belt (Kantola 2024 [S7]), Brazil InPlanet [S9],
-Newcastle oats (Beerling 2018 [S20]), Swiss vineyards (Dupla 2023 [S3]), and various
-mesocosms. Append rows as new ERW trials publish and re-run `erw-yield-fit` →
-`erw-yield-predict`. Small-n caveat: the posterior is heavily prior-dominated; the
-framework is in place but should not be over-interpreted at v1.
+**Trial dataset (`erw/erw-trial-data.csv`).** ~14 rows at v1, from temperate
+mesocosms (Lewis 2021 [S1]), US Corn Belt (Kantola 2023 [S7]), Brazil InPlanet [S9],
+Newcastle oats (Beerling 2018 [S20]), Swiss vineyards (Dupla et al. 2025 — see
+erw-tutorial.md [7]), Kisumu smallholder maize (Haque et al. 2025 — see
+erw-tutorial.md [6]), and various other mesocosms. Append rows as new ERW trials
+publish and re-run `erw-yield-fit` → `erw-yield-predict`. Small-n caveat: the
+posterior is heavily prior-dominated; the framework is in place but should not be
+over-interpreted at v1.
 
 ---
 
@@ -401,40 +421,46 @@ The full citation list referenced by the tables above.
 - **[S4]** Strefler, J., Amann, T., Bauer, N., Kriegler, E., & Hartmann, J. (2018). Potential and costs of carbon dioxide removal by enhanced weathering of rocks. *Environmental Research Letters*, 13(3), 034010. https://doi.org/10.1088/1748-9326/aaa9c4
 - **[S5]** Baek, S. H., Kanzaki, Y., Lora, J. M., Planavsky, N., Reinhard, C. T., & Zhang, S. (2023). Impact of climate on the global capacity for enhanced rock weathering on croplands. *Earth's Future*, 11. https://doi.org/10.1029/2023EF003698
 - **[S6]** Eufrasio, R. M., Kantzas, E. P., Edwards, N. R., Holden, P. B., Pollitt, H., Mercure, J.-F., Koh, S. C. L., & Beerling, D. J. (2022). Environmental and health impacts of atmospheric CO₂ removal by enhanced rock weathering depend on nations' energy mix. *Communications Earth & Environment*, 3, 106. https://doi.org/10.1038/s43247-022-00436-3
-- **[S7]** Kantola, I. B., Blanc-Betes, E., Masters, M. D., Chang, E., Marklein, A., Moore, C. E., von Haden, A., Bernacchi, C. J., Wolf, A., Epihov, D. Z., Beerling, D. J., & DeLucia, E. H. (2024). Improved net carbon budgets in the U.S. Midwest through direct measured impacts of enhanced weathering. *Global Change Biology*, 30(2), e17188. https://doi.org/10.1111/gcb.17188
+- **[S7]** Kantola, I. B., Blanc-Betes, E., Masters, M. D., Chang, E., Marklein, A., Moore, C. E., von Haden, A., Bernacchi, C. J., Wolf, A., Epihov, D. Z., Beerling, D. J., & DeLucia, E. H. (2023). Improved net carbon budgets in the U.S. Midwest through direct measured impacts of enhanced weathering. *Global Change Biology*, 29(24), 7012–7028. https://doi.org/10.1111/gcb.16903
 - **[S8]** Larkin, C. S., Andrews, M. G., Pearce, C. R., Yeong, K. L., Beerling, D. J., Bellamy, J., Benedick, S., Freckleton, R. P., Goring-Harford, H., Sadekar, S., & James, R. H. (2022). Quantification of CO₂ removal in a large-scale enhanced weathering field trial on an oil palm plantation in Sabah, Malaysia. *Frontiers in Climate*, 4, 959229. https://doi.org/10.3389/fclim.2022.959229
 - **[S9]** InPlanet (2024). Basalt-ERW field trial results, Brazil. Open data release. https://www.inplanet.earth/science (accessed 2025).
-- **[S10]** Kanzaki, Y., Planavsky, N. J., & Reinhard, C. T. (2024). New estimates of the storage permanence and ocean co-benefits of enhanced rock weathering. *PNAS Nexus*, 3(4), pgae059. https://doi.org/10.1093/pnasnexus/pgae059 (companion to Nature 2024 piece on permanence)
+- **[S10]** Kanzaki, Y., Planavsky, N. J., & Reinhard, C. T. (2023). New estimates of the storage permanence and ocean co-benefits of enhanced rock weathering. *PNAS Nexus*, 2(4), pgad059. https://doi.org/10.1093/pnasnexus/pgad059
 - **[S11]** White, A. F., & Brantley, S. L. (2003). The effect of time on the weathering of silicate minerals: why do weathering rates differ in the laboratory and field? *Chemical Geology*, 202(3–4), 479–506. https://doi.org/10.1016/j.chemgeo.2003.03.001
 - **[S12]** Brantley, S. L., Kubicki, J. D., & White, A. F. (Eds.) (2008). *Kinetics of Water-Rock Interaction*. Springer. https://doi.org/10.1007/978-0-387-73563-4
 - **[S13]** UNEP (1992). *World Atlas of Desertification*. United Nations Environment Programme, London: Edward Arnold. (Aridity-index categorisation used worldwide.)
-- **[S14]** Isometric (2024). *Enhanced Weathering Protocol v1.1*. https://registry.isometric.com/protocol/enhanced-weathering (accessed 2025)
+- **[S14]** Isometric (2024). *Enhanced Weathering in Agriculture v1.1*. https://registry.isometric.com/protocol/enhanced-weathering-agriculture/1.1 (accessed 2025)
 - **[S15]** Renforth, P. (2019). The negative emission potential of alkaline materials. *Nature Communications*, 10, 1401. https://doi.org/10.1038/s41467-019-09475-5
-- **[S16]** Reershemius, T., Kelland, M. E., Davis, I. R., D'Ascanio, R., Kalderon-Asael, B., Asael, D., Suhrhoff, T. J., Epihov, D. Z., Beerling, D. J., Reinhard, C. T., & Planavsky, N. J. (2024). Frontiers in Climate, perspective: Are ERW CDR rates overestimated? *Frontiers in Climate*, 6. https://doi.org/10.3389/fclim.2024.1346117
+- **[S16]** Reershemius, T., & Suhrhoff, T. J. (2024). On error, uncertainty, and assumptions in calculating carbon dioxide removal rates by enhanced rock weathering in Kantola et al., 2023. *Global Change Biology*, 30(1), e17025. https://doi.org/10.1111/gcb.17025
 - **[S17]** UNEP (2019). *Sand and Sustainability — Finding new solutions for environmental governance of global sand resources*. https://www.unep.org/resources/report/sand-and-sustainability-finding-new-solutions-environmental-governance-global
 - **[S18]** van Essen, H., et al. (2019). *Handbook on the external costs of transport — Version 2019*. European Commission. https://op.europa.eu/en/publication-detail/-/publication/9781f65f-8448-11ea-bf12-01aa75ed71a1
 - **[S19]** African Development Bank (2020–2024). *African Economic Outlook* annuals — country tariff and operating-cost snapshots. https://www.afdb.org/en/knowledge/publications/african-economic-outlook
 - **[S20]** Beerling, D. J., Leake, J. R., Long, S. P., Scholes, J. D., Ton, J., Nelson, P. N., Bird, M., Kantzas, E., Taylor, L. L., Sarkar, B., Kelland, M., DeLucia, E., Kantola, I., Müller, C., Rau, G., & Hansen, J. (2018). Farming with crops and rocks to address global climate, food and soil security. *Nature Plants*, 4, 138–147. https://doi.org/10.1038/s41477-018-0108-y
 - **[S21]** Weiss, D. J., Nelson, A., Vargas-Ruiz, C. A., Gligorić, K., Bavadekar, S., Gabrilovich, E., Bertozzi-Villa, A., Rozier, J., Gibson, H. S., Shekel, T., Kamath, C., Lieber, A., Schulman, K., Shao, Y., Qarkaxhija, V., Nandi, A. K., Keddie, S. H., Rumisha, S., Amratia, P., … Gething, P. W. (2020). Global maps of travel time to healthcare facilities. *Nature Medicine*, 26, 1835–1838. https://doi.org/10.1038/s41591-020-1059-1
 - **[S22]** Hartmann, J., & Moosdorf, N. (2012). The new global lithological map database GLiM: A representation of rock properties at the Earth surface. *Geochemistry, Geophysics, Geosystems*, 13(12), Q12004. https://doi.org/10.1029/2012GC004370 (Data: https://doi.pangaea.de/10.1594/PANGAEA.788537)
-- **[S23]** Ember (2024). *Yearly Electricity Data — 2023 release*. https://ember-climate.org/data/data-explorer/
-- **[S24]** International Energy Agency (2024). *Africa Energy Outlook 2024*. https://www.iea.org/reports/africa-energy-outlook-2024
+- **[S23]** Ember (2024). *Yearly Electricity Data — 2023 release*. https://ember-energy.org/data/data-explorer/
+- **[S24]** International Energy Agency (2022). *Africa Energy Outlook 2022*. https://www.iea.org/reports/africa-energy-outlook-2022
 - **[S25]** GET.invest (2022–2024). *Country fact sheets — electricity tariffs and grid characteristics*. EU initiative for renewable energy investment in Africa, the Caribbean and the Pacific. https://www.get-invest.eu/
-- **[S26]** World Bank (2022). *Doing Business — Getting Electricity*. Tariff series for low-income countries. https://archive.doingbusiness.org/en/data/exploretopics/getting-electricity
+- **[S26]** World Bank (2019). *Doing Business — Getting Electricity* (final data collection May 2019; series discontinued 2021). Tariff series for low-income countries. https://archive.doingbusiness.org/en/data/exploretopics/getting-electricity
 - **[S27]** European Environment Agency (2023). *EMEP/EEA air pollutant emission inventory guidebook — Road transport*. https://www.eea.europa.eu/publications/emep-eea-guidebook-2023
 - **[S28]** UK Department for Energy Security and Net Zero (BEIS) (2023). *Greenhouse gas reporting: conversion factors 2023*. https://www.gov.uk/government/publications/greenhouse-gas-reporting-conversion-factors-2023
 - **[S29]** Nemecek, T., & Schnetzer, J. (2011). *Methods of assessment of direct field emissions for LCIs of agricultural production systems*. Agroscope Reckenholz-Tänikon Research Station ART.
-- **[S30]** Frontier Climate (2024). *Offtake and prepurchase agreements — ERW transactions*. https://frontierclimate.com/research (accessed 2025)
+- **[S30]** Frontier Climate (2024). *Offtake and prepurchase agreements — ERW transactions*. https://frontierclimate.com/writing (accessed 2025)
 - **[S31]** CDR.fyi (2025). *Carbon Dioxide Removal Public Database — price index*. https://www.cdr.fyi/
-- **[S32]** Sutherland, K., Holland, K., Almaraz, M., & Beerling, D. J. (2024). Measurement, monitoring, reporting and verification for enhanced rock weathering: a systematic review and research agenda. *Frontiers in Climate*, 6, 1346117. https://doi.org/10.3389/fclim.2024.1346117
-- **[S33]** Food and Agriculture Organization of the United Nations (FAO) (2017). *Economic Analysis of Agricultural Investments: Discount Rate Guidance for SSA Projects*. Internal investment guidance.
-- **[S34]** FAOSTAT (2024). *Producer prices — annual*. https://www.fao.org/faostat/en/#data/PP
-- **[S35]** Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. *Nature*, 490, 254–257. https://doi.org/10.1038/nature11420
-- **[S36]** Aramburu Merlos, F., Silva, J. V., Baudron, F., & Hijmans, R. J. (2023). Estimating lime requirements for tropical soils: Model comparison and development. *Geoderma*, 432, 116421. https://doi.org/10.1016/j.geoderma.2023.116421
-- **[S37]** Bürkner, P.-C. (2017). brms: An R package for Bayesian multilevel models using Stan. *Journal of Statistical Software*, 80(1), 1–28. https://doi.org/10.18637/jss.v080.i01
+- **[S32]** Levy, C. R., Almaraz, M., Beerling, D. J., Raymond, P., Reinhard, C. T., Suhrhoff, T. J., & Taylor, L. (2024). Enhanced rock weathering for carbon removal — monitoring and mitigating potential environmental impacts on agricultural land. *Environmental Science & Technology*, 58(39), 17215–17226. https://doi.org/10.1021/acs.est.4c02368
+- **[S33]** FAO (2023). *FAOSTAT Producer Prices — annual, 2016–2020 series for SSA countries × 23 SPAM crops*. https://www.fao.org/faostat/en/#data/PP (accessed 2023-04-24; local export `data/FAOSTAT_data_en_4-24-2023.csv`).
+- **[S34]** Mueller, N. D., Gerber, J. S., Johnston, M., Ray, D. K., Ramankutty, N., & Foley, J. A. (2012). Closing yield gaps through nutrient and water management. *Nature*, 490, 254–257. https://doi.org/10.1038/nature11420
+- **[S35]** Aramburu Merlos, F., Silva, J. V., Baudron, F., & Hijmans, R. J. (2023). Estimating lime requirements for tropical soils: Model comparison and development. *Geoderma*, 432, 116421. https://doi.org/10.1016/j.geoderma.2023.116421
+- **[S36]** Bürkner, P.-C. (2017). brms: An R package for Bayesian multilevel models using Stan. *Journal of Statistical Software*, 80(1), 1–28. https://doi.org/10.18637/jss.v080.i01
+- **[S37]** Zomer, R. J., Xu, J., & Trabucco, A. (2022). Version 3 of the Global Aridity Index and Potential Evapotranspiration Database. *Scientific Data*, 9, 409. https://doi.org/10.1038/s41597-022-01493-1 (data: https://doi.org/10.6084/m9.figshare.7504448)
 
 ---
 
 ## Change log
 
 - **2026-05-13** — Initial version. Captures every constant in `erw-*.R` as shipped at this date.
+- **2026-05-26** — Re-anchored five defaults after a structural review of model conservatism:
+  - `basalt$grain_size_um` 100 → 50 µm (Strefler anchor; cost-minimising at carbon revenue ≥ 0).
+  - `MRV_COST_USD_T_CO2` 30 → 20 $/tCO₂ (midpoint of pilot vs. at-scale).
+  - `year1` regime now scales agronomic return by `project_horizon_yr` to match `cdr_tha`'s cumulative basis (was silently crediting 1 yr of agronomy against 5 yr of CDR).
+  - `erw-4`'s `max_ph` upper-bound generalised from a flat 5.5 to per-crop EcoCrop optima (cereals 7.0–7.5; legumes 6.8–8.0; tea 5.5; cocoa 6.0).
+  - Pedogenic-carbonate deduction now consumes the CGIAR-CSI Global Aridity Index raster when present at `data/cgiar_aridity_index.tif`; falls back to the MAP-only proxy otherwise.

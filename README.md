@@ -133,8 +133,13 @@ erw-0 → erw-1 → erw-2 → erw-3 → erw-4 → erw-5
 ## 4. Repository layout
 
 ```
-erw-exante/
+erw-exante-v2/
 ├── README.md                    ← you are here
+├── paper/                       ← manuscript, references, figures, tables, analysis (v2)
+│   ├── manuscript.tex / .pdf    ← Agricultural Economics submission draft
+│   ├── references.bib
+│   ├── figures/ · tables/
+│   └── analysis/                ← provisional Python engine + refinement prototypes
 ├── flows.html                   ← interactive pipeline documentation (open in browser)
 ├── flows.json                   ← machine-readable pipeline spec (drives flows.html)
 ├── workflows.html / .json       ← legacy workflow view

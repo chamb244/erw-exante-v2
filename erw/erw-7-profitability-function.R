@@ -77,6 +77,7 @@ get_fs <- function(p) as.numeric(fs$value[fs$parameter == p])
 GRAIN_SIZE_UM        <- get_fs('grain_size_um')
 GRINDING_KWH_PER_T   <- get_fs('grinding_kWh_per_t')
 GRINDING_USD_PER_T   <- get_fs('grinding_usd_per_t_at_ref_electricity')
+PROJECT_HORIZON_YR   <- get_fs('project_horizon_yr')
 
 # ------------------------------------------------------------------------------
 # cost components (override per scenario in erw-8)
@@ -91,7 +92,11 @@ TRANSPORT_FLAT_USD_T       <- 20           # fallback if basalt-access raster mi
 TRANSPORT_FLAT_KM          <- 100          # paired km for the LCA fallback
 
 CARBON_PRICE_USD_T         <- 150          # mid 2024-25 ERW credit market
-MRV_COST_USD_T_CO2         <- 30           # MRV stack: sampling, lab, verification, registry
+# MRV stack: sampling, lab, verification, registry. $30 is the current
+# first-of-kind pilot benchmark (Levy et al. 2024); $20 reflects the
+# at-scale aggregator pooling target that Isometric / Puro forecast for
+# 2027+ once protocols industrialise.
+MRV_COST_USD_T_CO2         <- 20
 DISCOUNT_RATE_PCT          <- 10           # for NPV regime
 
 # time-resolved CDR phasing — fraction of total reactive CDR realised per year
@@ -112,8 +117,9 @@ cat('CDR NPV factor (', length(CDR_PHASING), '-yr phasing, ', DISCOUNT_RATE_PCT,
 elec_path <- paste0(input_path, 'electricity_usd_kWh.tif')
 ci_path   <- paste0(input_path, 'grid_CI_kg_per_kWh.tif')
 if (file.exists(elec_path) && file.exists(ci_path)) {
-  electricity_raster <- terra::aggregate(terra::rast(elec_path), 10, mean, na.rm = TRUE)
-  grid_ci_raster     <- terra::aggregate(terra::rast(ci_path),   10, mean, na.rm = TRUE)
+  # Already exported at the working 0.0833° grid by erw-energy-country.R
+  electricity_raster <- terra::rast(elec_path)
+  grid_ci_raster     <- terra::rast(ci_path)
   cat('Using country-level electricity + grid CI rasters\n')
 } else {
   electricity_raster <- ELECTRICITY_USD_KWH_FB
@@ -132,8 +138,9 @@ lca_grinding_kg_per_t_px <- GRINDING_KWH_PER_T * grid_ci_raster
 transport_path <- paste0(input_path, 'basalt_transport_cost_usd_t.tif')
 km_path        <- paste0(input_path, 'basalt_transport_km.tif')
 if (file.exists(transport_path) && file.exists(km_path)) {
-  transport_cost <- terra::aggregate(terra::rast(transport_path), 10, mean, na.rm=TRUE)
-  transport_km   <- terra::aggregate(terra::rast(km_path),        10, mean, na.rm=TRUE)
+  # Already exported at the working 0.0833° grid by erw-basalt-access.R
+  transport_cost <- terra::rast(transport_path)
+  transport_km   <- terra::rast(km_path)
   cat('Using spatial transport from erw-basalt-access\n')
 } else {
   transport_cost <- TRANSPORT_FLAT_USD_T
@@ -290,6 +297,15 @@ profit <- function(crop, yield_resp, yf, crop_price, returns_f,
 
   if (returns_f == 'year1') {
     ret  <- returns(crop, yield_resp, yield_f = yf, crop_price)
+    # The basalt is paid for up front but resides in the soil for the full
+    # project horizon (default 5 yr — Lewis 2021 [S1]'s effective reactive
+    # window). cdr_tha is already a horizon-cumulative number coming out of
+    # erw-9, so the agronomic return must be put on the same cumulative
+    # undiscounted basis to avoid a unit mismatch that drags GM_year1
+    # artificially negative. NPV regime applies an explicit discount; this
+    # regime is the undiscounted cumulative.
+    agro_layer <- paste0(crop, '_agro_return_usha')
+    ret[[agro_layer]] <- ret[[agro_layer]] * PROJECT_HORIZON_YR
     cost <- basalt_cost(crop, rate_tha, basalt_cost_per_t)
     cdr  <- cdr_revenue(crop, rate_tha, cdr_tha, lca_kg_per_t,
                         carbon_price, mrv_cost_per_tco2)

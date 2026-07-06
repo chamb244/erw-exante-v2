@@ -1,0 +1,9 @@
+regime,allocation,envelope,ha_Mha,farms_M,value_prod_Musd,cdr_Mt
+npv,targeted,private,2.03,1.69,2261.9,21.05
+npv,targeted,public,1.75,1.25,1350.5,21.79
+npv,targeted,intersection,0.97,0.58,860.3,15.94
+npv,targeted,combined,4.94,4.36,4847.2,37.7
+npv,uniform_20,private,1.11,0.88,1308.6,5.29
+npv,uniform_20,public,2.53,1.87,1991.6,13.39
+npv,uniform_20,intersection,0.66,0.4,634.4,3.85
+npv,uniform_20,combined,4.32,3.59,4070.9,19.96

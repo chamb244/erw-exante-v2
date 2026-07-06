@@ -120,15 +120,52 @@ terra::writeRaster(climate_factor, paste0(input_path, 'cdr_climate_factor.tif'),
 #   semi-arid     AI 0.20–0.50 → ~40%
 #   dry sub-humid AI 0.50–0.65 → ~15%
 #   humid         AI > 0.65    → ~0%
-# Using MAP alone as a crude AI proxy in SSA (MAP=600mm ≈ AI 0.65 typical;
-# MAP=120mm ≈ hyperarid). This breaks down in cool highlands where PET is
-# low — accept the approximation for v1.
+#
+# Preferred: CGIAR-CSI Global Aridity Index (AI = MAP / PET) at 1 km,
+# Zomer et al. 2022 (https://doi.org/10.6084/m9.figshare.7504448). Place
+# the raster at data/cgiar_aridity_index.tif. CGIAR ships AI × 10 000 as
+# integer; this block auto-detects the scaling and divides if needed.
+# Fallback when the AI raster is absent: MAP-only proxy. The proxy
+# over-deducts in cool highlands (Ethiopian/Kenyan highlands, Rwanda,
+# Burundi, Lesotho) where low PET keeps the true AI in the humid band
+# even at modest MAP — replace by downloading the CGIAR file.
 
-pedogenic_frac <- terra::ifel(map_yr < 120, 0.90,
-                  terra::ifel(map_yr < 300, 0.70,
-                  terra::ifel(map_yr < 500, 0.40,
-                  terra::ifel(map_yr < 600, 0.15,
-                                            0.00))))
+# Accept any of the common CGIAR-CSI file names so users can drop in the raw
+# Figshare download without renaming.
+ai_candidates <- c(
+  paste0(input_path, 'cgiar_aridity_index.tif'),
+  paste0(input_path, 'ai_v31_yr.tif'),
+  paste0(input_path, 'ai_v3_yr.tif')
+)
+ai_path <- ai_candidates[file.exists(ai_candidates)][1]
+if (!is.na(ai_path)) {
+  ai <- terra::rast(ai_path)
+  ai <- terra::resample(terra::crop(ai, ref), ref)
+  # CGIAR ships INT2U with 65535 as the 16-bit nodata sentinel. terra picks
+  # the GDAL NAflag automatically when present, but the v3.1 distribution
+  # does not set it, so we mask explicitly. Values > 32767 are
+  # treated as nodata to also catch any near-sentinel encoding.
+  ai <- terra::ifel(ai >= 32767, NA, ai)
+  ai_max <- terra::global(ai, fun='max', na.rm=TRUE)$max
+  if (!is.na(ai_max) && ai_max > 10) ai <- ai / 10000   # CGIAR integer-scaled
+  names(ai) <- 'aridity_index'
+  pedogenic_frac <- terra::ifel(ai < 0.05, 0.90,
+                    terra::ifel(ai < 0.20, 0.70,
+                    terra::ifel(ai < 0.50, 0.40,
+                    terra::ifel(ai < 0.65, 0.15,
+                                           0.00))))
+  cat('Pedogenic deduction: using CGIAR-CSI Global Aridity Index (AI = MAP/PET)\n')
+} else {
+  pedogenic_frac <- terra::ifel(map_yr < 120, 0.90,
+                    terra::ifel(map_yr < 300, 0.70,
+                    terra::ifel(map_yr < 500, 0.40,
+                    terra::ifel(map_yr < 600, 0.15,
+                                              0.00))))
+  cat('Pedogenic deduction: CGIAR AI raster not found at ', ai_path,
+      ' — falling back to MAP-only proxy. Download AI from ',
+      'https://doi.org/10.6084/m9.figshare.7504448 for a better deduction.\n',
+      sep = '')
+}
 names(pedogenic_frac) <- 'pedogenic_fraction'
 terra::writeRaster(pedogenic_frac, paste0(input_path, 'cdr_pedogenic_fraction.tif'), overwrite=T)
 
@@ -165,6 +202,56 @@ cdr_yield_merlos_maintenance <- write_cdr(basalt_targeted_m, 'cdr_yield_merlos_m
 cdr_yield_uniform_10         <- write_cdr(basalt_uniform_10, 'cdr_yield_uniform_10')
 cdr_yield_uniform_20         <- write_cdr(basalt_uniform_20, 'cdr_yield_uniform_20')
 cdr_yield_uniform_50         <- write_cdr(basalt_uniform_50, 'cdr_yield_uniform_50')
+
+# ------------------------------------------------------------------------------
+# 5b) NET-EXPORT CDR (deduct alkalinity consumed neutralizing soil acidity)
+#
+# The alkalinity released by weathering can either neutralize soil acidity
+# (raising pH -- the agronomic/private benefit) OR export as bicarbonate to the
+# ocean (durable CDR). It cannot do both. Alkalinity that neutralizes
+# exchangeable acidity re-releases the captured CO2 (HCO3- + H+ -> H2O + CO2,
+# with protons supplied by Al3+ hydrolysis) -- exactly as agricultural lime does,
+# which is why lime is not a CDR technology. Durable CDR is therefore only the
+# alkalinity that exports BEYOND the soil's acidity demand:
+#
+#     net_export_CDR = max(gross_CDR - F * acidity_sink, 0)
+#
+#   F = CO2 re-released per t CaCO3-eq of acidity neutralized
+#     = cdr_eff_per_t_basalt / (effective_NV * 1000)   (feedstock chemistry; ~0.88)
+#   acidity_sink (t CaCO3/ha) = lime requirement from erw-3:
+#     year-1 doses -> standing exchangeable acidity   (caco3_kamprath)
+#     maintenance  -> annual re-acidification          (caco3_merlos_maintenance)
+#
+# NOTE: first-order (sequential) bound -- assumes the acidity sink is filled
+# before any alkalinity exports. The truth lies between this and the gross CDR
+# above; durable CDR is therefore mostly an equilibrium/maintenance phenomenon.
+# erw-7 can consume either the gross (cdr_yield_*) or net (cdr_yield_*_netexport)
+# rasters; the latter is the recommended default for the carbon (public) case.
+# ------------------------------------------------------------------------------
+
+effective_NV_value <- get_fs('effective_NV')
+F_CO2_PER_CACO3    <- cdr_eff_per_t_basalt / (effective_NV_value * 1000)
+cat('Net-export F (CO2 re-released per t CaCO3-eq neutralized):',
+    round(F_CO2_PER_CACO3, 3), '\n')
+
+acidity_standing <- terra::rast(paste0(input_path, 'caco3_kamprath.tif'))
+acidity_maint    <- terra::rast(paste0(input_path, 'caco3_merlos_maintenance.tif'))[[1]]
+
+net_export <- function(cdr_gross, sink, name) {
+  s   <- terra::resample(sink, cdr_gross)
+  s   <- terra::ifel(is.na(s), 0, s)
+  net <- cdr_gross - F_CO2_PER_CACO3 * s
+  net <- terra::ifel(net < 0, 0, net)
+  names(net) <- names(cdr_gross)
+  terra::writeRaster(net, paste0(input_path, name, '.tif'), overwrite = TRUE)
+  net
+}
+
+net_export(cdr_yield_merlos,             acidity_standing, 'cdr_yield_merlos_netexport')
+net_export(cdr_yield_merlos_maintenance, acidity_maint,    'cdr_yield_merlos_maintenance_netexport')
+net_export(cdr_yield_uniform_10,         acidity_standing, 'cdr_yield_uniform_10_netexport')
+net_export(cdr_yield_uniform_20,         acidity_standing, 'cdr_yield_uniform_20_netexport')
+net_export(cdr_yield_uniform_50,         acidity_standing, 'cdr_yield_uniform_50_netexport')
 
 # ------------------------------------------------------------------------------
 # 6) diagnostics

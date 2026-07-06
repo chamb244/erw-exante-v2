@@ -1,8 +1,18 @@
 % Header includes for docs/erw-model.tex (injected by build-erw-model.sh).
 % Tighten longtable layout so wide tables with monospace cells fit on A4.
 \usepackage{etoolbox}
-\AtBeginEnvironment{longtable}{\footnotesize}
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.05}
 % Allow line breaks inside long \texttt{} strings (filenames, paths)
 \usepackage{seqsplit}
+% Inside longtable cells: shrink font and let \texttt{} break anywhere so long
+% filenames (e.g. cdr_{climate_factor,pedogenic_fraction,per_t_basalt}.tif)
+% wrap inside narrow columns instead of overflowing the page. seqsplit only
+% inserts breakpoints — no visual effect unless a break is actually needed.
+\protected\def\erwBreakableTexttInTables{%
+  \let\origtexttt\texttt
+  \def\texttt##1{\origtexttt{\seqsplit{##1}}}%
+}
+\AtBeginEnvironment{longtable}{\footnotesize\erwBreakableTexttInTables}
+% Give the paragraph builder room to stretch before resorting to overfull lines.
+\setlength{\emergencystretch}{3em}

@@ -1,0 +1,17 @@
+Allocation,Envelope,Area (Mha),Private ($M),Public ($M),Cost ($M),CDR (Mt)
+Targeted,Private,4.31,3496,929,1743,7.1
+Targeted,Public,1.65,1339,630,434,4.8
+Targeted,Intersection,1.20,1274,510,337,3.9
+Targeted,Combined>0,6.85,4311,1418,2788,10.9
+Uniform 10,Private,3.52,3277,710,1432,5.5
+Uniform 10,Public,2.75,1364,809,610,6.2
+Uniform 10,Intersection,1.15,1244,371,258,2.9
+Uniform 10,Combined>0,7.09,4018,1567,2667,12.1
+Uniform 20,Private,1.29,1876,702,849,5.4
+Uniform 20,Public,3.16,1422,1965,1424,15.1
+Uniform 20,Intersection,0.74,1124,520,330,4.0
+Uniform 20,Combined>0,5.13,2973,2758,3165,21.2
+Uniform 50,Private,0.45,997,796,519,6.1
+Uniform 50,Public,3.38,1452,5438,3850,41.8
+Uniform 50,Intersection,0.41,890,754,439,5.8
+Uniform 50,Combined>0,3.84,1827,6020,4632,46.3

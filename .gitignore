@@ -1,1 +1,38 @@
+# --- large input/intermediate data (kept local, not shared on GitHub) ---
 data/
+
+# --- copyrighted literature PDFs (obtain via DOIs in paper/references.bib) ---
+paper/lit/
+
+# --- OS / editor cruft ---
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# --- Claude / Cowork session state ---
+.claude/
+.run_logs/
+
+# --- Python ---
+__pycache__/
+*.pyc
+paper/analysis/_cache/
+
+# --- LaTeX build artifacts ---
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.bbl
+*.blg
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.run.xml
+
+# --- misc stray outputs ---
+README.pdf
+datagadm_ssa.gpkg
+datageosurvey_processed.tif

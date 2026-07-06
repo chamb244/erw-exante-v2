@@ -1,0 +1,17 @@
+alloc,scenario,priv_M,area_Mha
+targeted,base,3496,4.31
+targeted,low,3328,4.12
+targeted,central,3262,4.02
+targeted,high,3219,3.98
+uniform_10,base,3277,3.52
+uniform_10,low,3142,3.37
+uniform_10,central,3075,3.29
+uniform_10,high,3052,3.25
+uniform_20,base,1876,1.29
+uniform_20,low,1785,1.22
+uniform_20,central,1774,1.21
+uniform_20,high,1469,0.93
+uniform_50,base,997,0.45
+uniform_50,low,967,0.44
+uniform_50,central,814,0.36
+uniform_50,high,8,0.0

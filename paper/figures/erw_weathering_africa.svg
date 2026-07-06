@@ -1,0 +1,153 @@
+<svg viewBox="0 0 1240 960" xmlns="http://www.w3.org/2000/svg" font-family="Helvetica,Arial,sans-serif" role="img" aria-labelledby="ttl dsc">
+<title id="ttl">Enhanced rock weathering on Sub-Saharan African cropland</title>
+<desc id="dsc">Isometric schematic: crushed basalt is quarried, hauled and spread on smallholder cropland; in the soil it reacts with CO2 and water to release nutrients and bicarbonate, which leaches to rivers and the ocean for long-term carbon storage.</desc>
+<defs>
+  <marker id="ah" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="#ffffff" stroke="#9aa7b0" stroke-width="0.4"/></marker>
+  <marker id="ahd" markerWidth="7" markerHeight="7" refX="5" refY="3.5" orient="auto"><path d="M0,0 L6,3.5 L0,7 Z" fill="#3f78b5"/></marker>
+  <!-- block arrow pointing down, box ~32x82 -->
+  <g id="barrow"><path d="M-8 0 L8 0 L8 48 L17 48 L0 80 L-17 48 L-8 48 Z" fill="#ffffff" stroke="#b7c2cb" stroke-width="1.4"/></g>
+  <!-- acacia (flat-top) -->
+  <g id="acacia"><rect x="-2.5" y="0" width="5" height="22" fill="#7a5a39"/><path d="M-26 2 Q0 -16 26 2 Q0 -6 -26 2 Z" fill="#3f6e3a"/><path d="M-22 0 Q0 -10 22 0" fill="none" stroke="#345d31" stroke-width="2"/></g>
+  <!-- baobab -->
+  <g id="baobab"><path d="M-9 24 Q-5 4 -3 0 L3 0 Q5 4 9 24 Z" fill="#8a6a45"/><path d="M0 0 Q-14 -4 -18 -10 M0 0 Q14 -4 18 -10 M0 0 Q-7 -10 -9 -16 M0 0 Q7 -10 9 -16" stroke="#8a6a45" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="0" cy="-12" rx="20" ry="9" fill="#4f7a45"/></g>
+  <!-- maize plant -->
+  <g id="maize"><path d="M0 0 L0 -14 M0 -10 Q-7 -14 -10 -7 M0 -8 Q7 -12 10 -5 M0 -12 Q-6 -18 -8 -13 M0 -13 Q6 -19 9 -14" stroke="#3d7a32" stroke-width="2" fill="none" stroke-linecap="round"/></g>
+  <!-- cloud -->
+  <g id="cloud"><ellipse cx="0" cy="0" rx="34" ry="20" fill="#c7d0d6"/><ellipse cx="-30" cy="6" rx="22" ry="15" fill="#c7d0d6"/><ellipse cx="30" cy="6" rx="24" ry="15" fill="#d4dce1"/></g>
+</defs>
+
+<!-- canvas -->
+<rect x="0" y="0" width="1240" height="960" rx="14" fill="#ffffff"/>
+<text x="40" y="46" font-size="25" font-weight="700" fill="#1d2a33">Enhanced rock weathering on Sub-Saharan African cropland</text>
+<text x="40" y="72" font-size="15" fill="#5a6a74">Crushed basalt spread on smallholder fields removes CO₂ while neutralizing soil acidity and supplying nutrients</text>
+
+<!-- ===================== OCEAN BLOCK (drawn first) ===================== -->
+<polygon points="815,612 1120,470 1205,512 900,656" fill="#7fb0de"/>
+<polygon points="900,656 1205,512 1205,712 900,856" fill="#5b93c8"/>
+<polygon points="815,612 900,656 900,856 815,812" fill="#4a80b6"/>
+<text x="1120" y="556" font-size="15" fill="#16324f">CO₃²⁻</text>
+<text x="1040" y="616" font-size="15" fill="#16324f">HCO₃⁻</text>
+<text x="985" y="700" font-size="15" fill="#16324f">CO₃²⁻</text>
+<g stroke="#e8f1f8" stroke-width="6" marker-end="url(#ah)" opacity="0.92" fill="none">
+  <path d="M980,540 L1010,640"/><path d="M1060,520 L1090,610"/>
+</g>
+<!-- seaweed / algae -->
+<g stroke="#2e7d52" stroke-width="4" fill="none" stroke-linecap="round">
+  <path d="M1080,790 q-10,-22 2,-44 q10,-18 -2,-40"/><path d="M1120,800 q10,-20 -2,-42"/>
+  <path d="M1150,770 q-8,-20 4,-40"/></g>
+<text x="1086" y="492" font-size="15" font-style="italic" fill="#16324f">ocean: &gt;10,000-yr storage</text>
+
+<!-- ===================== LAND BLOCK ===================== -->
+<!-- soil profile: front-right wall (under edge P3(435,580)->P2(905,365)) stacked layers -->
+<polygon points="435,580 905,365 905,405 435,620" fill="#7c5a3c"/>
+<polygon points="435,620 905,405 905,470 435,685" fill="#94704b"/>
+<polygon points="435,685 905,470 905,540 435,755" fill="#a98a63"/>
+<polygon points="435,755 905,540 905,580 435,795" fill="#5d636a"/><!-- basalt parent seam -->
+<!-- left/front wall (under edge P0(170,450)->P3(435,580)) -->
+<polygon points="170,450 435,580 435,795 170,665" fill="#6f5036"/>
+<polygon points="170,560 435,690 435,755 170,625" fill="#5d636a" opacity="0.55"/>
+<!-- top surface (cropland) -->
+<polygon points="170,450 640,235 905,365 435,580" fill="#6ba34f"/>
+<!-- savanna tint right portion -->
+<polygon points="640,235 905,365 700,463 520,372" fill="#7fae57" opacity="0.6"/>
+
+<!-- quarry patch + spoil -->
+<polygon points="205,452 360,382 452,428 297,498" fill="#9aa1a7"/>
+<g fill="#5b6066"><polygon points="250,452 300,432 332,449 282,469"/><polygon points="262,444 286,434 304,443 280,453"/><circle cx="318" cy="455" r="7"/><circle cx="305" cy="463" r="6"/><circle cx="333" cy="461" r="6"/><circle cx="270" cy="470" r="6"/></g>
+<!-- excavator -->
+<g><rect x="232" y="430" width="30" height="16" rx="2" fill="#e8b53a"/><rect x="236" y="446" width="34" height="7" rx="2" fill="#3b3f44"/><rect x="248" y="424" width="14" height="9" fill="#f2c84e"/><path d="M262,432 L292,440 L300,452 L290,452 L284,442 L260,438 Z" fill="#c99a2e"/><path d="M298,450 q10,4 10,12 l-16,0 q0,-8 6,-12 Z" fill="#5b6066"/></g>
+<text x="200" y="372" font-size="15" fill="#2a3942">Basalt source</text>
+<line x1="246" y1="378" x2="270" y2="408" stroke="#2a3942" stroke-width="1.2"/>
+
+<!-- haul truck (transport) on a light track -->
+<path d="M360,470 Q470,470 540,500" stroke="#c9b48f" stroke-width="12" fill="none" opacity="0.7"/>
+<g transform="translate(430,470)"><rect x="-22" y="-12" width="30" height="13" fill="#a23b34"/><rect x="8" y="-7" width="12" height="9" fill="#c14a42"/><polygon points="-22,-12 -2,-12 -2,-2 -22,-2" fill="#7d2b26"/><circle cx="-14" cy="3" r="4.5" fill="#2c2f33"/><circle cx="-1" cy="3" r="4.5" fill="#2c2f33"/><circle cx="13" cy="3" r="4.5" fill="#2c2f33"/></g>
+<text x="372" y="506" font-size="13" fill="#5a4632">haulage</text>
+
+<!-- tilled field with maize/sorghum -->
+<polygon points="540,400 690,330 770,372 620,442" fill="#8a6647"/>
+<g stroke="#74553a" stroke-width="1.4" opacity="0.7">
+ <line x1="560" y1="404" x2="700" y2="372"/><line x1="572" y1="412" x2="712" y2="380"/>
+ <line x1="584" y1="420" x2="724" y2="388"/><line x1="596" y1="428" x2="736" y2="396"/></g>
+<g>
+ <use href="#maize" transform="translate(572,406) scale(0.9)"/><use href="#maize" transform="translate(596,400)"/>
+ <use href="#maize" transform="translate(620,394)"/><use href="#maize" transform="translate(644,388)"/>
+ <use href="#maize" transform="translate(600,418) scale(0.95)"/><use href="#maize" transform="translate(624,412)"/>
+ <use href="#maize" transform="translate(648,406)"/><use href="#maize" transform="translate(672,400)"/>
+ <use href="#maize" transform="translate(628,430)"/><use href="#maize" transform="translate(652,424)"/>
+ <use href="#maize" transform="translate(676,418)"/><use href="#maize" transform="translate(700,412)"/></g>
+<text x="690" y="452" font-size="13" fill="#5a4632">maize / sorghum</text>
+
+<!-- trees: acacia + baobab scattered -->
+<use href="#acacia" transform="translate(225,545) scale(1.05)"/>
+<use href="#acacia" transform="translate(330,585)"/>
+<use href="#baobab" transform="translate(470,470) scale(0.95)"/>
+<use href="#acacia" transform="translate(800,400) scale(0.9)"/>
+<use href="#baobab" transform="translate(840,432) scale(0.85)"/>
+<use href="#acacia" transform="translate(560,300) scale(0.8)"/>
+
+<!-- river across top into ocean -->
+<path d="M735,250 Q690,330 600,372 Q520,410 470,500 Q450,548 470,575" fill="none" stroke="#6fb0e0" stroke-width="13" stroke-linecap="round"/>
+<path d="M470,575 Q620,520 830,612" fill="none" stroke="#6fb0e0" stroke-width="13" stroke-linecap="round" opacity="0.9"/>
+
+<!-- clouds + rain over field -->
+<use href="#cloud" transform="translate(820,150)"/>
+<use href="#cloud" transform="translate(700,120) scale(0.85)"/>
+<g stroke="#8fb8db" stroke-width="2.4" stroke-linecap="round">
+ <line x1="690" y1="172" x2="684" y2="190"/><line x1="712" y1="176" x2="706" y2="194"/>
+ <line x1="734" y1="172" x2="728" y2="190"/><line x1="800" y1="184" x2="794" y2="202"/>
+ <line x1="824" y1="186" x2="818" y2="204"/><line x1="848" y1="184" x2="842" y2="202"/></g>
+
+<!-- ===================== FLUX ARROWS ===================== -->
+<!-- CO2 down into field -->
+<use href="#barrow" transform="translate(648,300) scale(1.0)"/>
+<text x="664" y="330" font-size="16" font-weight="600" fill="#1d2a33">CO₂</text>
+<!-- CO2 small up (degassing near river) -->
+<use href="#barrow" transform="translate(905,300) scale(0.6) rotate(180)"/>
+<text x="915" y="300" font-size="15" fill="#1d2a33">CO₂</text>
+<!-- HCO3- leaching down through soil wall -->
+<g stroke="#3f78b5" stroke-width="7" fill="none" marker-end="url(#ahd)" opacity="0.95">
+ <path d="M560,470 L600,560"/><path d="M650,500 L700,610"/></g>
+<text x="565" y="560" font-size="15" fill="#16324f">HCO₃⁻</text>
+<text x="690" y="640" font-size="15" fill="#16324f">HCO₃⁻</text>
+<!-- bicarbonate flow along to ocean (big white arrow) -->
+<path d="M770,560 Q820,600 860,612" stroke="#ffffff" stroke-width="16" fill="none" marker-end="url(#ah)" opacity="0.95"/>
+<text x="788" y="585" font-size="16" font-weight="600" fill="#16324f">HCO₃⁻  bicarbonate</text>
+
+<!-- ===================== INSET REACTION BOX ===================== -->
+<g transform="translate(40,690)">
+  <rect x="0" y="0" width="430" height="252" rx="10" fill="#fbfaf7" stroke="#3a3a3a" stroke-width="1.4" stroke-dasharray="6 4"/>
+  <text x="16" y="26" font-size="15" font-weight="700" fill="#1d2a33">In the soil: basalt weathers</text>
+  <rect x="16" y="40" width="250" height="26" rx="4" fill="#d9dde0"/><text x="26" y="58" font-size="13" fill="#23303a">Basalt: Ca, Mg, Fe, Si oxides</text>
+  <text x="276" y="59" font-size="18" fill="#23303a">+</text>
+  <rect x="292" y="40" width="58" height="26" rx="4" fill="#e58b3d"/><text x="300" y="58" font-size="13" fill="#fff">CO₂</text>
+  <rect x="356" y="40" width="58" height="26" rx="4" fill="#7cc1e8"/><text x="366" y="58" font-size="13" fill="#16324f">H₂O</text>
+  <path d="M120,72 L120,98" stroke="#3a3a3a" stroke-width="6" marker-end="url(#ah)" fill="none"/>
+  <rect x="16" y="104" width="120" height="26" rx="4" fill="#efcf5a"/><text x="26" y="122" font-size="13" fill="#3a2f10">clay minerals</text>
+  <rect x="150" y="104" width="120" height="26" rx="4" fill="#9b6fb5"/><text x="160" y="122" font-size="13" fill="#fff">H₄SiO₄ (silicic acid)</text>
+  <rect x="16" y="140" width="120" height="26" rx="4" fill="#4f8fd0"/><text x="26" y="158" font-size="13" fill="#fff">Ca²⁺, Mg²⁺</text>
+  <rect x="150" y="140" width="120" height="26" rx="4" fill="#d05757"/><text x="160" y="158" font-size="13" fill="#fff">HCO₃⁻</text>
+  <text x="288" y="124" font-size="12.5" fill="#2a6e3a" font-weight="600">&#8594; yield gain</text>
+  <text x="284" y="158" font-size="12.5" fill="#2156a8" font-weight="600">&#8594; to ocean (CDR)</text>
+  <line x1="16" y1="182" x2="414" y2="182" stroke="#ccc" stroke-width="1"/>
+  <text x="16" y="202" font-size="13" font-weight="700" fill="#1d2a33">Two returns from one practice</text>
+  <text x="16" y="222" font-size="12.5" fill="#3a4a54">Private: cations raise pH and yield (like lime).</text>
+  <text x="16" y="240" font-size="12.5" fill="#3a4a54">Public: bicarbonate exports CO₂ for durable storage.</text>
+</g>
+
+<!-- ===================== LEGEND ===================== -->
+<g transform="translate(500,772)">
+  <rect x="0" y="0" width="232" height="170" rx="10" fill="#ffffff" stroke="#d8dde0" stroke-width="1"/>
+  <text x="14" y="24" font-size="14" font-weight="700" fill="#1d2a33">Legend</text>
+  <rect x="14" y="36" width="18" height="14" fill="#9aa1a7"/><text x="40" y="48" font-size="13" fill="#333">Basalt feedstock</text>
+  <rect x="14" y="58" width="18" height="14" fill="#efcf5a"/><text x="40" y="70" font-size="13" fill="#333">New clay minerals</text>
+  <rect x="14" y="80" width="18" height="14" fill="#9b6fb5"/><text x="40" y="92" font-size="13" fill="#333">Silicic acid</text>
+  <rect x="14" y="102" width="18" height="14" fill="#4f8fd0"/><text x="40" y="114" font-size="13" fill="#333">Nutrient cations</text>
+  <rect x="14" y="124" width="18" height="14" fill="#d05757"/><text x="40" y="136" font-size="13" fill="#333">Bicarbonate (stored C)</text>
+  <rect x="14" y="146" width="18" height="14" fill="#e58b3d"/><text x="40" y="158" font-size="13" fill="#333">Respiration CO₂</text>
+</g>
+
+<text x="760" y="812" font-size="13.5" fill="#5a6a74" font-style="italic">Figure 1. African adaptation of the enhanced-weathering</text>
+<text x="760" y="832" font-size="13.5" fill="#5a6a74" font-style="italic">process schematic (after Beerling et al. 2020), set on</text>
+<text x="760" y="852" font-size="13.5" fill="#5a6a74" font-style="italic">Sub-Saharan smallholder cropland.</text>
+</svg>

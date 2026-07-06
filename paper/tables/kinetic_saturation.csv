@@ -1,0 +1,17 @@
+alloc,Kd,pub_Mha,durCDR_Mt
+targeted,no sat,1.79,5.3
+targeted,mild (K_d=60),3.03,11.2
+targeted,central (K_d=30),8.68,37.2
+targeted,strong (K_d=15),13.5,68.6
+uniform_10,no sat,3.01,7.0
+uniform_10,mild (K_d=60),5.42,19.8
+uniform_10,central (K_d=30),14.49,71.3
+uniform_10,strong (K_d=15),21.1,127.0
+uniform_20,no sat,3.44,17.1
+uniform_20,mild (K_d=60),4.91,32.8
+uniform_20,central (K_d=30),9.13,75.1
+uniform_20,strong (K_d=15),13.81,131.5
+uniform_50,no sat,3.67,47.1
+uniform_50,mild (K_d=60),3.67,47.1
+uniform_50,central (K_d=30),3.67,47.1
+uniform_50,strong (K_d=15),3.67,47.1

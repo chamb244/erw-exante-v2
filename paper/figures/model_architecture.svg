@@ -1,0 +1,117 @@
+<svg viewBox="0 0 1240 860" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ERW model architecture: three value/cost streams combine into private, public and intersection returns">
+<style>
+ text{font-family:Helvetica,Arial,sans-serif;fill:#1d2733;}
+ .hdr{font-weight:700;font-size:16px;} .hsub{font-size:12px;}
+ .ttl{font-weight:700;font-size:14px;} .desc{font-size:11px;fill:#3a4654;}
+ .eq{font-size:12.5px;font-weight:700;} .eqs{font-size:10.5px;fill:#3a4654;}
+ .small{font-size:11px;} .lab{font-size:11px;font-style:italic;fill:#7d4f8c;}
+ rect{stroke-width:1.5;}
+</style>
+<defs><marker id="ar" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 Z" fill="#5a6675"/></marker></defs>
+<rect x="0" y="0" width="1240" height="860" fill="#ffffff"/>
+
+<!-- decision-variables banner -->
+<rect x="40" y="16" width="1160" height="74" rx="10" fill="#fdeeee" stroke="#d98c8c" stroke-dasharray="6 4"/>
+<text x="620" y="40" text-anchor="middle" class="ttl">Decision variables</text>
+<text x="620" y="60" text-anchor="middle" class="desc">feedstock chemistry (CaO + MgO) · grain size (10–500 µm) · allocation rule (LiTAS-targeted, uniform 10/20/50 t/ha)</text>
+<text x="620" y="76" text-anchor="middle" class="desc">carbon price ($/tCO₂) · MRV ($/tCO₂) · discount rate (NPV) · carbon accounting (gross vs net-export)</text>
+
+<!-- ============ COLUMN HEADERS ============ -->
+<rect x="40"  y="112" width="360" height="54" rx="9" fill="#dec9e8" stroke="#7d4f8c"/>
+<text x="220" y="135" text-anchor="middle" class="hdr">Agronomy</text>
+<text x="220" y="156" text-anchor="middle" class="hsub">gross PRIVATE value · R_agro</text>
+<rect x="440" y="112" width="360" height="54" rx="9" fill="#c5cce9" stroke="#4a4fa0"/>
+<text x="620" y="135" text-anchor="middle" class="hdr">Biogeochemistry</text>
+<text x="620" y="156" text-anchor="middle" class="hsub">gross PUBLIC value · R_CDR</text>
+<rect x="840" y="112" width="360" height="54" rx="9" fill="#f6cd92" stroke="#c98a2e"/>
+<text x="1020" y="135" text-anchor="middle" class="hdr">Economic geography</text>
+<text x="1020" y="156" text-anchor="middle" class="hsub">ERW application COST · C</text>
+
+<!-- ============ COLUMN 1 : AGRONOMY (private) ============ -->
+<rect x="40" y="186" width="360" height="70" rx="8" fill="#f4ecf7" stroke="#7d4f8c"/>
+<text x="220" y="208" text-anchor="middle" class="ttl">Soil acidity constraint</text>
+<text x="220" y="226" text-anchor="middle" class="desc">pH, exchangeable acidity,</text>
+<text x="220" y="241" text-anchor="middle" class="desc">Al saturation, ECEC</text>
+<rect x="40" y="276" width="360" height="70" rx="8" fill="#f4ecf7" stroke="#7d4f8c"/>
+<text x="220" y="298" text-anchor="middle" class="ttl">Lime-eq demand → basalt rate</text>
+<text x="220" y="316" text-anchor="middle" class="desc">Kamprath / Cochrane /</text>
+<text x="220" y="331" text-anchor="middle" class="desc">Aramburu-Merlos (LiTAS)</text>
+<rect x="40" y="366" width="360" height="70" rx="8" fill="#f4ecf7" stroke="#7d4f8c"/>
+<text x="220" y="388" text-anchor="middle" class="ttl">Crop response</text>
+<text x="220" y="406" text-anchor="middle" class="desc">EcoCrop ∪ Bayesian uplift</text>
+<text x="220" y="421" text-anchor="middle" class="desc">(trial-anchored posterior)</text>
+<rect x="40" y="456" width="360" height="62" rx="8" fill="#e3d2ec" stroke="#7d4f8c"/>
+<text x="220" y="480" text-anchor="middle" class="eq">R_agro = Δy(x) × p_crop</text>
+<text x="220" y="500" text-anchor="middle" class="eqs">gross value of yield gains</text>
+
+<!-- ============ COLUMN 2 : BIOGEOCHEMISTRY (public) ============ -->
+<rect x="440" y="186" width="360" height="70" rx="8" fill="#eef1fb" stroke="#4a4fa0"/>
+<text x="620" y="208" text-anchor="middle" class="ttl">Feedstock × grain size</text>
+<text x="620" y="226" text-anchor="middle" class="desc">reactive Ca/Mg surface from</text>
+<text x="620" y="241" text-anchor="middle" class="desc">CaO, MgO and SSA exponent</text>
+<rect x="440" y="276" width="360" height="70" rx="8" fill="#eef1fb" stroke="#4a4fa0"/>
+<text x="620" y="298" text-anchor="middle" class="ttl">Dissolution kinetics</text>
+<text x="620" y="316" text-anchor="middle" class="desc">f(MAT, MAP, pH) —</text>
+<text x="620" y="331" text-anchor="middle" class="desc">Arrhenius × acid catalysis</text>
+<rect x="440" y="366" width="360" height="70" rx="8" fill="#e4e8fb" stroke="#4a4fa0"/>
+<text x="620" y="386" text-anchor="middle" class="ttl">Net alkalinity export</text>
+<text x="620" y="403" text-anchor="middle" class="desc">total CDR − pedogenic-C (aridity)</text>
+<text x="620" y="418" text-anchor="middle" class="desc" style="font-weight:700;fill:#2156a8;">− acidity neutralized  (net-export)</text>
+<rect x="440" y="456" width="360" height="62" rx="8" fill="#c5cdf0" stroke="#4a4fa0"/>
+<text x="620" y="480" text-anchor="middle" class="eq">R_CDR = durable CDR_t × p_CO₂</text>
+<text x="620" y="500" text-anchor="middle" class="eqs">gross value of durable removal</text>
+
+<!-- ============ COLUMN 3 : ECONOMIC GEOGRAPHY (cost) ============ -->
+<rect x="840" y="186" width="360" height="70" rx="8" fill="#fdf1de" stroke="#c98a2e"/>
+<text x="1020" y="208" text-anchor="middle" class="ttl">Feedstock supply</text>
+<text x="1020" y="226" text-anchor="middle" class="desc">basalt fines at quarry gate;</text>
+<text x="1020" y="241" text-anchor="middle" class="desc">GLiM source rocks</text>
+<rect x="840" y="276" width="360" height="70" rx="8" fill="#fdf1de" stroke="#c98a2e"/>
+<text x="1020" y="298" text-anchor="middle" class="ttl">Logistics</text>
+<text x="1020" y="316" text-anchor="middle" class="desc">cost-distance over friction</text>
+<text x="1020" y="331" text-anchor="middle" class="desc">surface × $/min/t</text>
+<rect x="840" y="366" width="360" height="70" rx="8" fill="#fdf1de" stroke="#c98a2e"/>
+<text x="1020" y="386" text-anchor="middle" class="ttl">Grinding + spreading (cost + LCA)</text>
+<text x="1020" y="403" text-anchor="middle" class="desc">kWh/t × country tariff × grid CI;</text>
+<text x="1020" y="418" text-anchor="middle" class="desc">on-farm spreading</text>
+<rect x="840" y="456" width="360" height="62" rx="8" fill="#f7d9a8" stroke="#c98a2e"/>
+<text x="1020" y="480" text-anchor="middle" class="eq">C = quarry + logistics + grinding</text>
+<text x="1020" y="500" text-anchor="middle" class="eqs">+ spreading + MRV</text>
+
+<!-- intra-column arrows -->
+<g fill="none" stroke="#5a6675" stroke-width="2" marker-end="url(#ar)">
+ <path d="M220,256 L220,274"/><path d="M220,346 L220,364"/><path d="M220,436 L220,454"/>
+ <path d="M620,256 L620,274"/><path d="M620,346 L620,364"/><path d="M620,436 L620,454"/>
+ <path d="M1020,256 L1020,274"/><path d="M1020,346 L1020,364"/><path d="M1020,436 L1020,454"/>
+</g>
+<!-- ============ COMBINE BOX ============ -->
+<g fill="none" stroke="#5a6675" stroke-width="2" marker-end="url(#ar)">
+ <path d="M220,518 L220,556"/><path d="M620,518 L620,556"/><path d="M1020,518 L1020,556"/>
+</g>
+<rect x="40" y="558" width="1160" height="118" rx="12" fill="#cdebcf" stroke="#3c8c4a"/>
+<text x="620" y="582" text-anchor="middle" class="hdr">Per-pixel decomposition  (regime × allocation)</text>
+<text x="620" y="606" text-anchor="middle" class="eq">private  π_a = R_agro − C        public  π_c = R_CDR − C        combined  π = R_agro + R_CDR − C</text>
+<text x="620" y="630" text-anchor="middle" class="small">Envelopes: private-sufficient (π_a&gt;0) · public-sufficient (π_c&gt;0) · intersection (both) · combined-only (π&gt;0, neither alone)</text>
+<text x="620" y="652" text-anchor="middle" class="small" style="fill:#2d5d34;font-weight:700;">Headline regime: equilibrium (durable, net-export)   ·   robustness: year-1 and NPV @ 10%</text>
+
+<!-- ============ OUTPUTS ============ -->
+<g fill="none" stroke="#5a6675" stroke-width="2" marker-end="url(#ar)">
+ <path d="M220,676 L220,714"/><path d="M620,676 L620,714"/><path d="M1020,676 L1020,714"/>
+</g>
+<rect x="40" y="716" width="360" height="120" rx="9" fill="#f6cccc" stroke="#b34a4a"/>
+<text x="220" y="740" text-anchor="middle" class="ttl">Return typology &amp; envelopes</text>
+<text x="220" y="760" text-anchor="middle" class="desc">private / public / intersection /</text>
+<text x="220" y="775" text-anchor="middle" class="desc">combined maps; per envelope:</text>
+<text x="220" y="790" text-anchor="middle" class="desc">area, farms, private &amp; public</text>
+<text x="220" y="805" text-anchor="middle" class="desc">returns, cost, durable CDR</text>
+<rect x="440" y="716" width="360" height="120" rx="9" fill="#f6cccc" stroke="#b34a4a"/>
+<text x="620" y="740" text-anchor="middle" class="ttl">Supply curves</text>
+<text x="620" y="762" text-anchor="middle" class="desc">rank pixels by π per t basalt</text>
+<text x="620" y="780" text-anchor="middle" class="desc">→ Mt CO₂ @ $/tCO₂</text>
+<text x="620" y="800" text-anchor="middle" class="desc">marginal abatement cost</text>
+<rect x="840" y="716" width="360" height="120" rx="9" fill="#f6cccc" stroke="#b34a4a"/>
+<text x="1020" y="740" text-anchor="middle" class="ttl">Robustness &amp; targeting</text>
+<text x="1020" y="760" text-anchor="middle" class="desc">sensitivity: cost × price × yield</text>
+<text x="1020" y="775" text-anchor="middle" class="desc">× CDR rate × allocation;</text>
+<text x="1020" y="795" text-anchor="middle" class="desc">core priority areas for pilots</text>
+</svg>

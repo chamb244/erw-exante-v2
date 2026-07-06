@@ -1,0 +1,137 @@
+% ---------------------------------------------------------------------------
+% erw-cdr-slides.tex
+% Two-slide summary of the ERW CDR modelling chain and its references.
+% Build:  pdflatex erw-cdr-slides.tex
+% ---------------------------------------------------------------------------
+\documentclass[aspectratio=169,10pt]{beamer}
+
+\usetheme{default}
+\setbeamertemplate{navigation symbols}{}
+\setbeamertemplate{footline}[frame number]
+\setbeamerfont{frametitle}{size=\large,series=\bfseries}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\definecolor{erwblue}{HTML}{1F4E5F}
+\definecolor{erwgreen}{HTML}{2C7A3F}
+\setbeamercolor{frametitle}{fg=erwblue}
+\setbeamercolor{structure}{fg=erwblue}
+
+\newcommand{\co}{\mathrm{CO_2}}
+
+\title{Enhanced Rock Weathering: CDR Modelling}
+\date{}
+
+\begin{document}
+
+% ===========================================================================
+% SLIDE 1 -- methodology / equations
+% ===========================================================================
+\begin{frame}{How the CDR model works}
+
+\small
+For every $\sim$1\,km$^2$ pixel the model asks: \emph{how much $\co$ does one tonne of
+crushed basalt durably remove here?} A chemical ceiling is reduced by fractional
+``haircuts,'' scaled by the application rate, then netted against the project's own
+emissions.
+
+\medskip
+\textbf{1. Chemical ceiling (stoichiometry).} CaO/MgO each consume 2\,mol $\co$:
+\[
+\mathrm{CDR_{max}} =
+\Big(\underbrace{0.10}_{\mathrm{CaO}}\cdot\tfrac{2\cdot44.01}{56.08}
+   + \underbrace{0.07}_{\mathrm{MgO}}\cdot\tfrac{2\cdot44.01}{40.30}\Big)\cdot 1000
+\;\approx\; 310~\mathrm{kg~\co/t~basalt}.
+\]
+
+\textbf{2--4. Fractional haircuts} (reactivity, grain size, climate, soil pH, carbonate re-precipitation):
+\[
+\mathrm{CDR_{per\,t}}(px)=\mathrm{CDR_{max}}\times
+\underbrace{0.20}_{\text{reactive}}\times
+\underbrace{\big(\tfrac{100}{d}\big)^{0.5}}_{\text{grain}}\times
+\underbrace{f_{\mathrm{MAT}}f_{\mathrm{MAP}}f_{\mathrm{pH}}}_{\text{climate, capped}}\times
+\underbrace{(1-p_{\mathrm{ped}})}_{\text{exported}} .
+\]
+\[
+f_{\mathrm{MAT}}=\mathrm{clamp}\!\big(\tfrac{\mathrm{MAT}}{11^\circ\mathrm C},0.3,3\big),\quad
+f_{\mathrm{MAP}}=\mathrm{clamp}\!\big(\tfrac{\mathrm{MAP}}{1000\,\mathrm{mm}},0.3,3\big),\quad
+f_{\mathrm{pH}}:\text{triangular, peak}\approx\mathrm{pH}\,5.
+\]
+
+\textbf{5--7. Yield, net of emissions, revenue.}
+\[
+\mathrm{CDR_{gross}}=\mathrm{rate}\cdot\tfrac{\mathrm{CDR_{per\,t}}}{1000},\qquad
+\mathrm{CDR_{net}}=\max\!\big(0,\;\mathrm{CDR_{gross}}-\mathrm{rate}\cdot\tfrac{\mathrm{LCA_{per\,t}}}{1000}\big),
+\]
+\[
+\mathrm{revenue}=\mathrm{CDR_{net}}\cdot(\,p_{\mathrm{carbon}}-\mathrm{MRV}\,),\qquad
+\text{NPV regime: $\times$ 5-yr phasing factor }\approx 0.79 .
+\]
+
+\medskip
+\footnotesize\textcolor{erwgreen}{In short: chemistry sets the ceiling ($\sim$310\,kg/t);
+geography (temperature, rainfall, acidity, aridity) decides how much of it you actually
+capture ($\sim$80\,kg/t at the reference climate).}
+
+\end{frame}
+
+% ===========================================================================
+% SLIDE 2 -- references
+% ===========================================================================
+\begin{frame}{Key references for methodology \& coefficients}
+\scriptsize
+
+\begin{columns}[T]
+\begin{column}{0.5\textwidth}
+\textbf{Chemistry \& stoichiometry}\\
+Lewis et al.\ 2021, \emph{Appl.\ Geochem.}\ 132:105023 \\
+Beerling et al.\ 2020, \emph{Nature} 583:242 (SI)
+
+\medskip
+\textbf{Reactive fraction (0.20)}\\
+Lewis et al.\ 2021 --- load-bearing calibration
+
+\medskip
+\textbf{Grain size \& grinding ($\beta{=}0.5$, $\alpha{=}1.2$)}\\
+Strefler et al.\ 2018, \emph{ERL} 13:034010
+
+\medskip
+\textbf{Climate scaling}\\
+Kanzaki et al.\ 2023, \emph{PNAS Nexus} 2:pgad059 \\
+Baek et al.\ 2023, \emph{Earth's Future} 11
+
+\medskip
+\textbf{pH dependence}\\
+White \& Brantley 2003, \emph{Chem.\ Geol.}\ 202:479 \\
+Brantley et al.\ 2008, \emph{Kinetics of Water-Rock Interaction}
+\end{column}
+
+\begin{column}{0.5\textwidth}
+\textbf{Pedogenic-carbonate deduction}\\
+Renforth 2019, \emph{Nat.\ Commun.}\ 10:1401 \\
+Reershemius \& Suhrhoff 2024, \emph{GCB} 30:e17025 \\
+UNEP 1992 (aridity bands); Zomer et al.\ 2022, \emph{Sci.\ Data} 9:409
+
+\medskip
+\textbf{Net CDR / lifecycle emissions}\\
+Eufrasio et al.\ 2022, \emph{Commun.\ Earth Environ.}\ 3:106 \\
+EEA EMEP 2023; UK BEIS 2023; Nemecek \& Schnetzer 2011
+
+\medskip
+\textbf{Time phasing \& MRV}\\
+Kanzaki et al.\ 2023; Levy et al.\ 2024, \emph{ES\&T} 58:17215
+
+\medskip
+\textbf{Application rate \& targeting}\\
+Beerling 2020; Baek 2023; Kantola et al.\ 2023, \emph{GCB} 29:7012 \\
+Aramburu Merlos et al.\ 2023, \emph{Geoderma} 432:116421
+
+\vspace{1em}
+\textcolor{erwgreen}{Full catalogue (S1--S37) with DOIs: \texttt{docs/erw-parameters.md}}
+\end{column}
+\end{columns}
+
+\end{frame}
+
+\end{document}

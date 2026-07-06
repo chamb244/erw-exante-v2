@@ -66,16 +66,16 @@ The three operational levers are **rock type**, **grain size**, and **applicatio
 
 ### Global / continental modelling
 - Beerling et al. (Nature, 2020) estimate that deploying ERW on global croplands could remove **0.5–2 Gt CO₂/yr by 2050** at scale, with the highest per-hectare potential in the warm-humid tropics. Tropical croplands (~680 Mha) sit at the top of the priority list.
-- Baek et al. (2023) and Kanzaki et al. (Nature, 2024) confirm that climate is a first-order control: high temperature and moisture roughly double weathering rates compared to temperate sites. US-state-level modelling gives 0.16–0.30 Gt CO₂/yr by 2050 rising to 0.25–0.49 Gt CO₂/yr by 2070.
+- Baek et al. (2023) and Beerling et al. (Nature, 2025) confirm that climate is a first-order control: high temperature and moisture roughly double weathering rates compared to temperate sites. US-state-level modelling gives 0.16–0.30 Gt CO₂/yr by 2050 rising to 0.25–0.49 Gt CO₂/yr by 2070.
 
 ### Field-trial evidence (the picture is mixed)
 
 | Site / system                                | Result                                                                                 | Conditions                  |
 |----------------------------------------------|----------------------------------------------------------------------------------------|-----------------------------|
 | US Corn Belt (PNAS, 2024, Beerling group)    | Cumulative **3.8 → 10.5 t CO₂/ha** over 4 annual applications; yield +12–16%           | Warm-humid, mildly acidic   |
-| Kisumu County, Kenya (Flux × UNCCD, 2024)    | Maize yield **+71% Y1, +79% Y2** from a single 20 t/ha basalt application; +$326/ha    | Tropical smallholder, pH 6.4 |
+| Kisumu County, Kenya (Haque et al. 2025, CDRXIV)    | Maize yield **+71% Y1, +79% Y2** from a single 20 t/ha **nephelinite** (volcanic rock powder) application; +$326/ha    | Tropical smallholder, pH 6.4 |
 | InPlanet (Brazil, 2025)                       | First independently MRV-verified ERW credits issued (Isometric protocol)              | Tropical, multiple crops    |
-| Swiss vineyards (ES&T, 2025 — Amann et al.)   | Only **~100 kg CO₂/ha/yr** — 10–30× below the higher published rates                  | Cool, alkaline, vineyard    |
+| Swiss vineyards (ES&T, 2025 — Dupla et al.)   | Only **~100 kg CO₂/ha/yr** — 10–30× below the higher published rates                  | Cool, alkaline, vineyard    |
 
 The Swiss result is important: it does **not** invalidate ERW but underlines that **climate, soil pH, and drainage** dominate realised rates. Tropical, mildly-acidic, well-drained, vegetated systems consistently sit at the high end of the response distribution — which is exactly the agroecological space most of SSA occupies.
 
@@ -89,7 +89,7 @@ The agronomic case for ERW in SSA is, in some respects, stronger than the carbon
 - **Macronutrients.** Ca, Mg, K released as cations; P released from accessory apatite. Multiple studies report higher tissue Ca, K, and grain K after basalt application.
 - **Silicon.** Basalt is the only practical bulk source of plant-available Si for cereals (rice, sorghum, maize, wheat), where Si improves drought tolerance and reduces pest pressure.
 - **CEC.** ERW raises cation exchange capacity, improving fertiliser use efficiency.
-- **Yield responses observed.** +9–20% on temperate cereals (oats, corn, soybean); +47–79% on smallholder maize in the Kenya trial. The headline tropical numbers are very large but rest on a small evidence base.
+- **Yield responses observed.** +9–20% on temperate cereals (oats, corn, soybean); +71% Y1 to +79% Y2 on smallholder maize in the Kisumu/Kenya trial (Haque et al. 2025). The headline tropical numbers are very large but rest on a small evidence base.
 - **Lime substitution.** A basalt pass every 3–5 years may substitute for routine maintenance liming, with implications for the existing GAIA economics.
 
 ---
@@ -174,11 +174,12 @@ The repository's `erw-*` scripts realise the modelling outlined above. The compo
 ## 12. Selected references
 
 - Beerling, D. J. et al. (2020). *Potential for large-scale CO₂ removal via enhanced rock weathering with croplands.* Nature 583, 242–248.
-- Kantola, I. B. et al. (2024). *Enhanced weathering in the US Corn Belt delivers carbon removal with agronomic benefits.* PNAS 121, e2319436121.
-- Kanzaki, Y. et al. (2024). *Transforming US agriculture for carbon removal with enhanced weathering.* Nature.
-- Flux Carbon / UNCCD (2024). *Yield increases for smallholder farmers in SSA via ERW: preliminary results from Kisumu County, Kenya.* Working paper.
-- Amann, T. et al. (2025). *Three years of field trials indicate a sustained ERW signal with limited CO₂ removal.* Environmental Science & Technology.
-- Dupla, X. et al. (2023). *Potential accumulation of toxic trace elements in soils during enhanced rock weathering.* European Journal of Soil Science.
+- Beerling, D. J. et al. (2024). *Enhanced weathering in the US Corn Belt delivers carbon removal with agronomic benefits.* PNAS 121 (9), e2319436121.
+- Beerling, D. J. et al. (2025). *Transforming US agriculture for carbon removal with enhanced weathering.* Nature. doi:10.1038/s41586-024-08429-2
+- Haque, F. et al. (2025). *Agronomic Performance of Enhanced Rock Weathering in a Tropical Smallholder System: A Maize Trial in Kenya.* CDRXIV preprint 410 (Flux Carbon / UNCCD). <https://cdrxiv.org/preprint/410>.
+- Baek, S. H. et al. (2023). *Impact of climate on the global capacity for enhanced rock weathering on croplands.* Earth's Future 11, e2023EF003698. doi:10.1029/2023EF003698.
+- Dupla, X., Bertagni, M. B. & Grand, S. (2025). *Three Years of Field Trials Indicate a Sustained Enhanced Rock Weathering Signal with Limited CO₂ Removal.* Environmental Science & Technology 59 (48), 25751–25764. doi:10.1021/acs.est.5c09820.
+- Dupla, X. et al. (2023). *Potential accumulation of toxic trace elements in soils during enhanced rock weathering.* European Journal of Soil Science. doi:10.1111/ejss.13343.
 - Edwards, D. P. et al. (2017). *Climate change mitigation: potential benefits and pitfalls of ERW in tropical agriculture.* Biology Letters.
 - Hartmann, J. et al. (2013). *Enhanced chemical weathering as a geoengineering strategy.* Reviews of Geophysics.
 - Carbon Direct (2025). *2025 Criteria for High-Quality CDR: Enhanced Rock Weathering.*

@@ -1,0 +1,4 @@
+allocation,envelope,ha_Mha,farms_M,value_prod_Musd,cdr_Mt
+targeted,core_full_>=50%,0.74,0.45,663.4,13.14
+targeted,candidate_full_>=33%,1.73,1.16,1408.8,21.5
+targeted,core_band_>=75%,0.81,0.54,680.9,13.6

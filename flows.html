@@ -753,11 +753,11 @@
         <div class="dvars-label">Decision variables (and where they enter)</div>
         <ul>
           <li><code>CaO_frac</code>, <code>MgO_frac</code> — feedstock chemistry, B2 + B3</li>
-          <li><code>grain_size_um</code> — 10–500 µm, B2 + B9</li>
+          <li><code>grain_size_um</code> — default <strong>50 µm</strong>, 10–500 µm, B2 + B9</li>
           <li><code>allocation</code> — LiTAS-targeted vs uniform 10 / 20 / 50, B7 + B9</li>
           <li><code>CARBON_PRICE_USD_T</code> — default $150/tCO&#8322;, B7 + B9</li>
           <li><code>DISCOUNT_RATE_PCT</code> — default 10 %, NPV regime in B7</li>
-          <li><code>MRV_COST_USD_T_CO2</code> — default $30/tCO&#8322;, B7 + B9</li>
+          <li><code>MRV_COST_USD_T_CO2</code> — default <strong>$20/tCO&#8322;</strong>, B7 + B9</li>
         </ul>
       </div>
 
@@ -953,6 +953,146 @@
           &nbsp;— rebuild with <code>Rscript erw/erw-plot-maps.R</code>
         </div>
       </div>
+
+      <div class="maps-section">
+        <h3>4. Profitability outcomes &mdash; gross margin under different assumptions</h3>
+        <p class="maps-lede">
+          Rendered by <code class="mono">erw/erw-10-profitability-maps-tables.R</code> from the 276
+          per-crop gross-margin rasters in <code class="mono">data/economics_erw/</code>. Each map below is the
+          <em>crop-weighted</em> GM (\$/ha) at the 0.083° pixel &mdash; weighted by SPAM harvested area across the 23 crops
+          sharing that cell. Three return regimes (year-1, NPV @ 10%, equilibrium) &times; four allocation rules
+          (targeted, uniform 10/20/50&nbsp;t·ha&minus;¹) span the assumption space. The companion CSV tables under
+          <code class="mono">docs/tables/</code> aggregate the same rasters by country and by crop &mdash; see also
+          <a href="docs/erw-results.pdf">docs/erw-results.pdf</a> for the full panel.
+        </p>
+        <div class="maps-grid">
+          <div class="map-card">
+            <img src="docs/maps/profitability/ssa_gm_year1_targeted.png" alt="Crop-weighted GM, year-1, targeted">
+            <div class="map-cap">
+              <b>GM &mdash; year-1, targeted</b>
+              Single application, LiTAS dose on acid pixels. Profitable hot-spots in the Ethiopian highlands and East
+              African Rift where basalt is near and soils are acidic.
+              <div class="map-meta">ssa_gm_year1_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/ssa_gm_npv_targeted.png" alt="Crop-weighted GM, NPV, targeted">
+            <div class="map-cap">
+              <b>GM &mdash; NPV @ 10%, targeted</b>
+              5-year CDR phasing discounted at 10%; agronomic returns over the reapplication interval. The default
+              regime for ERW economics.
+              <div class="map-meta">ssa_gm_npv_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/ssa_gm_equilibrium_targeted.png" alt="Crop-weighted GM, equilibrium, targeted">
+            <div class="map-cap">
+              <b>GM &mdash; equilibrium, targeted</b>
+              Steady-state maintenance dose (~12 t/ha vs ~30 t/ha at year-1). Costs collapse while most CDR remains
+              &mdash; widest profitable footprint of the three regimes.
+              <div class="map-meta">ssa_gm_equilibrium_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/ssa_gm_npv_uniform_10.png" alt="Crop-weighted GM, NPV, uniform 10 t/ha">
+            <div class="map-cap">
+              <b>GM &mdash; NPV, uniform 10 t/ha</b>
+              Uniform 10&nbsp;t/ha across all cropland regardless of soil acidity &mdash; the conservative Beerling/Baek
+              benchmark.
+              <div class="map-meta">ssa_gm_npv_uniform_10.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/ssa_gm_npv_uniform_20.png" alt="Crop-weighted GM, NPV, uniform 20 t/ha">
+            <div class="map-cap">
+              <b>GM &mdash; NPV, uniform 20 t/ha</b>
+              Higher uniform dose. CDR doubles vs uniform-10 but so does basalt cost &mdash; tradeoff visible in the
+              profitable-footprint map.
+              <div class="map-meta">ssa_gm_npv_uniform_20.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/ssa_gm_npv_uniform_50.png" alt="Crop-weighted GM, NPV, uniform 50 t/ha">
+            <div class="map-cap">
+              <b>GM &mdash; NPV, uniform 50 t/ha</b>
+              Aggressive uniform dose. Basalt cost dominates at most pixels at the $150/tCO&#8322; default carbon price.
+              <div class="map-meta">ssa_gm_npv_uniform_50.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/profitable_mask_npv_targeted.png" alt="Profitable-pixel mask, NPV, targeted">
+            <div class="map-cap">
+              <b>Profitable mask &mdash; NPV, targeted</b>
+              Binary: pixels where crop-weighted GM&nbsp;&gt;&nbsp;0. The candidate set for the supply-ranked
+              deployment in <code>erw-supply</code>.
+              <div class="map-meta">profitable_mask_npv_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/profitable_mask_equilibrium_targeted.png" alt="Profitable-pixel mask, equilibrium, targeted">
+            <div class="map-cap">
+              <b>Profitable mask &mdash; equilibrium, targeted</b>
+              The widest profitable footprint of the four targeted scenarios &mdash; consistent with the
+              equilibrium-regime supply curve break-even at ≈50&nbsp;Mt&nbsp;yr&minus;¹.
+              <div class="map-meta">profitable_mask_equilibrium_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/breakeven_carbon_npv_targeted.png" alt="Breakeven carbon price, NPV, targeted">
+            <div class="map-cap">
+              <b>Breakeven carbon price &mdash; NPV, targeted</b>
+              Per-pixel minimum $/tCO&#8322; needed for GM = 0, all other defaults fixed (MRV $20, grain 50&nbsp;µm).
+              Pixels with no CDR potential masked; legend caps at $500/tCO&#8322;.
+              <div class="map-meta">breakeven_carbon_npv_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/crop_gm_MAIZ_npv_targeted.png" alt="Per-crop GM, MAIZ, NPV, targeted">
+            <div class="map-cap">
+              <b>Per-crop GM &mdash; MAIZ (NPV, targeted)</b>
+              Highest-acreage SSA crop. Per-crop maps for SORG, CASS, GROU, WHEA also under
+              <code>docs/maps/profitability/</code>.
+              <div class="map-meta">crop_gm_MAIZ_npv_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/crop_gm_CASS_npv_targeted.png" alt="Per-crop GM, CASS, NPV, targeted">
+            <div class="map-cap">
+              <b>Per-crop GM &mdash; CASS (NPV, targeted)</b>
+              Cassava: low acid-tolerance, low FAO price &mdash; CDR revenue dominates the profit signal.
+              <div class="map-meta">crop_gm_CASS_npv_targeted.png</div>
+            </div>
+          </div>
+
+          <div class="map-card">
+            <img src="docs/maps/profitability/crop_gm_WHEA_npv_targeted.png" alt="Per-crop GM, WHEA, NPV, targeted">
+            <div class="map-cap">
+              <b>Per-crop GM &mdash; WHEA (NPV, targeted)</b>
+              Wheat: the only crop with consistently positive pixel-mean GM at defaults &mdash; high FAO price + high
+              yield-response per liming-unit.
+              <div class="map-meta">crop_gm_WHEA_npv_targeted.png</div>
+            </div>
+          </div>
+        </div>
+        <div class="tikz-links">
+          Render script: <a href="erw/erw-10-profitability-maps-tables.R"><code>erw/erw-10-profitability-maps-tables.R</code></a>
+          &nbsp;— rebuild with <code>Rscript erw/erw-10-profitability-maps-tables.R</code>
+          &nbsp;·&nbsp; <a href="docs/erw-results.pdf">docs/erw-results.pdf</a>
+          &nbsp;·&nbsp; <a href="docs/tables/output-ssa-summary.csv">SSA summary CSV</a>
+          &nbsp;·&nbsp; <a href="docs/tables/output-country-summary.csv">country breakdown CSV</a>
+          &nbsp;·&nbsp; <a href="docs/tables/output-crop-ranking.csv">crop ranking CSV</a>
+        </div>
+      </div>
     </section>
 
     <main id="content"></main>
@@ -980,7 +1120,7 @@
          "key_constants":[
            {"name":"CaO_frac","value":"0.10","notes":"Mass fraction of CaO in basalt feedstock."},
            {"name":"MgO_frac","value":"0.07","notes":"Mass fraction of MgO in basalt feedstock."},
-           {"name":"grain_size_um","value":"100 um","notes":"Decision variable. Sweeps 10-500 um in erw-8."},
+           {"name":"grain_size_um","value":"50 um","notes":"Decision variable. Default lowered from 100 µm on 2026-05-26 (Strefler grinding-curve anchor). Sweeps 10-500 um in erw-8."},
            {"name":"reactive_fraction_ref","value":"0.20","notes":"Lewis 2021 calibration at reference grain x climate."},
            {"name":"GRAIN_BETA","value":"0.5","notes":"Surface-area exponent for grain-size factor."},
            {"name":"GRIND_ALPHA","value":"1.2","notes":"Strefler 2018 grinding-energy exponent."}
@@ -992,7 +1132,7 @@
            {"name":"T_ref","value":"11 C","notes":"Reference MAT anchor (US Corn Belt)."},
            {"name":"P_ref","value":"1000 mm","notes":"Reference MAP anchor."},
            {"name":"f_pH","value":"triangular peak ~ pH 5.0","notes":"Acid-catalysed dissolution scaling."},
-           {"name":"pedogenic_frac","value":"MAP-binned 0-90%","notes":"UNEP 1992 aridity bands using MAP as v1 proxy for AI=P/PET."}
+           {"name":"pedogenic_frac","value":"CGIAR-CSI AI-binned 0-90% (MAP-only fallback)","notes":"Primary: UNEP 1992 aridity bands keyed on the CGIAR-CSI Global Aridity Index raster (data/cgiar_aridity_index.tif or ai_v31_yr.tif), with 65535 nodata masking and auto-detected integer scaling. Fallback to MAP-only proxy when AI raster absent."}
          ]},
         {"id":"erw-basalt-access","file":"erw/erw-basalt-access.R","name":"Basalt access","purpose":"Per-pixel delivered basalt price ($/t) = quarry-gate price + cost-distance from basalt sources x $/min/t. Uses GLiM lithology (basic volcanic) and the Malaria Atlas Project friction surface.","inputs":["gadm_ssa.gpkg","soilgrids_properties_all.tif (reference grid)","spam_harv_area_processed.tif (cropland mask)","GLiM v1.0 lithology shapefile (external, PANGAEA)","MAP friction surface 2019 (external)"],"outputs":["basalt_source_mask.tif","basalt_traveltime_min.tif","basalt_transport_km.tif","basalt_transport_cost_usd_t.tif","basalt_delivered_price_usd_t.tif"],"depends_on":["erw-1","erw-2"],
          "key_constants":[
@@ -1012,7 +1152,7 @@
            {"name":"GRID_CI_KG_PER_KWH_FB","value":"0.60 kg/kWh","notes":"Fallback when country raster missing."},
            {"name":"TRUCK_KGCO2_PER_T_KM","value":"0.12","notes":"Diesel heavy truck."},
            {"name":"CARBON_PRICE_USD_T","value":"$150/tCO2","notes":"Mid of 2024-25 ERW credit market."},
-           {"name":"MRV_COST_USD_T_CO2","value":"$30/tCO2","notes":"Sampling + lab + verification + registry."},
+           {"name":"MRV_COST_USD_T_CO2","value":"$20/tCO2","notes":"Sampling + lab + verification + registry. Lowered from $30 on 2026-05-26 — midpoint of Levy et al. 2024 pilot benchmark and at-scale aggregator-pooled forecast."},
            {"name":"DISCOUNT_RATE_PCT","value":"10%","notes":"For NPV regime."},
            {"name":"CDR_PHASING","value":"30/25/20/15/10% over 5 yr","notes":"Time-resolved CDR realisation."}
          ]},
@@ -1020,14 +1160,20 @@
         {"id":"erw-supply","file":"erw/erw-supply.R","name":"Supply ranking","purpose":"Supply-constrained deployment frontier: ranks SSA cropland pixels descending by GM-per-tonne-basalt (the LP-dual on the basalt supply constraint). Outputs supply curves and deployment masks for selected caps.","inputs":["economics_erw/targeted/{crop}_{regime}.tif","cdr_per_t_basalt.tif"],"outputs":["gm_per_t_basalt_{regime}.tif","supply_curve_{regime}.csv","deployment_under_{10,50,250}_Mt_{regime}.tif"],"depends_on":["erw-7","erw-9"],
          "key_constants":[
            {"name":"SUPPLY_CAPS_MT","value":"1, 5, 10, 25, 50, 100, 250, 500, infty","notes":"Annual basalt-supply caps evaluated."}
+         ]},
+        {"id":"erw-10","file":"erw/erw-10-profitability-maps-tables.R","name":"Profitability maps + tables","purpose":"Render profitability outcome maps (continent-wide GM, per-crop GM, profitable masks, breakeven carbon price) and aggregate tables (SSA-wide totals, country breakdown, crop ranking) from the 276 economics_erw rasters. Covers all 3 regimes x 4 allocations.","inputs":["economics_erw/{allocation}/{crop}_{regime}.tif (276 rasters)","gadm_ssa.gpkg"],"outputs":["docs/maps/profitability/ssa_gm_{regime}_{alloc}.png (12)","docs/maps/profitability/profitable_mask_{regime}_{alloc}.png (12)","docs/maps/profitability/breakeven_carbon_{regime}_{alloc}.png (12)","docs/maps/profitability/crop_gm_{crop}_{regime}_targeted.png (10)","docs/tables/output-ssa-summary.csv","docs/tables/output-country-summary.csv","docs/tables/output-crop-ranking.csv"],"depends_on":["erw-7"],
+         "key_constants":[
+           {"name":"KEY_CROPS","value":"MAIZ, SORG, CASS, GROU, WHEA","notes":"Subset rendered as per-crop GM maps."},
+           {"name":"MRV (for breakeven)","value":"$20 / tCO2","notes":"Held fixed when backing out per-pixel breakeven carbon price."}
          ]}
       ]
     }
   ],
   "documents": [
     {"file":"docs/erw-tutorial.pdf","purpose":"Layman tutorial (compiled PDF, 18 pages) — explains the project, the conceptual framework, the nine modelling blocks, and the headline maps in plain language. Every assumption is anchored to a numbered reference; the key-constants table in §7.1 and the Scope (§8) + Limitations (§9) sections lay out what the model does and does not currently do. Glossary at the back. Source: docs/erw-tutorial.md → tex → PDF via docs/build-erw-tutorial.sh."},
-    {"file":"docs/erw-working-paper.pdf","purpose":"Working paper (compiled PDF, 19 pages, 20 verified references) — academic-style write-up: abstract, introduction, conceptual framework, methods with numbered equations, illustrative outputs, limitations and roadmap, references. Source: docs/erw-working-paper.md → docs/erw-working-paper.tex → PDF via docs/build-erw-working-paper.sh."},
+    
     {"file":"docs/erw-model.pdf","purpose":"Living model documentation (compiled PDF, 15 pages) — single source of truth for current pipeline state, block-by-block status, headline numbers, decision variables, and a dated changelog. Source: docs/erw-model.md → docs/erw-model.tex → PDF via docs/build-erw-model.sh. Edit the .md and re-run the build script."},
+    {"file":"docs/erw-results.pdf","purpose":"Profitability dashboard (compiled PDF) — maps and aggregate tables for all 3 regimes x 4 allocations. Embeds the SSA-wide totals, country breakdown, and crop ranking from docs/tables/. Source: docs/erw-results.md, built by docs/build-erw-results.sh."},
     {"file":"docs/erw-review.md","purpose":"Evidence review on ERW: chemistry, feedstocks, application practice, CDR potential, agronomic co-benefits, SSA case, risks, economics."},
     {"file":"docs/erw-README.md","purpose":"Runbook: file inventory, run order, key constants, deferred work, output schema, and known portability issues."},
     {"file":"docs/erw-parameters.md","purpose":"Catalogue of every constant and assumption used by erw-*.R scripts, with citations, source URLs/DOIs, and units."}
@@ -1049,8 +1195,40 @@
     {"name":"Delivered basalt price surface","file_pattern":"basalt_delivered_price_usd_t.tif","stages":["erw-basalt-access"],"what":"Spatial cost of basalt at farm gate ($/t)."},
     {"name":"CDR yield surface","file_pattern":"cdr_yield_*.tif","stages":["erw-9"],"what":"Per-pixel cumulative CDR (t CO2/ha) net of pedogenic precipitation."},
     {"name":"Supply curves","file_pattern":"supply_curve_{regime}.csv","stages":["erw-supply"],"what":"Marginal $/tCO2 and total CDR vs annual basalt supply cap (1-500 Mt/yr)."},
-    {"name":"Sensitivity tables","file_pattern":"output-erw-sensitivity-*.csv","stages":["erw-8"],"what":"Total profitable hectares and gross margin under price, yield, MRV, grain, and allocation scenarios."}
-  ]
+    {"name":"Sensitivity tables","file_pattern":"output-erw-sensitivity-*.csv","stages":["erw-8"],"what":"Total profitable hectares and gross margin under price, yield, MRV, grain, and allocation scenarios."},
+    {"name":"Profitability outcome maps","file_pattern":"docs/maps/profitability/{ssa_gm,profitable_mask,breakeven_carbon,crop_gm}_*.png","stages":["erw-10"],"what":"Crop-weighted GM, profitable-pixel masks, breakeven carbon price, and per-crop GM under 3 regimes x 4 allocations."},
+    {"name":"SSA / country / crop summary tables","file_pattern":"docs/tables/output-{ssa,country,crop}-*.csv","stages":["erw-10"],"what":"Aggregate gross margin, profitable area, and CDR by regime x allocation, broken down SSA-wide / per country / per crop."}
+  ],
+  "headline_results": {
+    "run_date": "2026-05-19",
+    "scope": "SSA cropland, 23 SPAM crops, defaults: $150/tCO2 credit, $30/tCO2 MRV, $52/t mean delivered basalt, 100 um grain.",
+    "delivered_basalt_per_t_usd": {"mean":52.0, "min":18.4, "max":61.4},
+    "lca_kg_per_t_basalt": {"mean":52.8, "min":0.75, "max":68.5},
+    "best_pixel_mean_cell": {"regime":"equilibrium","allocation":"targeted","crop":"WHEA","gm_combined_usha":57,"note":"Only positive pixel-mean cell at default parameters."},
+    "supply_curves": {
+      "year1":       {"break_even_cap_Mt":100, "peak_total_gm_Musd":2010, "peak_total_cdr_Mt":23.2, "marginal_usd_per_t_at_50Mt":20.0,  "marginal_usd_per_t_at_100Mt":6.9,   "marginal_usd_per_t_at_250Mt":-22.8},
+      "npv":         {"break_even_cap_Mt":100, "peak_total_gm_Musd":3816, "peak_total_cdr_Mt":22.7, "marginal_usd_per_t_at_50Mt":35.5,  "marginal_usd_per_t_at_100Mt":12.4,  "marginal_usd_per_t_at_250Mt":-16.6},
+      "equilibrium": {"break_even_cap_Mt":50,  "peak_total_gm_Musd":2245, "peak_total_cdr_Mt":9.8,  "marginal_usd_per_t_at_50Mt":10.2,  "marginal_usd_per_t_at_100Mt":-12.5, "marginal_usd_per_t_at_250Mt":-58.7}
+    },
+    "key_findings": [
+      "At default parameters pixel-mean ERW is negative for all 23 crops across all four allocation rules in year-1 and NPV regimes.",
+      "Only equilibrium | targeted | WHEA is positive at the pixel mean (+$57/ha).",
+      "Supply-frontier ranking flips the conclusion: top-decile deployment yields $2-4 B positive GM and 10-25 Mt CDR/yr.",
+      "Break-even marginal pixel sits at ~100 Mt/yr (year-1, NPV) or ~50 Mt/yr (equilibrium).",
+      "Total SSA deployable basalt tops out at 626 Mt/yr (year-1, NPV) or 206 Mt/yr (equilibrium), with cumulative CDR of 110 Mt and 37 Mt."
+    ],
+    "fixes_applied": [
+      {"file":"erw/erw-7-profitability-function.R","lines":"114-117, 134-137","change":"Removed redundant aggregate(...,10,...) on energy + transport rasters (already at the 0.0833 deg working grid).","date":"2026-05-19"},
+      {"file":"erw/erw-8-sensitivity-analysis.R","lines":"166-174","change":"Grain sweep referenced non-existent scalars ELECTRICITY_USD_KWH / GRID_CI_KG_PER_KWH; rewired to per-pixel electricity_raster / grid_ci_raster.","date":"2026-05-19"}
+    ],
+    "pipeline_status": {
+      "erw-5":      {"refreshed":true, "note":"Regenerated all 23 crops x 2 responses; ecocrop_f/ previously only had MAIZ + SORG."},
+      "erw-9":      {"refreshed":true, "note":"CDR rasters older than the basalt-rate rasters they multiply; layers 5-9 of cdr_yield_merlos.tif were all zero. Refreshed."},
+      "erw-7":      {"completed":true, "note":"276 rasters under data/economics_erw/."},
+      "erw-supply": {"completed":true, "note":"Supply curves and deployment masks written."},
+      "erw-8":      {"completed":false,"note":"Ready to run after the patch; default scope is ~6-8 h. Not executed in this run."}
+    }
+  }
 }
 </script>
 
@@ -1254,6 +1432,69 @@
         div.appendChild(ul);
         sh.appendChild(div);
       }
+      if (data.headline_results) {
+        const hr = data.headline_results;
+        const div = document.createElement("div");
+        div.innerHTML = '<div class="section-divider">Headline results — run ' + (hr.run_date || '') + '</div>';
+        if (hr.scope) {
+          const p = document.createElement("p");
+          p.style.color = "var(--muted)";
+          p.style.margin = "4px 0 8px";
+          p.textContent = hr.scope;
+          div.appendChild(p);
+        }
+        if (hr.supply_curves) {
+          const t = document.createElement("table");
+          t.className = "mono";
+          t.style.cssText = "border-collapse:collapse;margin:6px 0 10px;font-size:13px";
+          t.innerHTML = '<thead><tr>'
+            + ['regime','break-even cap (Mt/yr)','peak total GM ($M)','peak CDR (Mt)','marginal $/t @ 50 Mt','@ 100 Mt','@ 250 Mt']
+              .map(h => '<th style="text-align:left;padding:3px 10px;border-bottom:1px solid var(--muted)">'+h+'</th>').join('')
+            + '</tr></thead><tbody></tbody>';
+          const tb = t.querySelector("tbody");
+          ["year1","npv","equilibrium"].forEach(rg => {
+            const r = hr.supply_curves[rg]; if (!r) return;
+            const tr = document.createElement("tr");
+            tr.innerHTML = [rg, r.break_even_cap_Mt, r.peak_total_gm_Musd, r.peak_total_cdr_Mt,
+                            r.marginal_usd_per_t_at_50Mt, r.marginal_usd_per_t_at_100Mt, r.marginal_usd_per_t_at_250Mt]
+              .map(v => '<td style="padding:3px 10px">'+v+'</td>').join('');
+            tb.appendChild(tr);
+          });
+          div.appendChild(t);
+        }
+        if (hr.key_findings && hr.key_findings.length) {
+          const sub = document.createElement("div");
+          sub.style.cssText = "margin-top:6px;font-weight:600";
+          sub.textContent = "Key findings";
+          div.appendChild(sub);
+          const ul = document.createElement("ul");
+          hr.key_findings.forEach(k => {
+            const li = document.createElement("li");
+            li.textContent = k;
+            ul.appendChild(li);
+          });
+          div.appendChild(ul);
+        }
+        if (hr.pipeline_status) {
+          const sub = document.createElement("div");
+          sub.style.cssText = "margin-top:6px;font-weight:600";
+          sub.textContent = "Pipeline status";
+          div.appendChild(sub);
+          const ul = document.createElement("ul");
+          Object.keys(hr.pipeline_status).forEach(k => {
+            const s = hr.pipeline_status[k];
+            const li = document.createElement("li");
+            const done = s.completed || s.refreshed;
+            li.innerHTML = '<span class="mono">' + k + '</span> — '
+              + '<b style="color:' + (done ? 'var(--accent)' : '#a90') + '">'
+              + (done ? '✓' : 'pending') + '</b> '
+              + '<span style="color:var(--muted)">' + (s.note || '') + '</span>';
+            ul.appendChild(li);
+          });
+          div.appendChild(ul);
+        }
+        sh.appendChild(div);
+      }
       if (data.documents && data.documents.length) {
         const div = document.createElement("div");
         div.innerHTML = '<div class="section-divider">Companion documents</div>';
@@ -1261,7 +1502,7 @@
         ul.className = "doc-list";
         data.documents.forEach(d => {
           const li = document.createElement("li");
-          li.innerHTML = '<span class="mono">' + d.file + '</span> — '
+          li.innerHTML = '<a class="mono" href="' + encodeURI(d.file) + '">' + d.file + '</a> — '
             + '<span style="color:var(--muted)">' + d.purpose + '</span>';
           ul.appendChild(li);
         });
