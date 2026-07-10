@@ -76,10 +76,21 @@ def summarize(P, mask):
                 cdr_Mt=round(cdr_Mt(P, mask), 1))
 
 # ----------------------------------------------------------------------------
-# Load headline primitives once (targeted, equilibrium, net-export)
-print("Loading headline primitives (targeted / equilibrium / net-export)...")
+# Load headline primitives once (equilibrium, net-export).
+# erw-7 now bakes the net-export deduction into band 9, so build_primitives()
+# returns net-export CDR directly; the old E.apply_netexport() wrapper is gone.
+#
+# CAVEAT on the rmult lever below: it scales the ALREADY-DEDUCTED net CDR
+# (r * cdr_net). Physically r multiplies GROSS CDR, and the acidity sink F*S and
+# the LCA term are fixed subtrahends, so cdr_net is super-linear in r and this
+# compresses the lever on both sides (at r=2 the public envelope is 5.90 Mha, not
+# the 2.68 Mha reported here). Likewise `carbon`, `mrv` and `cmult` are not three
+# independent levers: the public envelope depends on them only through the ratio
+# (carbon - mrv)/cmult. See erw/erw-12-public-envelope-sensitivity.R, which
+# reconstructs GROSS/S/LCA separately and does both correctly.
+print(f"Loading headline primitives ({ALLOC} / {REGIME} / net-export)...")
 price = E.crop_prices()
-P = E.apply_netexport(E.build_primitives(ALLOC, REGIME, price), REGIME)
+P = E.build_primitives(ALLOC, REGIME, price)
 
 # ============================================================================
 # 1) NAMED SCENARIOS  -- the communication layer

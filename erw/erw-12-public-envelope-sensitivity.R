@@ -19,6 +19,9 @@
 # Three results this file establishes, each of which changes how the public
 # envelope's uncertainty should be reported:
 #
+# Numbers below are on the headline PUBLIC_ALLOC = uniform_20; the targeted
+# equivalents are given in parentheses.
+#
 #   (1) COLLAPSE. cdr_net depends on neither price nor cost, so the envelope
 #       depends on (p, m, c) only through the single ratio (p - m)/c. The
 #       five-lever tornado in erw-8 / erw_sensitivity_harness.py therefore
@@ -29,14 +32,22 @@
 #       Physically r multiplies GROSS (reactive fraction x grain x climate x
 #       exported fraction), and the sink F*S and LCA are fixed subtrahends. The
 #       max(.,0) then makes cdr_net super-linear in r, so scaling net compresses
-#       the lever on both sides. At r = 2 the public envelope is 5.90 Mha, not
-#       the 2.68 Mha the harness reports.
+#       the lever on both sides. At r = 2 the public envelope is 12.56 Mha, not
+#       the 5.99 Mha the harness reports (targeted: 5.90 vs 2.68).
 #
 #   (3) LAMBDA. The net-export partition -- the single most-scrutinised modelling
 #       choice (see paper/netexport-cdr-memo.md Sec.6) -- moves the envelope only
-#       from 2.23 (lambda=0, gross) to 1.65 Mha (lambda=1, sequential bound). It
-#       is the SMALLEST structural lever. Report one number and a band, not two
-#       competing accountings.
+#       from 3.51 (lambda=0, gross) to 3.16 Mha (lambda=1, sequential bound)
+#       (targeted: 2.23 -> 1.65). It is the SMALLEST structural lever. Report one
+#       number and a band, not two competing accountings.
+#
+#   NOTE. The CDR-rate lever still leads the tornado on uniform-20 (4.93 vs 4.60
+#   Mha for the price ratio) but by a much narrower margin than on targeted (2.56
+#   vs 2.16). uniform-20's acidity sink is a smaller share of its gross CDR
+#   (0.42/3.94 = 11% vs 0.43/1.67 = 26%), so the marginal amplifier falls from
+#   1.33 to 1.16 and the CDR-rate elasticity from 1.72 to 1.19. Re-leading the
+#   carbon case on uniform-20 therefore WEAKENS the "CDR rate dominates" claim,
+#   even as it roughly doubles the public envelope. Both facts should be reported.
 #
 # ACCOUNTING NOTE. This script reads band 8 `_cdr_gross_tha`, which is gross CDR
 # before any net-export deduction under BOTH the current and the re-run erw-7,
@@ -67,6 +78,13 @@ dir.create(TBL_OUT, recursive = TRUE, showWarnings = FALSE)
 
 REGIME <- "equilibrium"          # manuscript headline; "year1"/"npv" also valid
 ALLOCS <- c("targeted", "uniform_20", "uniform_50")
+
+# The carbon case is led on uniform-20 (Sec.6): the targeted lime-requirement dose
+# is CDR-minimal by construction, so leading the public envelope on it understates
+# the carbon case ~1.9x in area and ~3.1x in tonnage. `targeted` remains the lead
+# for the private/agronomic envelope elsewhere in the pipeline.
+PUBLIC_ALLOC <- "uniform_20"
+
 CARBON <- 150; MRV <- 20         # erw-7 defaults
 RATIO0 <- CARBON - MRV           # central effective net price per unit cost
 
@@ -128,7 +146,8 @@ build_primitives <- function(alloc) {
 }
 
 PR <- lapply(setNames(ALLOCS, ALLOCS), build_primitives)
-P  <- PR[["targeted"]]
+P  <- PR[[PUBLIC_ALLOC]]
+cat(sprintf("\nheadline allocation for the public envelope: %s\n", PUBLIC_ALLOC))
 
 # ------------------------------------------------------------------------------
 # envelope algebra
@@ -150,7 +169,7 @@ wmedian <- function(x, w) { o <- order(x); x <- x[o]; w <- w[o]
 # 0) which accounting do the on-disk rasters carry?
 # ==============================================================================
 cat("\n== 0) accounting check on the committed economics_erw rasters ==\n")
-r1  <- terra::rast(file.path(DATA,"economics_erw","targeted",paste0("MAIZ_",REGIME,".tif")))
+r1  <- terra::rast(file.path(DATA,"economics_erw",PUBLIC_ALLOC,paste0("MAIZ_",REGIME,".tif")))
 gg  <- r1[["MAIZ_cdr_gross_tha"]]; nn <- r1[["MAIZ_cdr_net_tha"]]
 lca <- r1[["MAIZ_basalt_tha"]] * (GRIND_KWH*terra::resample(ci,gg) +
                                   terra::resample(km,gg)*0.12 + 0.5) / 1000
@@ -259,7 +278,8 @@ write.csv(ald, file.path(TBL_OUT,"output-public-allocation-ladder.csv"), row.nam
 # ==============================================================================
 # 7) figure
 # ==============================================================================
-png(file.path(MAP_OUT, "public_envelope_sensitivity.png"), width=2100, height=1750, res=170)
+png(file.path(MAP_OUT, sprintf("public_envelope_sensitivity_%s.png", PUBLIC_ALLOC)),
+    width=2100, height=1750, res=170)
 par(mfrow=c(2,2), mar=c(4.6,4.6,3.6,1.4))
 
 rr <- seq(0.5, 3, by = 0.05)
@@ -267,7 +287,7 @@ ac <- sapply(rr, function(r) Mha(P, r=r)); ah <- sapply(rr, function(r) Mha(P, r
 plot(rr, ac, type="l", lwd=3, col="#b3261e", ylim=c(0, max(ac)),
      xlab="CDR-rate multiplier  r  (x gross tCO2 per t basalt)",
      ylab="Public-sufficient area (Mha)",
-     main="(a) The CDR-rate lever is understated\nwhen r scales post-deduction CDR")
+     main=sprintf("(a) The CDR-rate lever is understated when r\nscales post-deduction CDR (%s)", PUBLIC_ALLOC))
 lines(rr, ah, lwd=3, col="#2156a8", lty=2); abline(v=1, col="grey60", lty=3)
 points(1, base, pch=19)
 legend("topleft", c("correct: r scales GROSS","current harness: r scales NET"),
