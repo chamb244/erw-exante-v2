@@ -42,6 +42,9 @@
 #
 # Outputs:
 #   docs/maps/envelopes/*.png            envelope, typology, robustness, core maps
+#     (the public/VCM figures carry the allocation suffix: mac_{PUBLIC_ALLOC}.png,
+#      cdr_rate_sensitivity_panel_{PUBLIC_ALLOC}.png. Their unsuffixed ancestors from
+#      before that rename live in docs/maps/envelopes/orphan/ -- superseded, do not cite.)
 #   docs/tables/output-envelope-summary.csv          ha/farms/value/CDR per envelope
 #   docs/tables/output-envelope-country-summary.csv
 #   docs/tables/output-core-priority-summary.csv

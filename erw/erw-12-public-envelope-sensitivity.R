@@ -63,7 +63,7 @@
 #   data/basalt_feedstock_chemistry.csv
 #
 # Outputs:
-#   docs/maps/envelopes/public_envelope_sensitivity.png
+#   docs/maps/envelopes/public_envelope_sensitivity_{PUBLIC_ALLOC}.png
 #   docs/tables/output-public-*.csv
 # ------------------------------------------------------------------------------
 
