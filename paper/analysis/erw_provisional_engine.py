@@ -26,8 +26,20 @@ NET-EXPORT ACCOUNTING (the key model change; see paper/netexport-cdr-memo.md)
   S = acidity sink as lime requirement (t CaCO3/ha):
       NPV / year-1 -> caco3_kamprath.tif   (standing exchangeable acidity)
       equilibrium  -> caco3_merlos_maintenance.tif band 1 (annual re-acidification)
-  Implemented per pixel as a multiplier phi = max(1 - F*S/gross_CDR_tha, 0),
-  applied to CDRN (revenue-effective) and CDRT (physical).
+
+  This deduction is now applied INSIDE erw-7 (see its cdr_revenue()), so band 9
+  `_cdr_net_tha` is already net-export minus lifecycle emissions. This module
+  therefore reads it straight through and must NOT deduct again.
+
+  HISTORY: this file used to carry an apply_netexport() helper that multiplied
+  band 9 by phi = max(1 - F*S/band9, 0). That was correct only while the committed
+  economics_erw rasters predated the net-export wiring of erw-7 (commit 16b6321) and
+  band 9 still held gross CDR. Once erw-7 was re-run, keeping it would have deducted
+  the acidity sink twice and silently shrunk the public envelope. Removed. If you
+  ever regress erw-7 to emit gross CDR in band 9, this module goes wrong silently --
+  erw/erw-12-public-envelope-sensitivity.R Section 0 tests which accounting the
+  on-disk rasters actually carry, and is invariant to the answer because it reads
+  band 8 (gross) and applies the deduction itself.
 
 HEADLINE = equilibrium regime + net-export CDR (both streams steady-state).
 
@@ -60,11 +72,6 @@ NEXT STEPS (agreed 2026-07-02, to implement on resume):
 ======================================================================
 """
 import os, numpy as np, pandas as pd, rasterio
-from rasterio.features import rasterize
-from rasterio.warp import reproject, Resampling
-import geopandas as gpd
-
-import os
 ROOT = os.environ.get("ERW_ROOT", os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))  # repo root; override with ERW_ROOT
 DATA = f"{ROOT}/data"; FIG = f"{ROOT}/paper/figures"; TBL = f"{ROOT}/paper/tables"
 CARBON, MRV, F = 150.0, 20.0, 0.88
@@ -92,14 +99,6 @@ def crop_prices():
     d = d[(d.Year > 2015) & (d.Year <= 2020) & (d.Area.isin(SSA_AREAS))]
     return {c: (float(np.median(d[d.Item.isin(FAO_ITEM[c])]['Value'])) if len(d[d.Item.isin(FAO_ITEM[c])]) else np.nan) for c in CROPS}
 
-def _grid(path, band, transform, crs, H, W, how=Resampling.average):
-    dst = np.full((H, W), np.nan, np.float32)
-    with rasterio.open(path) as s:
-        reproject(rasterio.band(s, band), dst, src_transform=s.transform, src_crs=s.crs,
-                  dst_transform=transform, dst_crs=crs, resampling=how)
-        if s.nodata is not None: dst[dst == s.nodata] = np.nan
-    return dst
-
 def build_primitives(alloc, regime, price):
     ref = f"{DATA}/economics_erw/{alloc}/MAIZ_{regime}.tif"
     with rasterio.open(ref) as ds:
@@ -121,14 +120,6 @@ def build_primitives(alloc, regime, price):
                 CDRN=np.where(ok,ncr/wsm,np.nan)/(CARBON-MRV), WSUM=np.where(ok,ws,np.nan),
                 VOP=np.where(ok,vop,np.nan), CDRT=np.where(ok,cdrt,np.nan), ok=ok, TR=TR, CRS=CRS, H=H, W=W)
 
-def apply_netexport(P, regime):
-    sink_file = "caco3_kamprath.tif" if regime in ("npv","year1") else "caco3_merlos_maintenance.tif"
-    S = np.nan_to_num(_grid(f"{DATA}/{sink_file}", 1, P['TR'], P['CRS'], P['H'], P['W']))
-    g = np.where(P['WSUM']>0, P['CDRT']/P['WSUM'], np.nan)
-    phi = np.where(np.isfinite(g) & (g>0), np.maximum(1 - F*S/g, 0), 0.0)
-    Q = dict(P); Q['CDRN'] = P['CDRN']*phi; Q['CDRT'] = P['CDRT']*phi; Q['phi'] = phi
-    return Q
-
 def envelopes(P, carbon=CARBON, ymult=1, cmult=1, rmult=1):
     ga = P['AGRO']*ymult - P['BAS']*cmult
     gc = P['CDRN']*rmult*(carbon-MRV) - P['BAS']*cmult
@@ -144,7 +135,7 @@ def summarize(P, m):  # returns dict of $M / Mha / Mt over mask m
 def table2_ladder(regime="equilibrium"):
     price = crop_prices(); rows = []
     for alloc in ['targeted','uniform_10','uniform_20','uniform_50']:
-        P = apply_netexport(build_primitives(alloc, regime, price), regime); ok = P['ok']
+        P = build_primitives(alloc, regime, price); ok = P['ok']
         pr, pu, co = envelopes(P)
         for e, msk in [('Private',pr),('Public',pu),('Intersection',pr&pu),('Combined>0',co)]:
             rows.append(dict(Allocation=alloc, Envelope=e, **summarize(P, msk&ok)))

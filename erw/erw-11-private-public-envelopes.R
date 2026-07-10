@@ -16,13 +16,23 @@
 #   intersection        = private & public  (investment is doubly justified;
 #                         note: CDR credits are LEAST additional here)
 #
-# Because erw-7 stores agro_return, basalt_cost and cdr_net as separate layers,
-# every envelope and the whole parameter sweep reduce to three area-weighted
-# per-pixel primitives: AGRO ($/ha), BAS ($/ha), CDRN (tCO2/ha). The sweep is
-# therefore fully analytic - no per-scenario model re-run.
+# Because erw-7 stores agro_return, basalt_cost, gross CDR and net CDR as separate
+# layers, every envelope and the whole parameter sweep reduce to a handful of
+# area-weighted per-pixel primitives: AGRO ($/ha), BAS ($/ha), GROSS/LCA/S
+# (tCO2/ha). The sweep is therefore fully analytic - no per-scenario model re-run.
 #
-# Baseline: REGIME = year1, allocations targeted + uniform_20, carbon $150/tCO2,
-# MRV $20/tCO2 (matches erw-7 defaults).
+# ACCOUNTING. erw-7 bakes the net-export deduction into `_cdr_net_tha` (band 9),
+# so this file reads it straight through at the baseline. Verify with erw-12
+# Section 0 before trusting any number here: if the on-disk economics_erw rasters
+# predate the net-export wiring (commit 16b6321), band 9 is GROSS and every public
+# figure below is overstated (targeted public 2.23 vs 1.65 Mha). Re-run erw-7.
+#
+# ALLOCATION. Private/targeting sections lead on `targeted`; the public/carbon
+# section (Sec.4) leads on `uniform_20` -- the targeted dose is CDR-minimal by
+# construction. See Sec.4's comment and paper/netexport-cdr-memo.md Sec.3.
+#
+# Baseline: REGIME = equilibrium, allocations targeted + uniform_20, carbon
+# $150/tCO2, MRV $20/tCO2 (matches erw-7 defaults).
 #
 # Inputs:
 #   data/economics_erw/{targeted,uniform_20}/{crop}_year1.tif   (from erw-7)
@@ -98,43 +108,88 @@ econ_path <- function(alloc, crop)
 prod_stack <- rast(file.path(DATA, "spam_prod_processed.tif"))   # 23 layers, t/pixel
 ssa <- vect(file.path(DATA, "gadm_ssa.gpkg"))
 
-# Build the three area-weighted primitives (+ weight, value-of-production, CDR-t)
+# Feedstock constants for the net-export deduction. erw-7 already bakes the
+# deduction into `_cdr_net_tha`, but the sweep below has to be able to re-scale
+# the GROSS CDR rate and re-apply it, so we carry GROSS, LCA and the sink S
+# separately rather than re-scaling the already-deducted layer. See cdr_net().
+fs_chem <- read.csv(file.path(DATA, "basalt_feedstock_chemistry.csv"))
+get_fs  <- function(p) as.numeric(fs_chem$value[fs_chem$parameter == p])
+F_REEXPORT <- get_fs("CDR_eff_kg_per_t_ref") / (get_fs("effective_NV") * 1000)
+GRIND_KWH  <- get_fs("grinding_kWh_per_t")
+
+sink_file <- if (REGIME %in% c("year1","npv")) "caco3_kamprath.tif" else "caco3_merlos_maintenance.tif"
+S_raw  <- aggregate(rast(file.path(DATA, sink_file))[[1]], 10, mean, na.rm=TRUE)
+ci_raw <- rast(file.path(DATA, "grid_CI_kg_per_kWh.tif"))
+km_raw <- rast(file.path(DATA, "basalt_transport_km.tif"))
+
+# Build the area-weighted per-pixel primitives (+ weight, value-of-production, CDR-t)
 build_primitives <- function(alloc) {
-  num_agro <- num_bas <- num_cdrn <- wsum <- vop <- cdrt <- NULL
   ref <- rast(econ_path(alloc, CROPS[1]))[[1]]
+  lca_kg_per_t <- GRIND_KWH * resample(ci_raw, ref) + resample(km_raw, ref) * 0.12 + 0.5
+  S <- resample(S_raw, ref); S <- ifel(is.na(S), 0, S)
+
   z <- ref * 0
-  num_agro <- z; num_bas <- z; num_cdrn <- z; wsum <- z; vop <- z; cdrt <- z
+  num_agro <- z; num_bas <- z; num_cdrn <- z; num_gross <- z; num_lca <- z
+  wsum <- z; vop <- z; cdrt <- z
   for (cp in CROPS) {
-    r    <- rast(econ_path(alloc, cp))
-    ha   <- r[[paste0(cp, "_ha")]]
-    agro <- r[[paste0(cp, "_agro_return_usha")]]
-    bas  <- r[[paste0(cp, "_basalt_cost_usha")]]
-    cdrn <- r[[paste0(cp, "_cdr_net_tha")]]
-    gmc  <- r[[paste0(cp, "_gm_combined_usha")]]
+    r     <- rast(econ_path(alloc, cp))
+    ha    <- r[[paste0(cp, "_ha")]]
+    agro  <- r[[paste0(cp, "_agro_return_usha")]]
+    bas   <- r[[paste0(cp, "_basalt_cost_usha")]]
+    cdrn  <- r[[paste0(cp, "_cdr_net_tha")]]     # net-export, minus LCA (erw-7)
+    gross <- r[[paste0(cp, "_cdr_gross_tha")]]   # before any deduction
+    btha  <- r[[paste0(cp, "_basalt_tha")]]
+    gmc   <- r[[paste0(cp, "_gm_combined_usha")]]
     defined <- !is.na(gmc) & !is.na(ha) & ha > 0
-    w <- ifel(defined, ha, 0)
-    num_agro <- num_agro + ifel(defined, ifel(is.na(agro),0,agro) * w, 0)
-    num_bas  <- num_bas  + ifel(defined, ifel(is.na(bas), 0,bas)  * w, 0)
-    num_cdrn <- num_cdrn + ifel(defined, ifel(is.na(cdrn),0,cdrn) * w, 0)
-    wsum     <- wsum + w
-    cdrt     <- cdrt + ifel(defined, ifel(is.na(cdrn),0,cdrn) * w, 0)
+    w  <- ifel(defined, ha, 0)
+    nz <- function(x) ifel(is.na(x), 0, x)
+    num_agro  <- num_agro  + ifel(defined, nz(agro)  * w, 0)
+    num_bas   <- num_bas   + ifel(defined, nz(bas)   * w, 0)
+    num_cdrn  <- num_cdrn  + ifel(defined, nz(cdrn)  * w, 0)
+    num_gross <- num_gross + ifel(defined, nz(gross) * w, 0)
+    num_lca   <- num_lca   + ifel(defined, nz(btha * lca_kg_per_t / 1000) * w, 0)
+    wsum      <- wsum + w
+    cdrt      <- cdrt + ifel(defined, nz(cdrn) * w, 0)
     pr <- prod_stack[[which(CROPS == cp)]]
-    vop <- vop + ifel(defined, ifel(is.na(pr),0,pr) * crop_price[cp], 0)
+    vop <- vop + ifel(defined, nz(pr) * crop_price[cp], 0)
   }
-  ok   <- wsum > 0
-  AGRO <- ifel(ok, num_agro / wsum, NA)
-  BAS  <- ifel(ok, num_bas  / wsum, NA)
-  CDRN <- ifel(ok, num_cdrn / wsum, NA)
-  list(AGRO=AGRO, BAS=BAS, CDRN=CDRN,
-       WSUM=ifel(ok, wsum, NA), VOP=ifel(ok, vop, NA),
-       CDRT=ifel(ok, cdrt, NA), ok=ok)
+  ok <- wsum > 0
+  list(AGRO  = ifel(ok, num_agro  / wsum, NA),
+       BAS   = ifel(ok, num_bas   / wsum, NA),
+       CDRN  = ifel(ok, num_cdrn  / wsum, NA),
+       GROSS = ifel(ok, num_gross / wsum, NA),
+       LCA   = ifel(ok, num_lca   / wsum, NA),
+       S     = ifel(ok, S, NA),
+       WSUM  = ifel(ok, wsum, NA), VOP = ifel(ok, vop, NA),
+       CDRT  = ifel(ok, cdrt, NA), ok = ok)
 }
 
-# Envelopes from the primitives under arbitrary parameters
-envelopes <- function(P, carbon=CARBON_BASE, ymult=1, cmult=1, rmult=1) {
+# Durable CDR (t CO2/ha) under a GROSS-rate multiplier rmult and a net-export
+# partition lambda (1 = sequential bound, 0 = gross accounting):
+#
+#     cdr_net = max( max(rmult*GROSS - lambda*F*S, 0) - LCA , 0 )
+#
+# rmult multiplies GROSS, not the already-deducted net: the reactive fraction,
+# grain size, climate factor and exported fraction all scale gross CDR, while the
+# acidity sink F*S and the lifecycle term LCA are fixed subtrahends. Because of
+# the max(.,0), cdr_net is SUPER-linear in rmult, so scaling the net layer (as an
+# earlier version of this file did) compresses the lever on both sides -- at
+# rmult=2 the public envelope is 12.56 Mha under uniform-20, not 5.99 (targeted:
+# 5.90 vs 2.68). At rmult=1, lambda=1 this reproduces erw-7's `_cdr_net_tha`
+# exactly. See erw-12 for the full treatment.
+cdr_net <- function(P, rmult = 1, lambda = 1) {
+  pos <- function(x) ifel(x < 0, 0, x)
+  pos(pos(rmult * P$GROSS - lambda * F_REEXPORT * P$S) - P$LCA)
+}
+
+# Envelopes from the primitives under arbitrary parameters.
+# NOTE: the public envelope depends on (carbon, MRV, cmult) only through the
+# ratio (carbon - MRV)/cmult -- they are one lever, not three (see erw-12 Sec.1).
+envelopes <- function(P, carbon=CARBON_BASE, ymult=1, cmult=1, rmult=1, lambda=1) {
+  cdrn    <- cdr_net(P, rmult, lambda)
   gm_agro <- P$AGRO*ymult - P$BAS*cmult
-  gm_cdr  <- P$CDRN*rmult*(carbon-MRV) - P$BAS*cmult
-  gm_comb <- P$AGRO*ymult + P$CDRN*rmult*(carbon-MRV) - P$BAS*cmult
+  gm_cdr  <- cdrn*(carbon-MRV) - P$BAS*cmult
+  gm_comb <- P$AGRO*ymult + cdrn*(carbon-MRV) - P$BAS*cmult
   list(priv = gm_agro > 0, publ = gm_cdr > 0, comb = gm_comb > 0)
 }
 
@@ -298,17 +353,28 @@ cat("\nbaseline intersection:", round(base_ha,2), "Mha\n"); print(tor_df)
 # =============================================================================
 # Public-sufficiency reduces to a marginal-abatement-cost (MAC) test in which the
 # per-hectare dose cancels:
-#   MAC ($/tCO2) = cost_per_t_basalt / CDR_per_t_basalt = BAS / CDRN  (area-wt)
+#   MAC ($/tCO2) = cost_per_t_basalt / CDR_per_t_basalt = BAS / cdr_net (area-wt)
 # The public envelope is exactly { MAC < carbon_price - MRV }. Because realized
 # CDR per tonne basalt is small (~0.1-0.25 tCO2/t), MAC sits well above current
 # VCM prices on most cropland -> the CDR RATE, not the credit price, is binding.
-P <- PRIMS[["targeted"]]; ok <- P$ok
-MAC <- ifel(P$CDRN > 0 & ok, P$BAS / P$CDRN, NA)
+#
+# ALLOCATION. The carbon case is led on UNIFORM-20, not on the targeted dose. The
+# acidity sink F*S is a soil property and is near-constant across allocation rules,
+# while gross CDR scales with the dose -- so the lime-requirement (targeted) dose
+# is CDR-MINIMAL by construction: essentially all of its alkalinity is consumed
+# neutralizing the acidity it was sized to neutralize, and little exports. Leading
+# the carbon case on `targeted` understates the public envelope by ~1.9x in area
+# and ~3.1x in tonnage (1.65 -> 3.16 Mha; 4.85 -> 15.11 Mt). Targeted remains the
+# lead for the private/agronomic envelope and for the targeting sections above.
+# This is the dose-design corollary of paper/netexport-cdr-memo.md Sec.3.
+PUBLIC_ALLOC <- "uniform_20"
+P <- PRIMS[[PUBLIC_ALLOC]]; ok <- P$ok
+MAC <- ifel(cdr_net(P) > 0 & ok, P$BAS / cdr_net(P), NA)
 
-png(file.path(MAP_OUT,"mac_targeted.png"), width=1200, height=1100, res=150)
+png(file.path(MAP_OUT, sprintf("mac_%s.png", PUBLIC_ALLOC)), width=1200, height=1100, res=150)
 par(mar=c(2,2,3.5,4))
 plot(clamp(MAC,0,500),
-     main="Marginal abatement cost of ERW-CDR ($/tCO2)\n= delivered cost per t basalt / CDR per t basalt, targeted",
+     main=sprintf("Marginal abatement cost of ERW-CDR ($/tCO2)\n= delivered cost per t basalt / CDR per t basalt, %s", PUBLIC_ALLOC),
      col=rev(hcl.colors(20,"Inferno")), axes=FALSE, range=c(0,500),
      plg=list(title="$/tCO2", cex=0.8))
 plot(ssa, add=TRUE, lwd=0.3, border="grey30"); dev.off()
@@ -320,11 +386,37 @@ area_of <- function(which=c("public","intersection"),
   as.numeric(global(ifel(m & ok, P$WSUM, 0), "sum", na.rm=TRUE))/1e6
 }
 
-# carbon-price ladder
-ladder_p <- c(50,100,130,150,200,250,300,400,500,750,1000)
+# carbon-price ladder. Shares are of the TREATED cropland under this allocation --
+# note the denominator is allocation-specific: the targeted dose is applied only to
+# acid-eligible pixels (17.6 Mha) while a uniform dose goes on all cropland the 23
+# SPAM crops occupy (32.6 Mha at uniform-20). Always report which base is in use.
+treated_Mha <- as.numeric(global(ifel(ok, P$WSUM, 0), "sum", na.rm=TRUE))/1e6
+ALL_CROPLAND_MHA <- 146   # SSA harvested cropland, SPAM
+cat(sprintf("\ntreated cropland under %s: %.2f Mha\n", PUBLIC_ALLOC, treated_Mha))
+
+cdr_of <- function(carbon=CARBON_BASE, rmult=1, cmult=1) {
+  e <- envelopes(P, carbon=carbon, ymult=1, cmult=cmult, rmult=rmult)
+  as.numeric(global(ifel(e$publ & ok, cdr_net(P, rmult)*P$WSUM, 0), "sum", na.rm=TRUE))/1e6
+}
+ladder_p <- c(50,100,130,150,200,250,300,350,400,500,750,1000)
 ladder <- data.frame(carbon_usd=ladder_p,
-  public_Mha=sapply(ladder_p, function(p) round(area_of("public", carbon=p),2)))
+  public_Mha  = sapply(ladder_p, function(p) round(area_of("public", carbon=p),2)),
+  pct_treated = sapply(ladder_p, function(p) round(100*area_of("public",carbon=p)/treated_Mha,1)),
+  pct_all_cropland = sapply(ladder_p, function(p) round(100*area_of("public",carbon=p)/ALL_CROPLAND_MHA,1)),
+  durable_CDR_Mt = sapply(ladder_p, function(p) round(cdr_of(carbon=p),1)))
 write.csv(ladder, file.path(TBL_OUT,"output-public-mac-price-ladder.csv"), row.names=FALSE)
+print(ladder)
+
+# price-ladder figure on the HEADLINE basis (equilibrium, net-export, PUBLIC_ALLOC)
+png(file.path(MAP_OUT, sprintf("public_area_vs_price_%s.png", PUBLIC_ALLOC)),
+    width=1200, height=950, res=150)
+par(mar=c(4.6,4.8,3.4,1.4))
+plot(ladder$carbon_usd, ladder$public_Mha, type="b", pch=19, lwd=2, col="#2156a8",
+     xlab="VCM carbon price ($/tCO2)", ylab="Public-sufficient area (Mha)",
+     main=sprintf("Carbon-alone deployable area vs credit price\n(equilibrium, net-export, %s)", PUBLIC_ALLOC))
+abline(v=CARBON_BASE, lty=2, col="grey45")
+text(CARBON_BASE, max(ladder$public_Mha)*0.95, " $150 today", pos=4, cex=0.8, col="grey30")
+dev.off()
 
 # CDR-rate sweep (the binding lever)
 rmults <- c(0.5,0.75,1.0,1.25,1.5,2.0,2.5)
@@ -333,7 +425,12 @@ cdr_sens <- data.frame(cdr_rate_mult=rmults,
   intersection_Mha = sapply(rmults, function(r) round(area_of("intersection", rmult=r),2)))
 write.csv(cdr_sens, file.path(TBL_OUT,"output-cdr-rate-sensitivity.csv"), row.names=FALSE)
 
-# lever comparison on the public envelope
+# Lever comparison on the public envelope.
+# NOTE the carbon-price and delivered-cost rows are the SAME lever seen at
+# different step sizes: the public envelope depends on (carbon, MRV, cmult) only
+# through (carbon - MRV)/cmult. +33% carbon takes the ratio 130 -> 180 (x1.38);
+# -33% delivered cost takes it 130 -> 194 (x1.49). Kept for continuity with the
+# memo, but erw-12 reports the collapsed, band-free version.
 base_pub <- area_of("public")
 levers <- c("+33% carbon ($200)"  = area_of("public", carbon=200),
             "-33% delivered cost" = area_of("public", cmult=0.67),
@@ -342,12 +439,13 @@ levers <- c("+33% carbon ($200)"  = area_of("public", carbon=200),
 lever_pct <- round(100*(levers/base_pub - 1), 0)
 
 # two-panel CDR-rate sensitivity figure
-png(file.path(MAP_OUT,"cdr_rate_sensitivity_panel.png"), width=2000, height=850, res=150)
+png(file.path(MAP_OUT, sprintf("cdr_rate_sensitivity_panel_%s.png", PUBLIC_ALLOC)),
+    width=2000, height=850, res=150)
 par(mfrow=c(1,2), mar=c(4.5,4.5,3.5,1))
 plot(rmults, cdr_sens$public_Mha, type="b", pch=19, col="#2156a8", lwd=2,
      ylim=c(0, max(cdr_sens$public_Mha)),
-     xlab="CDR-rate multiplier (x realized tCO2 per t basalt)", ylab="Area (Mha)",
-     main="(a) Envelope area vs CDR rate (targeted, $150/tCO2)")
+     xlab="CDR-rate multiplier (x GROSS tCO2 per t basalt)", ylab="Area (Mha)",
+     main=sprintf("(a) Envelope area vs CDR rate (%s, $150/tCO2)", PUBLIC_ALLOC))
 lines(rmults, cdr_sens$intersection_Mha, type="b", pch=15, col="#7d1f8c", lwd=2)
 abline(v=1, lty=2)
 legend("topleft", c("public-sufficient","intersection"),
