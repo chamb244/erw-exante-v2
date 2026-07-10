@@ -1,0 +1,3 @@
+"hypothesis","max_abs_residual_tCO2_ha"
+"net = max(gross - LCA, 0)  [NO net-export]",8.9819398851887e-07
+"net = max(max(gross - F*S,0) - LCA, 0)  [net-export]",0.571065784949515
