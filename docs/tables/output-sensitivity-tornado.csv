@@ -1,0 +1,5 @@
+"parameter","min_inter_Mha","max_inter_Mha","swing_Mha"
+"cost_mult",0,2.36,2.36
+"cdr_rate_mult",0,1.61,1.61
+"carbon_price",0,1.59,1.59
+"yield_mult",0.8,1.56,0.76
