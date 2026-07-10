@@ -1,0 +1,6 @@
+lever,inter_low,inter_high,inter_swing,public_low,public_high,public_swing
+CDR rate (x0.5-1.5),0.0,1.52,1.52,0.0,2.32,2.32
+Carbon price ($100-250),0.34,1.59,1.25,0.35,2.51,2.16
+Delivered cost (x1.5-0.75),0.49,1.69,1.21,0.57,2.18,1.61
+Yield uplift (x0.75-1.5),1.05,1.43,0.38,1.65,1.65,0.0
+MRV cost ($40-10),0.99,1.28,0.3,1.24,1.81,0.57

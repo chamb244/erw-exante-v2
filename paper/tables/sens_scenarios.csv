@@ -1,0 +1,13 @@
+scenario,envelope,carbon,mrv,cmult,rmult,ymult,area_Mha,private_M,cdr_Mt
+Conservative,Private,100,40,1.5,0.5,0.75,1.36,1751,3.6
+Conservative,Public,100,40,1.5,0.5,0.75,0.0,0,0.0
+Conservative,Intersection,100,40,1.5,0.5,0.75,0.0,0,0.0
+Conservative,Combined,100,40,1.5,0.5,0.75,1.64,1896,4.1
+Central,Private,150,20,1.0,1.0,1.0,4.31,3496,7.1
+Central,Public,150,20,1.0,1.0,1.0,1.65,1339,4.8
+Central,Intersection,150,20,1.0,1.0,1.0,1.2,1274,3.9
+Central,Combined,150,20,1.0,1.0,1.0,6.85,4311,10.9
+Optimistic,Private,250,10,0.75,1.5,1.5,8.73,4868,12.0
+Optimistic,Public,250,10,0.75,1.5,1.5,8.76,3689,15.8
+Optimistic,Intersection,250,10,0.75,1.5,1.5,5.44,3169,10.2
+Optimistic,Combined,250,10,0.75,1.5,1.5,14.24,5674,19.0
