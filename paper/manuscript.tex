@@ -507,17 +507,22 @@ with no model re-run. We probe robustness over delivered cost ($\times$0.5--2.0)
 carbon price (\$50--250), yield benefit ($\times$0.5--2.0), the CDR rate
 ($\times$0.5--1.5), and the net-export partition $\lambda\in[0,1]$ of
 Section~\ref{sec:netexport}, and define a pixel's robustness score as the fraction
-of that grid under which it remains in the intersection. Two properties of the
-public envelope discipline how we read that grid, and are derived in
-Section~\ref{sec:public}: the price, MRV, and delivered-cost axes collapse to the
-single ratio $(p-m)/c_t$, and the CDR-rate multiplier must be applied to gross
-removal, before the acidity-sink deduction, because durable removal is super-linear
-in it. Envelopes and the targeting geography are reproducible via the
-\texttt{erw-11} script; the public-envelope sensitivity, including the collapse and
-the $\lambda$ sweep, via \texttt{erw-12}. Both read the decomposed cost, gross
-removal, and acidity-sink layers that \texttt{erw-7} writes, so no figure in this
-paper depends on which of the two accounting conventions is baked into the stored
-net-removal layer.
+of that grid under which it remains in the intersection. Two algebraic properties
+discipline how we read that grid, and are derived where they bite. Both envelope
+tests are homogeneous of degree zero in the delivered cost, so the five economic
+parameters reduce to four effective knobs for the intersection --- $y/c$,
+$(p-m)/c$, $r$ and $\lambda$ (Section~\ref{sec:robust}) --- and to just two for the
+carbon-only envelope, which does not depend on yield (Section~\ref{sec:public}).
+Our sweep is therefore a $180$-point grid over those four knobs, not a
+five-dimensional grid whose axes would be partly redundant. And the CDR-rate
+multiplier is applied to \emph{gross} removal, before the acidity-sink deduction,
+because durable removal is super-linear in it. All robustness results are computed
+in the equilibrium steady state with net-export accounting, the same regime on
+which we lead the carbon case. Envelopes and the targeting geography are
+reproducible via the \texttt{erw-11} script; the public-envelope sensitivity via
+\texttt{erw-12}. Both read the decomposed cost, gross removal, and acidity-sink
+layers that \texttt{erw-7} writes, so no figure in this paper depends on which of
+the two accounting conventions is baked into the stored net-removal layer.
 
 %=============================================================================
 \section{Results}\label{sec:results}
@@ -828,16 +833,49 @@ private one. The two policy levers are thus complementary and target different
 margins.
 
 \subsection{Targeting and robustness}\label{sec:robust}
-Repeating the envelope construction across the full parameter grid yields a
-per-pixel robustness score (Figure~\ref{fig:core}). Under the NPV regime no
-pixel survives the entire deliberately wide grid; the intersection is inherently
-parameter-sensitive. A core-targeting tier (in the intersection under at least
-half the grid) collapses to a small, high-confidence set concentrated in the
-Cameroon highlands, while a broader candidate tier (at least one-third of the
-grid) covers \(\sim\)0.8~Mha, \(\sim\)0.5~M farms, and \(\sim\)\$0.75~B of crop
-value, extending into the Guinean and Ethiopian highlands -- areas where acidic
-soils, a favorable weathering climate, basalt proximity, and adequate crop
-prices coincide.
+We compute the robustness of the doubly-justified geography on the same
+equilibrium steady state with net-export accounting on which the carbon case is
+led. The intersection test is homogeneous of degree zero in the delivered cost:
+dividing both envelope conditions by the cost multiplier $c$ leaves
+$\text{private}: a_i\,(y/c) > c_i$ and
+$\text{public}: \delta_i(r,\lambda)\,\bigl((p-m)/c\bigr) > c_i$, so the
+intersection depends on the five economic parameters only through \emph{four}
+effective knobs: the yield/cost ratio $y/c$, the net-price/cost ratio $(p-m)/c$,
+the CDR-rate multiplier $r$ applied to gross removal, and the net-export partition
+$\lambda$. We sweep a $5\times4\times3\times3 = 180$-point grid over these and
+define a pixel's robustness score as the fraction of the grid under which it
+remains in the intersection (Figure~\ref{fig:core}a).
+
+No pixel survives more than 58\% of this deliberately wide grid: the
+doubly-justified case is inherently parameter-sensitive. A core-targeting tier
+(in the intersection under at least half the grid) covers 0.59~Mha,
+\(\sim\)0.35~M farms and \(\sim\)\$0.54~B of crop value, and a broader candidate
+tier (at least one-third) covers 1.14~Mha, \(\sim\)0.70~M farms and
+\(\sim\)\$0.99~B (Figure~\ref{fig:core}b). Both concentrate sharply in the
+Cameroon highlands (0.43~Mha core, 0.57~Mha candidate) and the Guinean highlands
+(0.15 and 0.38~Mha), extending thinly into the Ethiopian highlands, Tanzania and
+Sierra Leone -- areas where acidic soils, a favorable weathering climate, basalt
+proximity, and adequate crop prices coincide. Two-thirds of the candidate tier
+lies in two countries.
+
+A one-at-a-time tornado around the central case (baseline intersection 1.20~Mha)
+ranks the four knobs: the CDR rate swings the intersection by 1.61~Mha, the
+net-price/cost ratio by 1.59~Mha, the yield/cost ratio by 0.76~Mha, and $\lambda$
+by only 0.26~Mha. Two readings matter. First, on the intersection the CDR rate and
+the price--cost ratio are effectively \emph{tied}; the CDR rate's clear lead over
+price appears in the carbon-only envelope (Section~\ref{sec:public}), not here,
+because the intersection is jointly constrained by the agronomic test that the CDR
+rate does not enter. Second, earlier drafts reported delivered cost as the dominant
+lever by a wide margin. On this basis its raw swing is indeed the largest
+(2.36~Mha), but that is an artifact of aggregation rather than a separate
+mechanism: cost is the only parameter that moves \emph{both} ratios. Holding $y/c$
+fixed, its public channel swings the intersection by 1.66~Mha; holding $(p-m)/c$
+fixed, its private channel swings it by 0.76~Mha -- exactly the yield swing, as it
+must be, since yield moves $y/c$ and nothing else. Delivered cost matters because
+it is levered twice, not because logistics dominates weathering. The reassuring
+corollary stands: the yield benefit, the most uncertain input given the thin
+field-trial base, is among the least influential, and $\lambda$ -- the
+most-scrutinized modeling choice -- is the least influential of all.
 
 The carbon case behaves very differently across regimes once durable removal is
 credited (Table~\ref{tab:regimes}). Under gross accounting the public envelope
@@ -869,11 +907,15 @@ Net-export   & 0.14 & 1.65 & 19 & 19 \\
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.72\textwidth]{core_priority_npv.png}
-\caption{Core-targeting tiers under the NPV regime. Red = robust core
-(intersection under $\geq$50\% of the parameter grid); orange = candidate tier
-($\geq$33\%). The core concentrates where soil acidity, weathering climate,
-basalt access, and crop value coincide.}
+\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{robustness_intersection_eqnx.png}\caption{Per-pixel robustness score}\end{subfigure}
+\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{core_priority_eqnx.png}\caption{Core-targeting tiers}\end{subfigure}
+\caption{Robustness of the doubly-justified geography, computed on the headline
+equilibrium steady state with net-export accounting. (a) Fraction of the 180-point
+grid over the four effective knobs ($y/c$, $(p-m)/c$, $r$, $\lambda$) under which a
+pixel remains in the intersection; no pixel exceeds 0.58. (b) Red = robust core
+(intersection under $\geq$50\% of the grid); orange = candidate tier ($\geq$33\%).
+The core concentrates where soil acidity, weathering climate, basalt access, and
+crop value coincide.}
 \label{fig:core}
 \end{figure}
 
@@ -897,15 +939,25 @@ yield gain, and program design must decide how that joint surplus is split
 between buyer and farmer.
 
 \paragraph{The carbon case is CDR-quantification risk, not price risk.}
-Equation~\eqref{eq:mac} and Figure~\ref{fig:cdrrate} show that the public
-envelope hinges on the realized removal per tonne of rock, the single largest
-lever and the least-resolved scientific quantity. For investors this relocates
-the central risk from the carbon market (price) to measurement, reporting, and
-verification (quantity and durability). It also reframes MRV: the \$20/\tco{}
-MRV cost is not merely a deduction but the mechanism that converts an uncertain
-$\delta_t$ into a sellable, high-integrity tonne. Investment in cheaper, tighter
-measurement raises the \emph{effective} CDR rate that can be monetized -- exactly
-where the leverage lies.
+Equation~\eqref{eq:mac} and Figure~\ref{fig:cdrrate} show that the public envelope
+hinges on the realized removal per tonne of rock, the largest lever on the
+carbon-only case and the least-resolved scientific quantity. The claim should be
+stated with its margin. On the carbon-only envelope the CDR rate leads the
+price--cost ratio by 4.9 to 4.6~Mha of swing, and on the doubly-justified
+intersection the two are effectively tied (1.61 versus 1.59~Mha); at small
+perturbations the cost lever is if anything the stronger. What distinguishes
+$\delta_t$ is the \emph{shape} of its response, not its local slope: because the
+acidity sink and lifecycle emissions are fixed subtrahends, durable removal is
+super-linear in $\delta_t$, so large improvements in the realized rate compound in a
+way that price and cost improvements do not. Doubling $\delta_t$ nearly quadruples
+the public envelope; no plausible price or cost move comes close. Together with the
+observation that price, MRV, and delivered cost are one lever rather than three,
+this relocates the central risk for investors from the carbon market (price) to
+measurement, reporting, and verification (quantity and durability). It also
+reframes MRV: the \$20/\tco{} MRV cost is not merely a deduction but the mechanism
+that converts an uncertain $\delta_t$ into a sellable, high-integrity tonne.
+Investment in cheaper, tighter measurement raises the \emph{effective} CDR rate that
+can be monetized -- exactly where the leverage lies.
 
 \paragraph{Targeting and sequencing.} The robustness analysis points to a small
 core geography that is attractive across a wide range of assumptions, and a

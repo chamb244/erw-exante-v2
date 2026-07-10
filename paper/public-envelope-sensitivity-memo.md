@@ -140,8 +140,14 @@ alkalinity, not by clearing a larger fraction of what it treats.
    as area-weighted. Area-weighted is `$426` (targeted), `$372` (uniform-20).
 6. Methods robustness paragraph now names λ as a swept lever and cites `erw-12`.
 
-Still open, and **not** done here: `core_priority_npv.png` and §`sec:robust` remain on the
-NPV/gross basis (PROPOSAL §1.1). Those concern the *intersection*, not the public envelope.
+7. §`sec:robust` and `fig:core` recomputed on the headline equilibrium net-export basis,
+   closing the regime mismatch of PROPOSAL §1.1. See `draft-robustness-section.md`.
+
+The intersection collapses too, but to **four** knobs rather than two, since the private test
+survives: `y/c`, `(p−m)/c`, `r`, `λ`. Delivered cost is the only parameter that moves two of
+them, which is why earlier drafts read it as the dominant lever — its 2.36 Mha swing is a
+1.66 Mha public channel plus a 0.76 Mha private channel, and that 0.76 is exactly the yield
+swing. Core tier 0.59 Mha, candidate 1.14 Mha; no pixel exceeds a robustness score of 0.58.
 
 ## 6. Caveats
 

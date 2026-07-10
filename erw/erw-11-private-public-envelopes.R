@@ -282,31 +282,70 @@ print(do.call(rbind, summary_rows))
 # =============================================================================
 # 2) targeting robustness sweep (primary allocation: targeted)
 # =============================================================================
-CMULT <- c(0.5,0.75,1.0,1.5,2.0)   # delivered basalt cost
-CPRICE<- c(50,100,150,250)         # VCM carbon price
-YMULT <- c(0.5,1.0,1.5,2.0)        # yield-benefit
-RMULT <- c(0.5,1.0,1.5)            # CDR-rate
+# The intersection test is homogeneous of degree zero in the delivered cost. Divide
+# both envelope conditions by the cost multiplier c:
+#
+#     private : AGRO * (ymult/c)        > BAS
+#     public  : cdr_net(r,lambda) * ((carbon - MRV)/c) > BAS
+#
+# so the intersection depends on the five economic parameters ONLY through four
+# effective knobs: the yield/cost ratio y/c, the net-price/cost ratio (p-m)/c, the
+# CDR-rate multiplier r, and the net-export partition lambda. Verified exactly:
+# (y,c,p) = (1,1,150), (2,2,280), (0.5,0.5,85) all give 1.2002 Mha.
+#
+# This is why the delivered cost looked like the dominant lever in earlier drafts:
+# it is the ONLY parameter that moves BOTH ratios at once. Its 2.36 Mha swing
+# decomposes into a public channel (1.66 Mha, holding y/c fixed) and a private
+# channel (0.76 Mha, holding (p-m)/c fixed) -- and that 0.76 is exactly the yield
+# swing, as it must be, since yield moves y/c and nothing else. Cost is not a
+# separate mechanism; it is the two ratios moving together.
+#
+# Everything below is on the HEADLINE basis (equilibrium, net-export), matching the
+# regime on which the carbon case is led. Earlier drafts computed this section on
+# the NPV/gross grid -- a regime mismatch.
+YC  <- c(0.5, 0.75, 1.0, 1.5, 2.0)   # yield / delivered-cost ratio
+PC  <- c(30, 80, 130, 230)           # (carbon - MRV) / delivered-cost ratio
+RM  <- c(0.5, 1.0, 1.5)              # CDR-rate multiplier (scales GROSS)
+LAM <- c(0.0, 0.5, 1.0)              # net-export partition
+
 P <- PRIMS[["targeted"]]; ok <- P$ok
-grid <- expand.grid(c=CMULT, cp=CPRICE, y=YMULT, r=RMULT)
+
+# vectorise over live cells: 180 combos of raster algebra would be needlessly slow
+cells <- which(!is.na(values(P$WSUM)) & values(P$WSUM) > 0)
+Av <- values(P$AGRO)[cells];  Bv <- values(P$BAS)[cells]
+Gv <- values(P$GROSS)[cells]; Lv <- values(P$LCA)[cells]
+Sv <- values(P$S)[cells];     Wv <- values(P$WSUM)[cells]
+posv <- function(x) pmax(x, 0)
+cdrv <- function(r, lam) posv(posv(r*Gv - lam*F_REEXPORT*Sv) - Lv)
+
+grid <- expand.grid(yc=YC, pc=PC, r=RM, lam=LAM)
 N <- nrow(grid)
-freq_i <- ref0*0; freq_c <- ref0*0
+freq_i <- numeric(length(cells)); freq_c <- numeric(length(cells))
 for (i in seq_len(N)) {
-  g <- grid[i,]; e <- envelopes(P, g$cp, g$y, g$c, g$r)
-  freq_i <- freq_i + ifel((e$priv & e$publ) & ok, 1, 0)
-  freq_c <- freq_c + ifel(e$comb & ok, 1, 0)
+  g  <- grid[i, ]; cd <- cdrv(g$r, g$lam)
+  pr <- Av*g$yc > Bv
+  pu <- cd*g$pc > Bv
+  freq_i <- freq_i + (pr & pu)
+  freq_c <- freq_c + (Av*g$yc + cd*g$pc > Bv)
 }
-robust_i <- mask(freq_i/N, ok, maskvalue=FALSE)
-robust_c <- mask(freq_c/N, ok, maskvalue=FALSE)
+cat(sprintf("\nrobustness sweep: %d combos over (y/c, (p-m)/c, r, lambda)\n", N))
+
+mkrast <- function(v) { r <- ref0; values(r) <- NA_real_; r[cells] <- v; r }
+robust_i <- mkrast(freq_i/N); robust_c <- mkrast(freq_c/N)
 plot_cont(robust_i, "robustness_intersection.png",
-  sprintf("Robustness of the intersection (%d combos)", N), hcl.colors(20,"Inferno"),"frac")
+  sprintf("Robustness of the intersection (%d combos, equilibrium net-export)", N),
+  hcl.colors(20,"Inferno"), "frac")
 plot_cont(robust_c, "robustness_combined.png",
-  sprintf("Robustness of profitability (%d combos)", N), hcl.colors(20,"Viridis"),"frac")
+  sprintf("Robustness of profitability (%d combos, equilibrium net-export)", N),
+  hcl.colors(20,"Viridis"), "frac")
 
 core <- robust_i >= 0.50; cand <- robust_i >= 0.33
 plot_cat(ifel(core,1,ifel(cand,2,0)), "core_priority.png",
-  "Core targeting tiers (full-grid robustness)",
+  "Core targeting tiers (equilibrium, net-export)",
   c(0,2,1), c("grey85","#f4a259","#b30000"),
   c("outside","candidate >=33%","core >=50%"))
+cat(sprintf("max per-pixel robustness score: %.2f\n",
+    max(freq_i)/N))
 
 core_summary <- rbind(
   cbind(tier="core_>=50%",  summarize_mask(P, core & ok)),
@@ -322,31 +361,37 @@ core_country <- core_country[order(-core_country$core_Mha),]
 write.csv(core_country, file.path(TBL_OUT,"output-core-priority-by-country.csv"), row.names=FALSE)
 
 # =============================================================================
-# 3) one-at-a-time tornado: total intersection ha vs each parameter
+# 3) one-at-a-time tornado: total intersection ha vs each EFFECTIVE knob
 # =============================================================================
-inter_ha <- function(carbon, ymult, cmult, rmult) {
-  e <- envelopes(P, carbon, ymult, cmult, rmult)
-  as.numeric(global(ifel((e$priv & e$publ) & ok, P$WSUM, 0), "sum", na.rm=TRUE))/1e6
-}
-base_ha <- inter_ha(CARBON_BASE, 1, 1, 1)
-axes <- list(carbon_price=list("carbon",CPRICE), yield_mult=list("ymult",YMULT),
-             cost_mult=list("cmult",CMULT), cdr_rate_mult=list("rmult",RMULT))
-tor <- list()
-for (nm in names(axes)) {
-  key <- axes[[nm]][[1]]; vals <- axes[[nm]][[2]]; hh <- numeric(length(vals))
-  for (j in seq_along(vals)) {
-    args <- list(CARBON_BASE,1,1,1)
-    names(args) <- c("carbon","ymult","cmult","rmult")
-    args[[c(carbon="carbon",ymult="ymult",cmult="cmult",rmult="rmult")[key]]] <- vals[j]
-    hh[j] <- do.call(inter_ha, args)
-  }
-  tor[[nm]] <- data.frame(parameter=nm, min_inter_Mha=round(min(hh),2),
-                          max_inter_Mha=round(max(hh),2), swing_Mha=round(max(hh)-min(hh),2))
-}
-tor_df <- do.call(rbind, tor); tor_df <- tor_df[order(-tor_df$swing_Mha),]
+# Reported on the four knobs the intersection actually depends on. The raw
+# delivered-cost lever is reported too, but decomposed: it is not a fifth
+# mechanism, it is y/c and (p-m)/c moving together.
+inter_v <- function(yc=1, pc=RATIO0, r=1, lam=1)
+  sum(Wv[(Av*yc > Bv) & (cdrv(r,lam)*pc > Bv)]) / 1e6
+RATIO0 <- CARBON_BASE - MRV          # = 130, the central net price per unit cost
+base_ha <- inter_v()
+
+sweep1 <- function(vals, f) { h <- sapply(vals, f); c(min(h), max(h)) }
+rows <- list(
+  c("yield/cost ratio y/c (x0.5-2.0)",        sweep1(YC,  function(x) inter_v(yc=x)),        "private"),
+  c("net-price/cost ratio (p-m)/c (30-230)",  sweep1(PC,  function(x) inter_v(pc=x)),        "public"),
+  c("CDR rate r (x0.5-1.5)",                  sweep1(RM,  function(x) inter_v(r=x)),         "public"),
+  c("net-export lambda (0-1)",                sweep1(LAM, function(x) inter_v(lam=x)),       "public"),
+  c("[delivered cost c (x0.5-2.0)]",          sweep1(c(0.5,0.75,1,1.5,2),
+       function(x) inter_v(yc=1/x, pc=RATIO0/x)),                                            "both"),
+  c("  -- its public channel only",           sweep1(c(0.5,0.75,1,1.5,2),
+       function(x) inter_v(yc=1, pc=RATIO0/x)),                                              "public"),
+  c("  -- its private channel only",          sweep1(c(0.5,0.75,1,1.5,2),
+       function(x) inter_v(yc=1/x, pc=RATIO0)),                                              "private")
+)
+tor_df <- do.call(rbind, lapply(rows, function(z) data.frame(
+  knob = z[1], min_inter_Mha = round(as.numeric(z[2]),2),
+  max_inter_Mha = round(as.numeric(z[3]),2),
+  swing_Mha = round(as.numeric(z[3]) - as.numeric(z[2]), 2), acts_on = z[4])))
 write.csv(tor_df, file.path(TBL_OUT,"output-sensitivity-tornado.csv"), row.names=FALSE)
 
-cat("\nbaseline intersection:", round(base_ha,2), "Mha\n"); print(tor_df)
+cat("\nbaseline intersection:", round(base_ha,2), "Mha (equilibrium, net-export)\n")
+print(tor_df, row.names=FALSE)
 
 # =============================================================================
 # 4) public/VCM envelope: marginal abatement cost + CDR-rate sensitivity panel
