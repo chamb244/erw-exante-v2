@@ -579,10 +579,10 @@ Cost. \emph{CDR} is durable net-export removal (Mt).}
 \toprule
 Allocation & Envelope & Area & Private (\$M) & Public (\$M) & Cost (\$M) & CDR (Mt) \\
 \midrule
-Targeted   & Private        & 4.31 & 3{,}496 & 929 & 1{,}743 & 7.1 \\
+Targeted   & Private        & 4.31 & 3{,}496 & 930 & 1{,}743 & 7.2 \\
 Targeted   & Public         & 1.65 & 1{,}339 & 630 & 434 & 4.8 \\
 Targeted   & \textbf{Intersection} & \textbf{1.20} & \textbf{1{,}274} & \textbf{510} & \textbf{337} & \textbf{3.9} \\
-Targeted   & Combined $>0$  & 6.85 & 4{,}311 & 1{,}418 & 2{,}788 & 10.9 \\
+Targeted   & Combined $>0$  & 6.86 & 4{,}312 & 1{,}419 & 2{,}789 & 10.9 \\
 \midrule
 Uniform 10 & Private        & 3.52 & 3{,}277 & 710 & 1{,}432 & 5.5 \\
 Uniform 10 & Public         & 2.75 & 1{,}364 & 809 & 610 & 6.2 \\
@@ -595,7 +595,7 @@ Uniform 20 & \textbf{Intersection} & \textbf{0.74} & \textbf{1{,}124} & \textbf{
 Uniform 20 & Combined $>0$  & 5.13 & 2{,}973 & 2{,}758 & 3{,}165 & 21.2 \\
 \midrule
 Uniform 50 & Private        & 0.45 & 997 & 796 & 519 & 6.1 \\
-Uniform 50 & Public         & 3.38 & 1{,}452 & 5{,}438 & 3{,}850 & 41.8 \\
+Uniform 50 & Public         & 3.38 & 1{,}452 & 5{,}437 & 3{,}850 & 41.8 \\
 Uniform 50 & \textbf{Intersection} & \textbf{0.41} & \textbf{890} & \textbf{754} & \textbf{439} & \textbf{5.8} \\
 Uniform 50 & Combined $>0$  & 3.84 & 1{,}827 & 6{,}020 & 4{,}632 & 46.3 \\
 \bottomrule
@@ -816,21 +816,25 @@ envelope depends on them only through $(p-m)/c_t$.}
 \end{figure}
 
 \subsection{Cost-side levers: at-scale solar haulage}\label{sec:solar}
-Transport is the largest single component of delivered cost (\(\sim\)56\% on
-average, median \(\sim\)65\%) and is wholly variable in distance. We evaluate an
-at-scale solar-electric haulage scenario that displaces the fuel/energy portion
-of trucking cost. Grounding the energy share in trucking-cost data and the
-diesel-to-solar-electric energy gap implies a feasible \(\sim\)25\% reduction in
-the transport term (range 15--40\%), i.e.\ \(\sim\)14\% off average delivered
-cost. Applied to the grid (NPV basis, for comparability with the sensitivity grid),
-this widens the \emph{private} envelope materially
-(2.0 to 2.6~Mha at $-$25\%, to 3.1~Mha at $-$40\%) but the public envelope only
-slightly (1.8 to 1.9~Mha), confirming the asymmetry implied by
-equation~\eqref{eq:mac}: cost reductions relax the private test directly but
-relax the public test only to the extent the MAC falls below the credit price.
-Carbon price and CDR rate move the public envelope; logistics cost moves the
-private one. The two policy levers are thus complementary and target different
-margins.
+Transport is the largest single component of delivered cost (\(\sim\)55\% on
+average, median \(\sim\)66\%) and is wholly variable in distance. We evaluate an
+at-scale solar-electric haulage scenario that displaces the fuel/energy portion of
+trucking cost. Grounding the energy share in trucking-cost data and the
+diesel-to-solar-electric energy gap implies a feasible \(\sim\)25\% reduction in the
+transport term (range 15--40\%), i.e.\ \(\sim\)14\% off average delivered cost.
+Applied to the headline grid (equilibrium steady state, net-export accounting,
+targeted allocation, so the comparison is against the headline envelopes), this
+widens the \emph{private} envelope materially --- from 4.31 to 5.12~Mha at $-$25\%
+and to 5.80~Mha at $-$40\% --- but the durable public envelope only slightly, from
+1.65 to 1.76 and 1.84~Mha. The intersection tracks the private side (1.20 to 1.29
+and 1.36~Mha). This confirms the asymmetry implied by equation~\eqref{eq:mac}: a
+cost reduction relaxes the private test dollar-for-dollar, but relaxes the public
+test only where it drags a pixel's marginal abatement cost below the net credit
+price, which happens on comparatively little land. Carbon price and CDR rate move
+the public envelope; logistics cost moves the private one. The two policy levers are
+thus complementary and target different margins. (This scenario holds transport LCA
+emissions fixed; because solar haulage would also cut them, the public-side gain
+reported here is a conservative lower bound.)
 
 \subsection{Targeting and robustness}\label{sec:robust}
 We compute the robustness of the doubly-justified geography on the same

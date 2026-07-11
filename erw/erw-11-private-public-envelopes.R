@@ -121,19 +121,23 @@ F_REEXPORT <- get_fs("CDR_eff_kg_per_t_ref") / (get_fs("effective_NV") * 1000)
 GRIND_KWH  <- get_fs("grinding_kWh_per_t")
 
 sink_file <- if (REGIME %in% c("year1","npv")) "caco3_kamprath.tif" else "caco3_merlos_maintenance.tif"
-S_raw  <- aggregate(rast(file.path(DATA, sink_file))[[1]], 10, mean, na.rm=TRUE)
-ci_raw <- rast(file.path(DATA, "grid_CI_kg_per_kWh.tif"))
-km_raw <- rast(file.path(DATA, "basalt_transport_km.tif"))
+S_raw     <- aggregate(rast(file.path(DATA, sink_file))[[1]], 10, mean, na.rm=TRUE)
+ci_raw    <- rast(file.path(DATA, "grid_CI_kg_per_kWh.tif"))
+km_raw    <- rast(file.path(DATA, "basalt_transport_km.tif"))
+# transport-only $/t, so the solar cost lever (Sec.5) can cut just that component
+trans_raw <- if (file.exists(file.path(DATA, "basalt_transport_cost_usd_t.tif")))
+               rast(file.path(DATA, "basalt_transport_cost_usd_t.tif")) else NULL
 
 # Build the area-weighted per-pixel primitives (+ weight, value-of-production, CDR-t)
 build_primitives <- function(alloc) {
   ref <- rast(econ_path(alloc, CROPS[1]))[[1]]
   lca_kg_per_t <- GRIND_KWH * resample(ci_raw, ref) + resample(km_raw, ref) * 0.12 + 0.5
   S <- resample(S_raw, ref); S <- ifel(is.na(S), 0, S)
+  trans_t <- if (!is.null(trans_raw)) resample(trans_raw, ref) else ref*0
 
   z <- ref * 0
   num_agro <- z; num_bas <- z; num_cdrn <- z; num_gross <- z; num_lca <- z
-  wsum <- z; vop <- z; cdrt <- z
+  num_trans <- z; wsum <- z; vop <- z; cdrt <- z
   for (cp in CROPS) {
     r     <- rast(econ_path(alloc, cp))
     ha    <- r[[paste0(cp, "_ha")]]
@@ -151,6 +155,7 @@ build_primitives <- function(alloc) {
     num_cdrn  <- num_cdrn  + ifel(defined, nz(cdrn)  * w, 0)
     num_gross <- num_gross + ifel(defined, nz(gross) * w, 0)
     num_lca   <- num_lca   + ifel(defined, nz(btha * lca_kg_per_t / 1000) * w, 0)
+    num_trans <- num_trans + ifel(defined, nz(btha * trans_t) * w, 0)  # transport $/ha
     wsum      <- wsum + w
     cdrt      <- cdrt + ifel(defined, nz(cdrn) * w, 0)
     pr <- prod_stack[[which(CROPS == cp)]]
@@ -163,6 +168,7 @@ build_primitives <- function(alloc) {
        GROSS = ifel(ok, num_gross / wsum, NA),
        LCA   = ifel(ok, num_lca   / wsum, NA),
        S     = ifel(ok, S, NA),
+       TRANS = ifel(ok, num_trans / wsum, NA),   # transport $/ha (for the solar lever)
        WSUM  = ifel(ok, wsum, NA), VOP = ifel(ok, vop, NA),
        CDRT  = ifel(ok, cdrt, NA), ok = ok)
 }
@@ -509,6 +515,53 @@ mac_med <- median(values(MAC), na.rm=TRUE)
 cat("\npublic-envelope MAC median ($/tCO2):", round(mac_med,0), "\n")
 cat("baseline public:", round(base_pub,2), "Mha;  2x CDR rate:",
     round(area_of("public", rmult=2),2), "Mha\n"); print(cdr_sens)
+
+# =============================================================================
+# 5) cost-side lever: at-scale solar/electric haulage (targeted; sec:solar)
+# =============================================================================
+# Solar displaces the fuel/energy portion of trucking cost -> a cut to the
+# TRANSPORT term of delivered cost only. Per pixel:
+#     BAS_solar = BAS - f * TRANS         (TRANS = transport $/ha, area-weighted)
+# The CDR side is left untouched: solar would also cut transport LCA emissions,
+# so holding LCA fixed makes the public-side gain a conservative lower bound.
+# Reported on the HEADLINE basis (equilibrium net-export), NOT the NPV/gross grid
+# the earlier draft used -- the point of the section is to compare against the
+# headline envelopes, so it must share their regime.
+Psol <- PRIMS[["targeted"]]; oks <- Psol$ok
+solar_env <- function(f = 0) {           # f = fraction off the transport term
+  BASs <- Psol$BAS - f * Psol$TRANS
+  cd   <- cdr_net(Psol)                  # rmult=1, lambda=1
+  net  <- CARBON_BASE - MRV
+  list(priv  = (Psol$AGRO - BASs) > 0,
+       publ  = (cd*net    - BASs) > 0,
+       inter = ((Psol$AGRO - BASs) > 0) & ((cd*net - BASs) > 0))
+}
+solar_Mha <- function(m) as.numeric(global(ifel(m & oks, Psol$WSUM, 0),"sum",na.rm=TRUE))/1e6
+
+# transport share of delivered cost. Report the AREA-weighted mean of the per-pixel
+# share (so "x% off delivered" = f * mean share is internally consistent), plus the
+# area-weighted median for the distribution.
+tsh <- Psol$TRANS / Psol$BAS
+tsh_mean <- as.numeric(global(ifel(oks, tsh * Psol$WSUM, 0),"sum",na.rm=TRUE)) /
+            as.numeric(global(ifel(oks, Psol$WSUM,       0),"sum",na.rm=TRUE))
+tsh_med  <- {
+  v <- values(tsh)[oks_v <- which(!is.na(values(tsh)) & !is.na(values(Psol$WSUM)))]
+  wv <- values(Psol$WSUM)[oks_v]; o <- order(v)
+  approx(cumsum(wv[o])/sum(wv), v[o], 0.5, ties="ordered")$y
+}
+
+solar <- do.call(rbind, lapply(c(0, 0.25, 0.40), function(f) {
+  e <- solar_env(f)
+  data.frame(transport_cut = f,
+             pct_off_delivered = round(100*f*tsh_mean, 0),
+             private_Mha = round(solar_Mha(e$priv), 2),
+             public_Mha  = round(solar_Mha(e$publ), 2),
+             inter_Mha   = round(solar_Mha(e$inter), 2))
+}))
+write.csv(solar, file.path(TBL_OUT,"output-solar-transport.csv"), row.names=FALSE)
+cat(sprintf("\nsolar haulage (targeted, equilibrium net-export); transport share of\n"))
+cat(sprintf("delivered cost: mean %.0f%%, median %.0f%%\n", 100*tsh_mean, 100*tsh_med))
+print(solar, row.names=FALSE)
 
 cat("\nmaps  ->", MAP_OUT, "\ntables ->", TBL_OUT, "\n")
 # ------------------------------------------------------------------------------
