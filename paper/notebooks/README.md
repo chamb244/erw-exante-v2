@@ -1,6 +1,31 @@
-# Interactive notebooks
+# Interactive explorers
 
-## `public_envelope_explorer.ipynb`
+Two ways to explore how the return envelopes respond to the model's parameter
+assumptions. Same math; different delivery.
+
+## `public_envelope_explorer.html` — zero-install, open in any browser
+
+A **single self-contained HTML file** (~2.2 MB): the primitives are baked in as a
+quantised, base64-embedded binary blob, and a small JS engine recomputes the
+envelopes and redraws the map on every slider move. No Python, no server, no network
+— double-click it, or host it anywhere static. This is the version to hand to a
+coauthor or an investor.
+
+Sliders for allocation, carbon price, MRV, delivered cost, CDR rate (on gross
+removal), net-export λ, yield, and solar haulage, plus Central / Conservative /
+Optimistic / 2×-CDR presets and a light/dark toggle. Displayed areas are on a
+2×-aggregated grid for size and speed and track the canonical `erw-12` numbers to
+~2–3% (the file states the fine-resolution figures).
+
+**Regenerate** it from the current rasters with
+[`../analysis/build_explorer_html.py`](../analysis/build_explorer_html.py)
+(reads [`../analysis/explorer_template.html`](../analysis/explorer_template.html)):
+
+```bash
+ERW_ROOT=$(pwd) python3 paper/analysis/build_explorer_html.py
+```
+
+## `public_envelope_explorer.ipynb` — full resolution, in Jupyter
 
 Slider-driven exploration of how the private / public / intersection / combined
 return envelopes remap under the model's economic and CDR parameter assumptions,
