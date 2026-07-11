@@ -43,7 +43,7 @@ import matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import erw_provisional_engine as E   # reuse the validated primitives + math
+import erw_envelope_primitives as EP   # separable GROSS/S/LCA primitives (validated vs erw-12)
 
 ROOT = os.environ.get("ERW_ROOT", os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 TBL  = f"{ROOT}/paper/tables"; FIG = f"{ROOT}/paper/figures"
@@ -53,44 +53,37 @@ REGIME, ALLOC = "equilibrium", "targeted"   # manuscript headline
 MRV_CENTRAL   = 20.0
 
 # ----------------------------------------------------------------------------
-# Generalised envelopes: like E.envelopes but with MRV as an explicit lever.
-# CDRN in the engine is physical net-export tCO2/ha (crev/(CARBON-MRV)), so the
-# revenue re-scales cleanly with any (carbon, mrv) pair.
-def envelopes(P, carbon=150.0, mrv=MRV_CENTRAL, ymult=1.0, cmult=1.0, rmult=1.0):
-    net_price = carbon - mrv
-    ga = P['AGRO']*ymult - P['BAS']*cmult
-    gc = P['CDRN']*rmult*net_price - P['BAS']*cmult
-    gco = P['AGRO']*ymult + P['CDRN']*rmult*net_price - P['BAS']*cmult
-    return ga > 0, gc > 0, gco > 0
+# Envelopes via the separable primitives, so the CDR-rate multiplier scales GROSS
+# removal (correct) rather than the already-deducted net CDR. An earlier version
+# of this harness scaled net, which is super-linear-compressed and understated the
+# upside badly (Optimistic public 8.8 vs the correct 11.3 Mha). Note also that
+# carbon, mrv and cmult are not three independent levers: the public envelope
+# depends on them only through (carbon - mrv)/cmult. The tornado below reports them
+# separately for continuity, but see erw-12 / the memo for the collapsed view.
+def envelopes(P, carbon=150.0, mrv=MRV_CENTRAL, ymult=1.0, cmult=1.0, rmult=1.0, lam=1.0):
+    e = EP.envelopes(P, carbon=carbon, mrv=mrv, cmult=cmult, rmult=rmult, lam=lam, ymult=ymult)
+    return e['private'], e['public'], e['combined']
+
+def cd_of(rmult=1.0, lam=1.0):
+    return EP.cdr_net(P, rmult, lam)          # per-ha net-export CDR under the lever
 
 def area_Mha(P, mask):
     return float(np.nansum(np.where(mask & P['ok'], P['WSUM'], 0)))/1e6
 
-def cdr_Mt(P, mask):
-    return float(np.nansum(np.where(mask & P['ok'], P['CDRT'], 0)))/1e6
+def cdr_Mt(P, mask, cd):
+    return float(np.nansum(np.where(mask & P['ok'], cd*P['WSUM'], 0)))/1e6
 
-def summarize(P, mask):
+def summarize(P, mask, cd):
     pr = float(np.nansum(np.where(mask & P['ok'], P['AGRO']*P['WSUM'], 0)))/1e6
     return dict(area_Mha=round(area_Mha(P, mask), 2),
                 private_M=int(round(pr)),
-                cdr_Mt=round(cdr_Mt(P, mask), 1))
+                cdr_Mt=round(cdr_Mt(P, mask, cd), 1))
 
 # ----------------------------------------------------------------------------
-# Load headline primitives once (equilibrium, net-export).
-# erw-7 now bakes the net-export deduction into band 9, so build_primitives()
-# returns net-export CDR directly; the old E.apply_netexport() wrapper is gone.
-#
-# CAVEAT on the rmult lever below: it scales the ALREADY-DEDUCTED net CDR
-# (r * cdr_net). Physically r multiplies GROSS CDR, and the acidity sink F*S and
-# the LCA term are fixed subtrahends, so cdr_net is super-linear in r and this
-# compresses the lever on both sides (at r=2 the public envelope is 5.90 Mha, not
-# the 2.68 Mha reported here). Likewise `carbon`, `mrv` and `cmult` are not three
-# independent levers: the public envelope depends on them only through the ratio
-# (carbon - mrv)/cmult. See erw/erw-12-public-envelope-sensitivity.R, which
-# reconstructs GROSS/S/LCA separately and does both correctly.
+# Load headline primitives once (equilibrium, net-export), keeping GROSS/S/LCA
+# separate so the CDR-rate and net-export-partition levers act on the right term.
 print(f"Loading headline primitives ({ALLOC} / {REGIME} / net-export)...")
-price = E.crop_prices()
-P = E.build_primitives(ALLOC, REGIME, price)
+P = EP.build(ALLOC, REGIME)
 
 # ============================================================================
 # 1) NAMED SCENARIOS  -- the communication layer
@@ -103,11 +96,11 @@ SCENARIOS = {
 srows = []
 for name, s in SCENARIOS.items():
     pr, pu, co = envelopes(P, **s)
-    inter = pr & pu
+    inter = pr & pu; cd = cd_of(s["rmult"])
     for env, m in [("Private", pr), ("Public", pu), ("Intersection", inter), ("Combined", co)]:
         srows.append(dict(scenario=name, envelope=env,
                           **{k: s[k] for k in ("carbon","mrv","cmult","rmult","ymult")},
-                          **summarize(P, m)))
+                          **summarize(P, m, cd)))
 scen_df = pd.DataFrame(srows)
 scen_df.to_csv(f"{TBL}/sens_scenarios.csv", index=False)
 print("\n=== Named scenarios (targeted, equilibrium, net-export) ===")
@@ -134,14 +127,14 @@ rows = []
 for combo in combos:
     s = dict(zip(keys, combo))
     pr, pu, co = envelopes(P, **s)
-    inter = pr & pu
+    inter = pr & pu; cd = cd_of(s["rmult"])
     rows.append(dict(**s,
                      private_Mha=round(area_Mha(P, pr), 2),
                      public_Mha=round(area_Mha(P, pu), 2),
                      intersection_Mha=round(area_Mha(P, inter), 2),
                      combined_Mha=round(area_Mha(P, co), 2),
-                     intersection_CDR_Mt=round(cdr_Mt(P, inter), 1),
-                     public_CDR_Mt=round(cdr_Mt(P, pu), 1)))
+                     intersection_CDR_Mt=round(cdr_Mt(P, inter, cd), 1),
+                     public_CDR_Mt=round(cdr_Mt(P, pu, cd), 1)))
     freq_inter += np.where(inter & P['ok'], 1, 0)
     freq_comb  += np.where(co & P['ok'], 1, 0)
 sweep_df = pd.DataFrame(rows)
@@ -165,9 +158,10 @@ N = len(combos)
 robust_i = np.where(P['ok'], freq_inter/N, np.nan)
 core = robust_i >= 0.50
 cand = robust_i >= 0.33
+cd0 = cd_of(1.0)   # central net CDR for the tier CDR columns
 core_rows = [
-    dict(tier="core (>=50% of grid)",      **summarize(P, core)),
-    dict(tier="candidate (>=33% of grid)", **summarize(P, cand)),
+    dict(tier="core (>=50% of grid)",      **summarize(P, core, cd0)),
+    dict(tier="candidate (>=33% of grid)", **summarize(P, cand, cd0)),
 ]
 pd.DataFrame(core_rows).to_csv(f"{TBL}/sens_robustness_core.csv", index=False)
 print("\n=== Robust core-targeting tiers ===")
@@ -243,8 +237,8 @@ print(f"\nWrote {FIG}/sens_scenario_tornado.png")
 # ============================================================================
 try:
     fig2, ax2 = plt.subplots(figsize=(7, 6.5))
-    ext = [E._grid.__defaults__ is None] if False else None
-    im = ax2.imshow(robust_i, cmap="inferno", vmin=0, vmax=robust_i[np.isfinite(robust_i)].max() if np.isfinite(robust_i).any() else 1)
+    im = ax2.imshow(robust_i, cmap="inferno", extent=P["extent"],
+                    vmin=0, vmax=robust_i[np.isfinite(robust_i)].max() if np.isfinite(robust_i).any() else 1)
     ax2.set_title(f"Targeting robustness: fraction of {N} parameter\ncombinations under which a pixel is doubly-justified")
     ax2.axis("off")
     cb = fig2.colorbar(im, ax=ax2, shrink=0.7); cb.set_label("robustness score")
