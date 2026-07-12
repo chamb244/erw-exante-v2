@@ -13,15 +13,27 @@ coauthor or an investor.
 
 Sliders for allocation, carbon price, MRV, delivered cost, CDR rate (on gross
 removal), net-export λ, yield, and solar haulage, plus Central / Conservative /
-Optimistic / 2×-CDR presets and a light/dark toggle. Displayed areas are on a
-2×-aggregated grid for size and speed and track the canonical `erw-12` numbers to
-~2–3% (the file states the fine-resolution figures).
+Optimistic / 2×-CDR presets and a light/dark toggle. Also:
 
-**Regenerate** it from the current rasters with
-[`../analysis/build_explorer_html.py`](../analysis/build_explorer_html.py)
-(reads [`../analysis/explorer_template.html`](../analysis/explorer_template.html)):
+- **Show: Private / Public / Both.** Private and Public draw a single envelope in one
+  colour (everything where that stream alone covers the cost); Both draws the full
+  five-way typology (intersection, private-only, public-only, combined-only, neither).
+- **National boundaries (GADM level 0)** as a toggleable overlay.
+- **By-country table** that re-aggregates to the shown envelope on every change —
+  deployable Mha and durable Mt CO₂ per country, sorted, with a total.
+
+Displayed areas are on a 2×-aggregated grid for size and speed and track the canonical
+`erw-12` numbers to ~2–3% (the file states the fine-resolution figures).
+
+**Regenerate** it from the current rasters. The country IDs and boundaries come from
+[`../analysis/build_explorer_geo.R`](../analysis/build_explorer_geo.R) (run once; needs
+`data/gadm_ssa.gpkg`), then
+[`../analysis/build_explorer_html.py`](../analysis/build_explorer_html.py) bakes
+everything into the HTML from
+[`../analysis/explorer_template.html`](../analysis/explorer_template.html):
 
 ```bash
+Rscript paper/analysis/build_explorer_geo.R           # -> data/country_id_grid.tif, explorer_gadm0.geojson, codes
 ERW_ROOT=$(pwd) python3 paper/analysis/build_explorer_html.py
 ```
 
