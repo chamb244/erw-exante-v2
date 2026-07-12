@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Bake the envelope primitives into a single self-contained HTML explorer.
+"""Bake the envelope primitives into a single self-contained HTML explorer (v2).
 
-Regenerates paper/notebooks/public_envelope_explorer.html from
+Regenerates paper/notebooks/public_envelope_explorer_v2.html from
 paper/analysis/explorer_template.html + the current economics_erw rasters.
+
+  v1 (paper/notebooks/public_envelope_explorer_v1.html) is a FROZEN copy of the
+  original single-map explorer -- do not regenerate it; this script only writes v2.
+  v2 adds national-boundary overlay, private/public/both view modes, and a
+  per-country table.
 
     ERW_ROOT=$(pwd) python3 paper/analysis/build_explorer_html.py
 
@@ -127,6 +132,6 @@ CANON = {"targeted": "1.65", "uniform_10": "2.75", "uniform_20": "3.16", "unifor
 meta["canon_public"] = CANON
 
 html = TEMPLATE.replace("__META__", json.dumps(meta, separators=(",", ":"))).replace("__DATA__", b64)
-out = "paper/notebooks/public_envelope_explorer.html"
+out = "paper/notebooks/public_envelope_explorer_v2.html"
 open(out, "w").write(html)
 print("wrote", out, f"({os.path.getsize(out)/1e6:.2f} MB)")

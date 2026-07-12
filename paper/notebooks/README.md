@@ -1,15 +1,21 @@
 # Interactive explorers
 
-Two ways to explore how the return envelopes respond to the model's parameter
+Ways to explore how the return envelopes respond to the model's parameter
 assumptions. Same math; different delivery.
 
-## `public_envelope_explorer.html` — zero-install, open in any browser
+Two self-contained HTML versions. Both are single files (~2.2–2.4 MB) with the
+primitives baked in as a quantised, base64-embedded blob and a JS engine that
+recomputes the envelopes on every slider move — no Python, no server, no network.
+Double-click, or host anywhere static.
 
-A **single self-contained HTML file** (~2.2 MB): the primitives are baked in as a
-quantised, base64-embedded binary blob, and a small JS engine recomputes the
-envelopes and redraws the map on every slider move. No Python, no server, no network
-— double-click it, or host it anywhere static. This is the version to hand to a
-coauthor or an investor.
+- **`public_envelope_explorer_v1.html`** — the original single-map explorer. **Frozen:**
+  no build script writes to it, so it can't be disturbed by later changes. Reach for
+  this when you want the clean, minimal version.
+- **`public_envelope_explorer_v2.html`** — v1 plus national-boundary overlay,
+  Private/Public/Both view modes, and a per-country table (below). This is the one the
+  generator regenerates; new features land here.
+
+## `public_envelope_explorer_v2.html` — the current, feature-rich version
 
 Sliders for allocation, carbon price, MRV, delivered cost, CDR rate (on gross
 removal), net-export λ, yield, and solar haulage, plus Central / Conservative /
