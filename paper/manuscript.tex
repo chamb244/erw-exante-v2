@@ -62,11 +62,15 @@ together they do. This is the central economic result: voluntary carbon finance
 is not a bonus on an already-profitable practice but the margin that makes an
 otherwise-unprofitable agronomic investment viable. Properly accounting for
 acidity neutralization cuts credited removal by about 80\% at first application
-and shows that durable removal is largely a steady-state phenomenon; the carbon
-case is bound by the realized \co{} removed per tonne of rock (median marginal
-abatement cost \$446/\tco{}), the largest and least-resolved lever. We map a
-robust core-targeting geography and the field-data priorities that would most
-improve it.
+and shows that durable removal is largely a steady-state phenomenon. It also
+implies that the lime-requirement dose is CDR-minimal by construction, so the
+durable carbon case must be diagnosed at doses above the agronomic optimum: on a
+uniform 20~t~ha$^{-1}$ dose the public envelope is 3.2~Mha carrying 15.1~Mt of
+durable removal, against 1.7~Mha and 4.8~Mt at the targeted dose. The carbon case
+is bound by the realized \co{} removed per tonne of rock (area-weighted median
+marginal abatement cost \$372/\tco{} on that uniform dose, \$426 on the targeted
+dose), the largest and least-resolved lever. We map a robust core-targeting
+geography and the field-data priorities that would most improve it.
 \\[4pt]
 \textbf{Keywords:} enhanced rock weathering; carbon dioxide removal; voluntary
 carbon markets; soil acidity; agricultural liming; Sub-Saharan Africa;
@@ -396,7 +400,34 @@ it is then netted of grinding, transport, and spreading life-cycle emissions. Th
 agronomic return is the modeled yield response to acidity neutralization valued
 at crop-specific producer prices. We adopt baseline parameters of a \$150/\tco{}
 credit price, \$20/\tco{} MRV cost, 50~$\mu$m grain size, and a
-10\% discount rate.
+10\% discount rate. Table~\ref{tab:costs} decomposes the delivered cost.
+
+\begin{table}[t]
+\centering
+\caption{Delivered-cost decomposition per tonne of basalt, with the separate MRV
+deduction. Delivered cost $=$ quarry-gate $+$ grinding $+$ transport $+$
+spreading; MRV is netted from the carbon price rather than added to delivered
+cost. Transport is the only spatially varying (variable) term and drives the
+cost heterogeneity that determines where ERW is deployable; grinding cost varies
+with the country electricity tariff. Life-cycle \co{} of grinding, transport, and
+spreading is separately deducted from gross removal (not shown).}
+\label{tab:costs}
+\footnotesize
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{2.9cm}p{4.3cm}p{1.15cm}p{4.7cm}@{}}
+\toprule
+Component & Reference value & Type & Basis / source \\
+\midrule
+Quarry-gate feedstock & \$10/t & fixed & basalt fines as aggregate by-product \\
+Grinding (50~$\mu$m) & 19.4~kWh/t $\times$ tariff ($\approx$\$1.9/t) & fixed & \citet{strefler2018} energy curve \\
+Transport (haulage) & travel-time $\times$ \$0.04/min/t & variable & 30\,t truck over MAP friction surface \\
+Spreading & \$8/t & fixed & on-farm application \\
+\midrule
+\textbf{Delivered cost/t} & quarry $+$ grind $+$ transport $+$ spread & & consumed per pixel \\
+MRV (netted separately) & \$20/\tco{} & per \tco{} & \citet{levy2024} pilot benchmark \$30 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \subsection{Net-export carbon accounting}\label{sec:netexport}
 The alkalinity released by weathering can either neutralize soil acidity or
@@ -466,15 +497,32 @@ tables. Throughout, area shares are taken relative to the \emph{treated}
 cropland---the 17.6~Mha of acid-eligible land on which the targeted dose is
 applied, our action set---rather than all cropland.\footnote{Total SSA harvested
 cropland is 146~Mha (SPAM). Shares of that broader base are roughly one-eighth of
-the treated-cropland shares reported here (17.6/146).} Because the per-hectare
-dose cancels, the public envelope, the MAC surface
-(\eqref{eq:mac}), and the entire parameter sweep are computed analytically from
-three per-pixel primitives, with no model re-run. We probe robustness over
-delivered cost ($\times$0.5--2.0), carbon price (\$50--250), yield benefit
-($\times$0.5--2.0), and CDR rate ($\times$0.5--1.5), and define a pixel's
-robustness score as the fraction of that grid under which it remains in the
-intersection. All analysis is reproducible via the \texttt{erw-11} script in the
-repository.
+the treated-cropland shares reported here (17.6/146). The treated base is
+allocation-specific: a uniform dose is applied to all cropland the 23 SPAM crops
+occupy (32.6~Mha at uniform-20), so treated-cropland shares are comparable across
+prices within an allocation but not across allocations.} Because the per-hectare
+dose cancels, the public envelope, the MAC surface (\eqref{eq:mac}), and the entire
+parameter sweep are computed analytically from a handful of per-pixel primitives,
+with no model re-run. We probe robustness over delivered cost ($\times$0.5--2.0),
+carbon price (\$50--250), yield benefit ($\times$0.5--2.0), the CDR rate
+($\times$0.5--1.5), and the net-export partition $\lambda\in[0,1]$ of
+Section~\ref{sec:netexport}, and define a pixel's robustness score as the fraction
+of that grid under which it remains in the intersection. Two algebraic properties
+discipline how we read that grid, and are derived where they bite. Both envelope
+tests are homogeneous of degree zero in the delivered cost, so the five economic
+parameters reduce to four effective knobs for the intersection --- $y/c$,
+$(p-m)/c$, $r$ and $\lambda$ (Section~\ref{sec:robust}) --- and to just two for the
+carbon-only envelope, which does not depend on yield (Section~\ref{sec:public}).
+Our sweep is therefore a $180$-point grid over those four knobs, not a
+five-dimensional grid whose axes would be partly redundant. And the CDR-rate
+multiplier is applied to \emph{gross} removal, before the acidity-sink deduction,
+because durable removal is super-linear in it. All robustness results are computed
+in the equilibrium steady state with net-export accounting, the same regime on
+which we lead the carbon case. Envelopes and the targeting geography are
+reproducible via the \texttt{erw-11} script; the public-envelope sensitivity via
+\texttt{erw-12}. Both read the decomposed cost, gross removal, and acidity-sink
+layers that \texttt{erw-7} writes, so no figure in this paper depends on which of
+the two accounting conventions is baked into the stored net-removal layer.
 
 %=============================================================================
 \section{Results}\label{sec:results}
@@ -531,10 +579,10 @@ Cost. \emph{CDR} is durable net-export removal (Mt).}
 \toprule
 Allocation & Envelope & Area & Private (\$M) & Public (\$M) & Cost (\$M) & CDR (Mt) \\
 \midrule
-Targeted   & Private        & 4.31 & 3{,}496 & 929 & 1{,}743 & 7.1 \\
+Targeted   & Private        & 4.31 & 3{,}496 & 930 & 1{,}743 & 7.2 \\
 Targeted   & Public         & 1.65 & 1{,}339 & 630 & 434 & 4.8 \\
 Targeted   & \textbf{Intersection} & \textbf{1.20} & \textbf{1{,}274} & \textbf{510} & \textbf{337} & \textbf{3.9} \\
-Targeted   & Combined $>0$  & 6.85 & 4{,}311 & 1{,}418 & 2{,}788 & 10.9 \\
+Targeted   & Combined $>0$  & 6.86 & 4{,}312 & 1{,}419 & 2{,}789 & 10.9 \\
 \midrule
 Uniform 10 & Private        & 3.52 & 3{,}277 & 710 & 1{,}432 & 5.5 \\
 Uniform 10 & Public         & 2.75 & 1{,}364 & 809 & 610 & 6.2 \\
@@ -547,7 +595,7 @@ Uniform 20 & \textbf{Intersection} & \textbf{0.74} & \textbf{1{,}124} & \textbf{
 Uniform 20 & Combined $>0$  & 5.13 & 2{,}973 & 2{,}758 & 3{,}165 & 21.2 \\
 \midrule
 Uniform 50 & Private        & 0.45 & 997 & 796 & 519 & 6.1 \\
-Uniform 50 & Public         & 3.38 & 1{,}452 & 5{,}438 & 3{,}850 & 41.8 \\
+Uniform 50 & Public         & 3.38 & 1{,}452 & 5{,}437 & 3{,}850 & 41.8 \\
 Uniform 50 & \textbf{Intersection} & \textbf{0.41} & \textbf{890} & \textbf{754} & \textbf{439} & \textbf{5.8} \\
 Uniform 50 & Combined $>0$  & 3.84 & 1{,}827 & 6{,}020 & 4{,}632 & 46.3 \\
 \bottomrule
@@ -641,114 +689,235 @@ the agronomic (targeted) dose and fans out at high uniform rates.}
 \subsection{What binds the public (carbon) envelope}\label{sec:public}
 Because ERW investment interest concentrates on the carbon case, we diagnose it
 directly through the MAC test of equation~\eqref{eq:mac}, on durable net-export
-removal. In the equilibrium steady state the area-weighted MAC has a median of
-\textbf{\$446/\tco{}} (Figure~\ref{fig:mac}a), against a net credit price of only
-\$130 (\$150 less \$20 MRV); only the cheapest fraction of land clears, which is
-why the durable public envelope is 1.7~Mha. The contrast with first application
-is stark: under net-export accounting the year-1/NPV median MAC rises to roughly
-\$1{,}250/\tco{} and the carbon case all but disappears, because the standing
-acidity must be paid down before any carbon exports -- again locating durable
-removal in the steady state.
+removal. We lead this subsection on the \emph{uniform-20} allocation rather than the
+targeted dose. The reason is structural, and follows from
+Section~\ref{sec:netexport}: the acidity sink is a soil property and is nearly
+invariant to the dose (0.42 versus 0.43~\tco{}/ha of alkalinity consumed at
+uniform-20 and targeted), while gross removal scales with the rock applied. The
+lime-requirement dose is therefore \emph{CDR-minimal by construction} -- almost all
+of its alkalinity is spent neutralizing the acidity it was sized to neutralize, and
+little exports. Diagnosing the carbon case on the targeted dose understates the
+durable public envelope by a factor of 1.9 in area and 3.1 in removal (1.7 versus
+3.2~Mha; 4.8 versus 15.1~Mt). The targeted dose remains our lead for the private and
+intersection geography (Sections~\ref{sec:envelopes} and~\ref{sec:robust}), where it
+is the agronomically motivated default.
 
-The durable public envelope of 1.7~Mha is 9.4\% of the treated cropland (1.1\% of
-all SSA cropland), and its size is governed by the carbon price rather than by any
-kinetic assumption: carbon-alone deployable area rises steeply as the price
-climbs, from 2\% of treated cropland at \$100/\tco{} to 9\% at today's \$150,
-28\% at \$350, and 50\% at \$500 (Table~\ref{tab:priceladder}). Two implications
-follow. First, the physical removal potential is large but its \emph{economic}
-viability under carbon revenue alone is price-limited: at present prices durable
-CDR pays for its delivered cost on only about a tenth of the ERW-relevant
-cropland. Second---and this is the crux of the argument---the fact that carbon
-revenue rarely clears on its own is precisely why the private co-benefit matters.
-Land that carbon alone cannot reach at \$150 becomes viable once the yield return
-is stacked on top (the combined-only band, Section~\ref{sec:envelopes}); the
-co-benefit is not a nicety but the mechanism that mobilizes voluntary carbon
-finance across the region. And because the marginal abatement cost is the ratio of
-delivered cost to \co{} removed per tonne, the two routes to broadening
-carbon-alone viability are a higher realized CDR rate and cheaper delivery, both
-of which lower it.
+In the equilibrium steady state the area-weighted MAC under uniform-20 has a median
+of \textbf{\$372/\tco{}} (Figure~\ref{fig:mac}a; \$426 under the targeted dose),
+against a net credit price of only \$130 (\$150 less \$20 MRV); only the cheapest
+fraction of land clears, which is why the durable public envelope is 3.2~Mha. The
+contrast with first application is stark: under net-export accounting the year-1/NPV
+median MAC rises to roughly \$1{,}250/\tco{} and the carbon case all but disappears,
+because the standing acidity must be paid down before any carbon exports -- again
+locating durable removal in the steady state.
+
+The durable public envelope of 3.2~Mha is 9.7\% of the cropland treated under a
+uniform-20 dose (2.2\% of all SSA cropland), and its size is governed by the carbon
+price rather than by any kinetic assumption: carbon-alone deployable area rises
+steeply as the price climbs, from 1.9\% of treated cropland at \$100/\tco{} to 9.7\%
+at today's \$150, 41\% at \$350, and 59\% at \$500 (Table~\ref{tab:priceladder}).
+Notably the share of treated land that clears is almost identical to the targeted
+case (9.4\% at \$150): uniform-20 widens the carbon envelope by treating more land
+and by exporting more of each tonne's alkalinity, not by clearing a larger fraction
+of what it treats. Two implications follow. First, the physical removal potential is
+large but its \emph{economic} viability under carbon revenue alone is price-limited:
+at present prices durable CDR pays for its delivered cost on under a tenth of the
+ERW-relevant cropland. Second---and this is the crux of the argument---the fact that
+carbon revenue rarely clears on its own is precisely why the private co-benefit
+matters. Land that carbon alone cannot reach at \$150 becomes viable once the yield
+return is stacked on top (the combined-only band, Section~\ref{sec:envelopes}); the
+co-benefit is not a nicety but the mechanism that mobilizes voluntary carbon finance
+across the region. And because the marginal abatement cost is the ratio of delivered
+cost to \co{} removed per tonne, the two routes to broadening carbon-alone viability
+are a higher realized CDR rate and cheaper delivery, both of which lower it.
+
+One caveat on the arithmetic of that last sentence. The public test
+$\delta_t\,(p-m) > c_t$ is homogeneous of degree zero in the pair
+$\bigl((p-m),\,c_t\bigr)$: the carbon price, the MRV cost, and the delivered cost
+enter the public envelope \emph{only} through the ratio $(p-m)/c_t$. They are one
+lever, not three, and a sensitivity analysis that perturbs them separately reports
+the widths of its own bands rather than three distinct uncertainties. The genuinely
+distinct levers on the carbon case are that price--cost ratio and the realized
+removal rate $\delta_t$.
 
 \begin{table}[t]
 \centering
 \caption{Carbon-alone deployability is price-conditional. Public-sufficient area
 (durable net-export CDR revenue exceeds delivered cost) in the equilibrium steady
-state, targeted allocation, across VCM carbon prices. Shares are of the 17.6~Mha
-treated cropland; the all-cropland share (of 146~Mha) is shown for reference.}
+state, \emph{uniform-20} allocation, across VCM carbon prices. Shares are of the
+32.6~Mha of cropland treated under a uniform-20 dose; the all-cropland share (of
+146~Mha) is shown for reference. The treated base is allocation-specific: the
+targeted dose is applied only to the 17.6~Mha of acid-eligible cropland, so its
+percentage shares are not comparable in levels to the uniform ladder. Targeted
+values are given in brackets for reference.}
 \label{tab:priceladder}
 \small
 \begin{tabular}{rrrrr}
 \toprule
 VCM price (\$/\tco{}) & Public area (Mha) & \% treated & \% all cropland & Durable CDR (Mt) \\
 \midrule
-100 & 0.35 &  2.0 & 0.2 &  1.7 \\
-150 & 1.65 &  9.4 & 1.1 &  4.8 \\
-250 & 2.51 & 14.3 & 1.7 &  6.1 \\
-350 & 4.84 & 27.6 & 3.3 & 11.0 \\
-500 & 8.76 & 49.9 & 6.0 & 15.8 \\
+100 &  0.63 \,[0.35] &  1.9 \,[2.0] &  0.4 & \phantom{0}3.5 \,[\phantom{0}1.7] \\
+150 &  3.16 \,[1.65] &  9.7 \,[9.4] &  2.2 & 15.1 \,[\phantom{0}4.8] \\
+250 &  5.23 \,[2.51] & 16.1 \,[14.3] &  3.6 & 22.9 \,[\phantom{0}6.1] \\
+350 & 13.25 \,[4.84] & 40.7 \,[27.6] &  9.1 & 54.1 \,[11.0] \\
+500 & 19.26 \,[8.76] & 59.1 \,[49.9] & 13.2 & 71.1 \,[15.8] \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 The binding factor is the realized \co{} removed per tonne of rock, $\delta_t$
 (here on the order of 0.1 to 0.25 tonnes \co{} per tonne of rock), not the credit
-price or logistics. Figure~\ref{fig:cdrrate} makes this quantitative (shown on the gross
-NPV basis for comparability with the parameter grid): doubling $\delta_t$
-raises the public envelope far more than a 33\% higher
-carbon price or a 33\% delivered-cost reduction. $\delta_t$ is set by
-the reactive fraction, grain size, the climate factor, and pedogenic-carbonate
-loss -- the parameters that current process knowledge and MRV resolve least well.
-The economic and the scientific frontier therefore coincide: the largest lever on
-the carbon case is also the least-resolved quantity.
+price or logistics. Figure~\ref{fig:cdrrate} makes this quantitative, now on the
+headline equilibrium net-export basis: doubling $\delta_t$ nearly quadruples the
+public envelope (3.2 to 12.6~Mha, $+297\%$), far outstripping a 33\% higher carbon
+price ($+36\%$) or a 33\% delivered-cost reduction ($+45\%$). Two qualifications keep
+this honest. First, $\delta_t$ must be scaled where it physically acts -- on
+\emph{gross} removal, before the acidity sink is deducted. Because the sink and the
+lifecycle term are fixed subtrahends inside a $\max(\cdot,0)$, durable removal is
+super-linear in $\delta_t$; scaling the already-deducted quantity instead would
+report only 6.0~Mha at $2\delta_t$ rather than 12.6~Mha, understating the very lever
+the argument rests on. Second, the dominance is a property of \emph{large} moves in
+$\delta_t$, not of local slopes: at the $\pm33\%$ step the delivered-cost lever is
+in fact marginally the stronger of the two, and on the uniform-20 lead the
+one-at-a-time swing in $\delta_t$ (4.9~Mha) only narrowly exceeds that of the
+price--cost ratio (4.6~Mha). The margin is wider on the targeted dose (2.6 versus
+2.2~Mha), where the acidity sink absorbs 26\% of gross removal rather than
+uniform-20's 11\%, so the super-linearity bites harder. $\delta_t$ is set by the
+reactive fraction, grain size, the climate factor, and pedogenic-carbonate loss --
+the parameters that current process knowledge and MRV resolve least well. The
+economic and the scientific frontier therefore coincide: the largest lever on the
+carbon case is also the least-resolved quantity.
 
 \begin{figure}[t]
 \centering
-\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{mac_targeted_eqnx.png}\caption{Marginal abatement cost (durable)}\end{subfigure}
-\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{public_area_vs_price_npv.png}\caption{Public area vs.\ carbon price}\end{subfigure}
+\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{mac_uniform_20_eqnx.png}\caption{Marginal abatement cost (durable)}\end{subfigure}
+\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{public_area_vs_price_uniform_20_eqnx.png}\caption{Public area vs.\ carbon price}\end{subfigure}
 \caption{(a) Marginal abatement cost of durable net-export ERW-CDR (\$/\tco{},
-capped at 500; equilibrium, targeted). (b) Public-sufficient area as a function of
-the VCM carbon price (gross NPV accounting, an upper bound); the schedule is
-steeply convex around current prices.}
+capped at 500; equilibrium steady state, uniform-20 allocation). (b)
+Public-sufficient area as a function of the VCM carbon price, on the same
+equilibrium net-export basis; the schedule is steeply convex around current prices.
+Both panels are led on uniform-20 because the targeted lime-requirement dose is
+CDR-minimal by construction (Section~\ref{sec:public}).}
 \label{fig:mac}
 \end{figure}
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.95\textwidth]{cdr_rate_sensitivity_panel_npv.png}
-\caption{The CDR rate is the binding lever for the public envelope.
-(a) Public and intersection area versus the realized CDR-rate multiplier.
-(b) Change in public-sufficient area under alternative levers: doubling the CDR
-rate dominates plausible carbon-price or delivered-cost moves.}
+\includegraphics[width=0.95\textwidth]{cdr_rate_sensitivity_panel_uniform_20_eqnx.png}
+\caption{The CDR rate is the binding lever for the public envelope (equilibrium,
+net-export, uniform-20). (a) Public and intersection area versus the realized
+CDR-rate multiplier, applied to \emph{gross} removal before the acidity-sink
+deduction. (b) Change in public-sufficient area under alternative levers: doubling
+the CDR rate dominates plausible carbon-price or delivered-cost moves, though at the
+$\pm33\%$ step the cost lever is marginally the stronger. Note that the carbon-price
+and delivered-cost bars are the same lever at different step sizes, since the public
+envelope depends on them only through $(p-m)/c_t$.}
 \label{fig:cdrrate}
 \end{figure}
 
 \subsection{Cost-side levers: at-scale solar haulage}\label{sec:solar}
-Transport is the largest single component of delivered cost (\(\sim\)56\% on
-average, median \(\sim\)65\%) and is wholly variable in distance. We evaluate an
-at-scale solar-electric haulage scenario that displaces the fuel/energy portion
-of trucking cost. Grounding the energy share in trucking-cost data and the
-diesel-to-solar-electric energy gap implies a feasible \(\sim\)25\% reduction in
-the transport term (range 15--40\%), i.e.\ \(\sim\)14\% off average delivered
-cost. Applied to the grid (NPV basis, for comparability with the sensitivity grid),
-this widens the \emph{private} envelope materially
-(2.0 to 2.6~Mha at $-$25\%, to 3.1~Mha at $-$40\%) but the public envelope only
-slightly (1.8 to 1.9~Mha), confirming the asymmetry implied by
-equation~\eqref{eq:mac}: cost reductions relax the private test directly but
-relax the public test only to the extent the MAC falls below the credit price.
-Carbon price and CDR rate move the public envelope; logistics cost moves the
-private one. The two policy levers are thus complementary and target different
-margins.
+Transport is the largest single component of delivered cost (\(\sim\)55\% on
+average, median \(\sim\)66\%) and is wholly variable in distance. We evaluate an
+at-scale solar-electric haulage scenario that displaces the fuel/energy portion of
+trucking cost. Grounding the energy share in trucking-cost data and the
+diesel-to-solar-electric energy gap implies a feasible \(\sim\)25\% reduction in the
+transport term (range 15--40\%), i.e.\ \(\sim\)14\% off average delivered cost.
+Applied to the headline grid (equilibrium steady state, net-export accounting,
+targeted allocation, so the comparison is against the headline envelopes), this
+widens the \emph{private} envelope materially --- from 4.31 to 5.12~Mha at $-$25\%
+and to 5.80~Mha at $-$40\% --- but the durable public envelope only slightly, from
+1.65 to 1.76 and 1.84~Mha. The intersection tracks the private side (1.20 to 1.29
+and 1.36~Mha). This confirms the asymmetry implied by equation~\eqref{eq:mac}: a
+cost reduction relaxes the private test dollar-for-dollar, but relaxes the public
+test only where it drags a pixel's marginal abatement cost below the net credit
+price, which happens on comparatively little land. Carbon price and CDR rate move
+the public envelope; logistics cost moves the private one. The two policy levers are
+thus complementary and target different margins. (This scenario holds transport LCA
+emissions fixed; because solar haulage would also cut them, the public-side gain
+reported here is a conservative lower bound.)
 
 \subsection{Targeting and robustness}\label{sec:robust}
-Repeating the envelope construction across the full parameter grid yields a
-per-pixel robustness score (Figure~\ref{fig:core}). Under the NPV regime no
-pixel survives the entire deliberately wide grid; the intersection is inherently
-parameter-sensitive. A core-targeting tier (in the intersection under at least
-half the grid) collapses to a small, high-confidence set concentrated in the
-Cameroon highlands, while a broader candidate tier (at least one-third of the
-grid) covers \(\sim\)0.8~Mha, \(\sim\)0.5~M farms, and \(\sim\)\$0.75~B of crop
-value, extending into the Guinean and Ethiopian highlands -- areas where acidic
-soils, a favorable weathering climate, basalt proximity, and adequate crop
-prices coincide.
+We compute the robustness of the doubly-justified geography on the same
+equilibrium steady state with net-export accounting on which the carbon case is
+led. The intersection test is homogeneous of degree zero in the delivered cost:
+dividing both envelope conditions by the cost multiplier $c$ leaves
+$\text{private}: a_i\,(y/c) > c_i$ and
+$\text{public}: \delta_i(r,\lambda)\,\bigl((p-m)/c\bigr) > c_i$, so the
+intersection depends on the five economic parameters only through \emph{four}
+effective knobs: the yield/cost ratio $y/c$, the net-price/cost ratio $(p-m)/c$,
+the CDR-rate multiplier $r$ applied to gross removal, and the net-export partition
+$\lambda$. We sweep a $5\times4\times3\times3 = 180$-point grid over these and
+define a pixel's robustness score as the fraction of the grid under which it
+remains in the intersection (Figure~\ref{fig:core}a).
+
+No pixel survives more than 58\% of this deliberately wide grid: the
+doubly-justified case is inherently parameter-sensitive. A core-targeting tier
+(in the intersection under at least half the grid) covers 0.59~Mha,
+\(\sim\)0.35~M farms and \(\sim\)\$0.54~B of crop value, and a broader candidate
+tier (at least one-third) covers 1.14~Mha, \(\sim\)0.70~M farms and
+\(\sim\)\$0.99~B (Figure~\ref{fig:core}b). Both concentrate sharply in the
+Cameroon highlands (0.43~Mha core, 0.57~Mha candidate) and the Guinean highlands
+(0.15 and 0.38~Mha), extending thinly into the Ethiopian highlands, Tanzania and
+Sierra Leone -- areas where acidic soils, a favorable weathering climate, basalt
+proximity, and adequate crop prices coincide. Two-thirds of the candidate tier
+lies in two countries.
+
+A one-at-a-time tornado around the central case (baseline intersection 1.20~Mha)
+ranks the four knobs: the CDR rate swings the intersection by 1.61~Mha, the
+net-price/cost ratio by 1.59~Mha, the yield/cost ratio by 0.76~Mha, and $\lambda$
+by only 0.26~Mha. Two readings matter. First, on the intersection the CDR rate and
+the price--cost ratio are effectively \emph{tied}; the CDR rate's clear lead over
+price appears in the carbon-only envelope (Section~\ref{sec:public}), not here,
+because the intersection is jointly constrained by the agronomic test that the CDR
+rate does not enter. Second, earlier drafts reported delivered cost as the dominant
+lever by a wide margin. On this basis its raw swing is indeed the largest
+(2.36~Mha), but that is an artifact of aggregation rather than a separate
+mechanism: cost is the only parameter that moves \emph{both} ratios. Holding $y/c$
+fixed, its public channel swings the intersection by 1.66~Mha; holding $(p-m)/c$
+fixed, its private channel swings it by 0.76~Mha -- exactly the yield swing, as it
+must be, since yield moves $y/c$ and nothing else. Delivered cost matters because
+it is levered twice, not because logistics dominates weathering. The reassuring
+corollary stands: the yield benefit, the most uncertain input given the thin
+field-trial base, is among the least influential, and $\lambda$ -- the
+most-scrutinized modeling choice -- is the least influential of all.
+
+To make the range concrete for a non-technical reader, we also stack the five
+levers into three coherent bundles (Table~\ref{tab:scenarios}): a Conservative case
+with every lever at its ERW-unfavorable end, the Central case of
+Table~\ref{tab:envelopes}, and an Optimistic case with every lever favorable. The
+qualitative story is robust while the magnitudes are not. The private envelope never
+collapses --- it holds at 1.4~Mha even under the Conservative bundle --- and the
+combined footprint is always the largest of the four. The carbon-only case is far
+more fragile: the public envelope vanishes entirely under the Conservative bundle (a
+\$100 price, \$40 MRV, a halved CDR rate, and 1.5$\times$ delivered cost together
+clear no land against the resulting net price) and swells past 11~Mha under the
+Optimistic one --- an asymmetry that is itself the point, since the upside is driven
+by the CDR rate acting on gross removal, where it is super-linear. This is the honest
+headline: the \emph{ordering} of the envelopes and the pivotal role of the
+combined-only band survive the whole grid, but the absolute carbon geography is
+contingent, and most contingent on the CDR rate.
+
+\begin{table}[t]
+\centering
+\caption{The four return envelopes under three coherent parameter bundles
+(targeted allocation, equilibrium steady state, net-export accounting; area in Mha).
+Conservative sets every lever to its ERW-unfavorable end
+($p=\$100$, MRV $\$40$, delivered cost $\times1.5$, CDR rate $\times0.5$, yield
+$\times0.75$); Optimistic sets every lever favorable ($\$250$, $\$10$, $\times0.75$,
+$\times1.5$, $\times1.5$); Central is the baseline of Table~\ref{tab:envelopes}.}
+\label{tab:scenarios}
+\small
+\begin{tabular}{lrrr}
+\toprule
+Envelope & Conservative & Central & Optimistic \\
+\midrule
+Private          & 1.36 & 4.31 & 8.73 \\
+Public           & 0.00 & 1.65 & 11.30 \\
+Intersection     & 0.00 & 1.20 & 6.60 \\
+Combined $>0$    & 1.53 & 6.86 & 15.61 \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 The carbon case behaves very differently across regimes once durable removal is
 credited (Table~\ref{tab:regimes}). Under gross accounting the public envelope
@@ -780,11 +949,15 @@ Net-export   & 0.14 & 1.65 & 19 & 19 \\
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=0.72\textwidth]{core_priority_npv.png}
-\caption{Core-targeting tiers under the NPV regime. Red = robust core
-(intersection under $\geq$50\% of the parameter grid); orange = candidate tier
-($\geq$33\%). The core concentrates where soil acidity, weathering climate,
-basalt access, and crop value coincide.}
+\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{robustness_intersection_eqnx.png}\caption{Per-pixel robustness score}\end{subfigure}
+\begin{subfigure}{0.49\textwidth}\includegraphics[width=\linewidth]{core_priority_eqnx.png}\caption{Core-targeting tiers}\end{subfigure}
+\caption{Robustness of the doubly-justified geography, computed on the headline
+equilibrium steady state with net-export accounting. (a) Fraction of the 180-point
+grid over the four effective knobs ($y/c$, $(p-m)/c$, $r$, $\lambda$) under which a
+pixel remains in the intersection; no pixel exceeds 0.58. (b) Red = robust core
+(intersection under $\geq$50\% of the grid); orange = candidate tier ($\geq$33\%).
+The core concentrates where soil acidity, weathering climate, basalt access, and
+crop value coincide.}
 \label{fig:core}
 \end{figure}
 
@@ -808,15 +981,25 @@ yield gain, and program design must decide how that joint surplus is split
 between buyer and farmer.
 
 \paragraph{The carbon case is CDR-quantification risk, not price risk.}
-Equation~\eqref{eq:mac} and Figure~\ref{fig:cdrrate} show that the public
-envelope hinges on the realized removal per tonne of rock, the single largest
-lever and the least-resolved scientific quantity. For investors this relocates
-the central risk from the carbon market (price) to measurement, reporting, and
-verification (quantity and durability). It also reframes MRV: the \$20/\tco{}
-MRV cost is not merely a deduction but the mechanism that converts an uncertain
-$\delta_t$ into a sellable, high-integrity tonne. Investment in cheaper, tighter
-measurement raises the \emph{effective} CDR rate that can be monetized -- exactly
-where the leverage lies.
+Equation~\eqref{eq:mac} and Figure~\ref{fig:cdrrate} show that the public envelope
+hinges on the realized removal per tonne of rock, the largest lever on the
+carbon-only case and the least-resolved scientific quantity. The claim should be
+stated with its margin. On the carbon-only envelope the CDR rate leads the
+price--cost ratio by 4.9 to 4.6~Mha of swing, and on the doubly-justified
+intersection the two are effectively tied (1.61 versus 1.59~Mha); at small
+perturbations the cost lever is if anything the stronger. What distinguishes
+$\delta_t$ is the \emph{shape} of its response, not its local slope: because the
+acidity sink and lifecycle emissions are fixed subtrahends, durable removal is
+super-linear in $\delta_t$, so large improvements in the realized rate compound in a
+way that price and cost improvements do not. Doubling $\delta_t$ nearly quadruples
+the public envelope; no plausible price or cost move comes close. Together with the
+observation that price, MRV, and delivered cost are one lever rather than three,
+this relocates the central risk for investors from the carbon market (price) to
+measurement, reporting, and verification (quantity and durability). It also
+reframes MRV: the \$20/\tco{} MRV cost is not merely a deduction but the mechanism
+that converts an uncertain $\delta_t$ into a sellable, high-integrity tonne.
+Investment in cheaper, tighter measurement raises the \emph{effective} CDR rate that
+can be monetized -- exactly where the leverage lies.
 
 \paragraph{Targeting and sequencing.} The robustness analysis points to a small
 core geography that is attractive across a wide range of assumptions, and a
@@ -824,6 +1007,27 @@ broader candidate tier for early deployment. Because cost-side and revenue-side
 levers move different envelopes, an efficient program pairs logistics
 investment (basalt siting, low-carbon haulage) where the private case is close,
 with carbon-price or CDR-rate improvements where the public case is close.
+
+\paragraph{Where field data would most improve the model.} The robustness analysis
+doubles as a data-collection agenda, and answers the sixth question the introduction
+poses. The single input that most moves both the carbon-only and the
+doubly-justified geography is the realized \co{} removed per tonne of rock,
+$\delta_t$, which the model carries as a climate- and pH-scaled reactive fraction
+calibrated largely on temperate soils. The priority measurements, in order of
+leverage, are therefore: (i) tropical, smallholder-system CDR rates that pin down
+$\delta_t$ and its climate scaling --- the top lever on the public envelope and,
+jointly with the price--cost ratio, on the doubly-justified area; (ii) the
+pedogenic-carbonate fraction in semi-arid zones, which the aridity-band deduction
+only proxies and which enters $\delta_t$ directly; and (iii) delivered-cost
+calibration near candidate-tier basalt sources --- the levered price--cost ratio ---
+which moves the private envelope directly and the intersection through both of its
+channels. Notably the yield response, the input with the thinnest evidence base
+(a prior-dominated fit on roughly a dozen trials), is where additional data would
+change the targeting map \emph{least}, because the private envelope is robust to it.
+Field effort is best spent on the carbon quantity rather than the agronomic one, and
+concentrated in the candidate-tier geography, where a measurement is most likely to
+change a deployment decision rather than confirm one. The economic frontier and the
+scientific frontier are, once again, the same quantity.
 
 \paragraph{Limitations.} The year-1 accounting is the most optimistic and the
 NPV the most conservative; we report both. Farm counts use national average

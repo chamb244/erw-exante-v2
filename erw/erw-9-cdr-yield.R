@@ -83,7 +83,26 @@ ph     <- terra::resample(ph, ref)
 T_ref <- 11
 P_ref <- 1000
 
-f_mat <- terra::clamp(mat    / T_ref, 0.3, 3.0); names(f_mat) <- 'f_MAT'
+# Temperature response of gross weathering. Default "linear" (MAT/T_ref).
+# "arrhenius" uses the standard kinetic form exp(-Ea/R (1/T - 1/T_ref)) with a
+# silicate activation energy Ea = 68.8 kJ/mol (White & Blum 1995) -- the same
+# value Cascade Climate's Weathering Potential Explorer uses. Both are normalized
+# to f = 1 at T_ref and clamped to [0.3, 3.0] for comparability. The Arrhenius
+# form is steeper in temperature and, area-weighted, raises SSA gross CDR by
+# ~27% (capped) over the linear default. Carried as a SENSITIVITY VARIANT: for
+# the analytic sweep in erw-11/erw-12, pass the pre-computed per-pixel multiplier
+# data/cdr_climate_arrhenius_multiplier.tif (= f_arr/f_lin) as `rmult` to cdr_net()
+# instead of re-running this script. See paper/analysis/erw_arrhenius_variant.py
+# and paper/cascade-comparison-memo.md.
+CLIMATE_TEMP_MODE <- "linear"          # "linear" | "arrhenius"
+Ea <- 68800; Rgas <- 8.314             # J/mol ; J/mol/K
+if (CLIMATE_TEMP_MODE == "arrhenius") {
+  f_mat <- exp(-(Ea / Rgas) * (1 / (mat + 273.15) - 1 / (T_ref + 273.15)))
+  f_mat <- terra::clamp(f_mat, 0.3, 3.0)
+} else {
+  f_mat <- terra::clamp(mat / T_ref, 0.3, 3.0)
+}
+names(f_mat) <- 'f_MAT'
 f_map <- terra::clamp(map_yr / P_ref, 0.3, 3.0); names(f_map) <- 'f_MAP'
 
 # triangular pH factor peaking at pH ~5.0
