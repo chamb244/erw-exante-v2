@@ -203,8 +203,8 @@ title(s, "A decomposed per-pixel gross margin")
 text(s, Inches(0.55), Inches(1.35), Inches(5.3), Inches(0.8),
      [[("π  =  R", 24, INK, True, False), ("agro", 14, ACCENT, True, False),
        ("  +  R", 24, INK, True, False), ("CDR", 14, BLUE, True, False),
-       ("  −  C", 24, INK, True, False)],
-      [("gross margin = private agronomic return + public carbon return − full delivered cost", 11.5, MUTED, False, True)]],
+       ("  -  C", 24, INK, True, False)],
+      [("gross margin = private agronomic return + public carbon return - full delivered cost", 11.5, MUTED, False, True)]],
      space_after=2)
 bullets(s, Inches(0.55), Inches(2.55), Inches(5.3), Inches(4.2), [
     ("Resolution", "~0.083° grid × 44 SSA countries × 23 SPAM crops, area-weighted to each pixel."),
@@ -251,7 +251,7 @@ title(s, "Cost is dominated by transport — a real lever")
 bullets(s, Inches(0.55), Inches(1.5), Inches(5.4), Inches(4.6), [
     ("Decomposed cost", "Quarry-gate + grinding + freight + spreading, built up per pixel from the friction surface; MRV netted from the carbon price."),
     ("Transport binds", "Mean 55% (median 66%) of delivered cost. Remote acid soils are priced out even where the agronomy is strong."),
-    ("The solar lever", "Electrified / solar-assisted haulage cuts the variable transport term: −25% transport widens the private envelope 4.31 → 5.12 Mha, the public one only 1.95 → 2.07."),
+    ("The solar lever", "Electrified / solar-assisted haulage cuts the variable transport term: -25% transport widens the private envelope 4.31 → 5.12 Mha, the public one only 1.95 → 2.07."),
 ], gap=10)
 pic(s, os.path.join(AST, "image-7-1.png"), Inches(6.15), Inches(1.3), Inches(6.9), Inches(5.5))
 footer(s)
@@ -291,12 +291,12 @@ title(s, "The carbon return uses a net VCM price")
 tag(s, "equilibrium · uniform-20 (carbon lead)")
 text(s, Inches(0.55), Inches(1.45), Inches(5.4), Inches(1.0),
      [[("R", 20, INK, True, False), ("CDR", 12, BLUE, True, False),
-       ("  =  durable CDR × ( p − m )", 20, INK, True, False)],
+       ("  =  durable CDR × ( p - m )", 20, INK, True, False)],
       [("p = VCM carbon price ($/tCO₂)  ·  m = per-tonne MRV cost", 11.5, MUTED, False, True)]], space_after=2)
 text(s, Inches(0.55), Inches(2.7), Inches(5.4), Inches(2.2),
      [[("Baseline is ", 12.5, MUTED, False, False), ("$150/tCO₂", 12.5, INK, True, False),
        (" — a conservative floor: 2024–25 durable-CDR transactions cluster at $250–450/tCO₂ (CDR.fyi). "
-        "Price, MRV and delivered cost move the public envelope only through the single ratio (p − m)/c.", 12.5, MUTED, False, False)],
+        "Price, MRV and delivered cost move the public envelope only through the single ratio (p - m)/c.", 12.5, MUTED, False, False)],
       [("The ladder is steeply convex: between $250 and $350 the deployable area jumps from 7 to 23 Mha.", 12.5, INK, False, False)]],
      space_after=8)
 LAD = [("$/tCO₂", "Public Mha", "% treated", "Durable CDR (Mt)", True),
@@ -322,7 +322,7 @@ footer(s)
 s = slide(); eyebrow(s, "Assumption 3 · Net-export CDR")
 title(s, "Credit only carbon that is durably exported")
 text(s, Inches(0.55), Inches(1.42), Inches(5.35), Inches(1.0),
-     [[("durable CDR = max( gross − F·S , 0 )", 19, INK, True, False)],
+     [[("durable CDR = max( gross - F·S , 0 )", 19, INK, True, False)],
       [("F = 0.88 tCO₂ per t CaCO₃-eq  ·  S = acidity sink (standing / maintenance)", 11.5, MUTED, False, True)]], space_after=2)
 text(s, Inches(0.55), Inches(2.5), Inches(5.35), Inches(1.35),
      [[("Alkalinity spent neutralizing soil acidity re-releases its CO₂ — exactly as agricultural lime does — so it must be deducted "
@@ -414,8 +414,8 @@ divider("Part II", "Results",
 s = slide(); eyebrow(s, "Results · Typology")
 title(s, "A five-way pixel classification")
 tag(s, "equilibrium · net-export · targeted")
-TYP = [("Private-sufficient", "R_agro − C > 0", ACCENT),
-       ("Public-sufficient", "R_CDR − C > 0", BLUE),
+TYP = [("Private-sufficient", "R_agro - C > 0", ACCENT),
+       ("Public-sufficient", "R_CDR - C > 0", BLUE),
        ("Intersection", "both hold at the same pixel", RGBColor(0x6A, 0x3D, 0x8F)),
        ("Combined-only", "neither alone, but GM > 0", RUST),
        ("Neither", "GM ≤ 0 — not deployable", MUTED)]
@@ -482,7 +482,7 @@ title(s, "Marginal abatement cost, not kinetics")
 tag(s, "equilibrium · uniform-20 (carbon lead)")
 stat(s, Inches(0.55), Inches(1.5), Inches(4.2), "$276", "/ tCO₂", "area-weighted median MAC — vs a $130 net credit price ($330 on the targeted dose)", color=BLUE, big_size=42)
 text(s, Inches(0.55), Inches(3.15), Inches(5.3), Inches(1.3),
-     [[("MAC = delivered cost per tonne of rock ÷ durable CDR per tonne. The public envelope is exactly the land where MAC < (p − m).",
+     [[("MAC = delivered cost per tonne of rock ÷ durable CDR per tonne. The public envelope is exactly the land where MAC < (p - m).",
         12.5, MUTED, False, False)],
       [("That median sits at the upper edge of the published cost-synthesis IQR ($137–276; Suhrhoff et al. 2026) — the residual gap is accounting stringency, not SSA logistics.",
         12.5, INK, False, False)]], space_after=8)
@@ -498,7 +498,7 @@ s = slide(); eyebrow(s, "Results · The levers")
 title(s, "Two levers — not three — shift the public envelope")
 tag(s, "equilibrium · uniform-20 (carbon lead)")
 bullets(s, Inches(0.55), Inches(1.5), Inches(5.4), Inches(4.9), [
-    ("1 · The price–cost ratio (p − m)/c",
+    ("1 · The price–cost ratio (p - m)/c",
      "Carbon price, MRV and delivered cost enter the public test only through this single ratio: deployable area climbs from 4.3% of treated cropland at $100 to 86% at $500. Cost cuts (solar haulage) act on the same lever — and move mostly the private envelope."),
     ("2 · Durable CDR per tonne of rock",
      "Scaled where it physically acts — on gross removal, before the acidity sink. Because the sink and life-cycle terms are fixed subtrahends, durable removal is super-linear in it: doubling the rate takes the public envelope 3.95 → 22.5 Mha (~6×). Kinetic saturation is second-order here."),
@@ -578,3 +578,13 @@ footer(s)
 
 prs.save(OUT)
 print(f"wrote {OUT} ({_n[0]} slides)")
+
+# document properties (avoid python-pptx template defaults)
+prs2 = Presentation(OUT)
+cp = prs2.core_properties
+cp.title = "Public and private returns to Enhanced Rock Weathering in Sub-Saharan Africa"
+cp.author = "Bisrat Haile Gebrekidan; Jordan Chamberlin"
+cp.last_modified_by = "Bisrat Haile Gebrekidan"
+cp.comments = "Full walkthrough deck, regenerated from the 2026-09-01 model run by build_walkthrough_pptx.py"
+prs2.save(OUT)
+print("core properties set")
