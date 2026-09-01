@@ -1,5 +1,5 @@
 "quantity","value"
-"d lnA / d ln[(p-m)/c]",1.04749735361296
-"d lnA / d ln[CDR rate r]",1.19191975009637
-"d lnA / d lambda",-0.137855290561277
-"marginal-pixel amplifier GROSS/cdr_net",1.16022191031002
+"d lnA / d ln[(p-m)/c]",1.10157903381137
+"d lnA / d ln[CDR rate r]",1.28233107245078
+"d lnA / d lambda",-0.183895417711848
+"marginal-pixel amplifier GROSS/cdr_net",1.16550599990345
