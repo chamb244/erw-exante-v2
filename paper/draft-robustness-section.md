@@ -1,5 +1,15 @@
 # Draft manuscript edits: robustness section + supporting text
 
+> **[2026-09-01] Numbers in this memo are superseded.** The pipeline was re-run
+> on the Arrhenius + pH-6.0 basis (erw-9 temperature factor now Arrhenius,
+> Ea = 68.8 kJ/mol; pH-factor peak moved 5.0 → 6.0; yield sweep capped at 1.8×)
+> after the ESROC-anchored citation review (`litrature/citation-review.md`).
+> Current headline (equilibrium net-export, $150/$20, targeted): private 4.31 /
+> public 1.95 / intersection 1.32 / combined 7.61 Mha; combined-only 2.67;
+> uniform-20 public 3.95 Mha / 20.4 Mt; MAC medians $276 (uniform-20) / $330
+> (targeted); core 0.65 / candidate 1.22 Mha. The memo's *reasoning* stands;
+> quote numbers only from the 2026-09-01 tables in `docs/tables/`.
+
 *Status: **APPLIED** to `paper/manuscript.tex` (2026-07-10). Kept as a record of what
 changed and why. Numbers are from `erw/erw-11-private-public-envelopes.R` §2–3, computed on
 the headline basis (equilibrium steady state, net-export accounting, targeted allocation) so
