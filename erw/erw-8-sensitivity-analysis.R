@@ -193,7 +193,9 @@ for (r_f in REGIMES) {
       rows[[length(rows) + 1]] <- data.frame(
         regime = r_f, crop = crop, grain_size_um = gs,
         reactivity_factor = round(new_grain_factor, 3),
-        grinding_usd_t    = round(new_grinding_usd, 2),
+        # grinding cost is per-pixel (tariff raster) since the erw-7 refactor,
+        # so report the scalar energy requirement instead of a single $ figure
+        grinding_kwh_t    = round(new_grinding_kWh, 1),
         gm_combined = r$combined$gm, ha_combined = r$combined$ha,
         gm_agro = r$agro$gm, gm_cdr = r$cdr$gm)
     }
