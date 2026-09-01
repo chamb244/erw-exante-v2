@@ -48,3 +48,10 @@ venv/
 
 # --- pre-net-export raster backup (local only; delete when confirmed) ---
 data/economics_erw_pre_netexport/
+
+# --- literature corpus (copyrighted PDFs + extracted full text; obtain via
+# --- the verified DOIs in litrature/ref-verification.json / papers/INDEX.md) ---
+litrature/*.pdf
+litrature/papers/*.pdf
+litrature/ew-esroc.txt
+litrature/ew-esroc-references.txt

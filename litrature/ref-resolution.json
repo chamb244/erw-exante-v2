@@ -1,0 +1,2149 @@
+[
+ {
+  "ref": 126,
+  "slug": "renforth2019-natcomm",
+  "topic": "stoichiometry: eta=1.5, Steinour",
+  "citation": "P. Renforth, Nat. Commun., 2019, 1\u20138.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s41467-019-09475-5",
+    "title": "The negative emission potential of alkaline materials",
+    "year": 2019,
+    "container": "Nature Communications",
+    "author1": "Renforth",
+    "score": 35.882668
+   },
+   {
+    "doi": "10.1038/s41467-020-16510-3",
+    "title": "Ambient weathering of magnesium oxide for CO2 removal from air",
+    "year": 2020,
+    "container": "Nature Communications",
+    "author1": "McQueen",
+    "score": 28.259342
+   },
+   {
+    "doi": "10.5194/sp-2023-1-ac1",
+    "title": "Comment on sp-2023-1",
+    "year": 2023,
+    "container": "",
+    "author1": "Renforth",
+    "score": 22.524187
+   }
+  ]
+ },
+ {
+  "ref": 18,
+  "slug": "renforth2012-ijggc",
+  "topic": "stoichiometry: modified Steinour, thermo ocean bound",
+  "citation": "P. Renforth, International Journal of Greenhouse Gas Control, 2012, 10, 229\u2013243.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.ijggc.2012.06.011",
+    "title": "The potential of enhanced weathering in the UK",
+    "year": 2012,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "Renforth",
+    "score": 64.02107
+   },
+   {
+    "doi": "10.1016/j.ijggc.2023.104010",
+    "title": "An inventory of UK mineral resources suitable for enhanced rock weathering",
+    "year": 2023,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "Madankan",
+    "score": 41.457897
+   },
+   {
+    "doi": "10.1016/s1750-5836(12)00199-5",
+    "title": "Editorial Board",
+    "year": 2012,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "",
+    "score": 40.67537
+   }
+  ]
+ },
+ {
+  "ref": 37,
+  "slug": "renforth-henderson2017-revgeo",
+  "topic": "ocean storage, 15-20% loss, 0.8 charge ratio",
+  "citation": "P. Renforth and G. Henderson, Reviews of Geophysics, 2017, 55, 636\u2013674.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1002/2016rg000533",
+    "title": "Assessing ocean alkalinity for carbon sequestration",
+    "year": 2017,
+    "container": "Reviews of Geophysics",
+    "author1": "Renforth",
+    "score": 67.60335
+   },
+   {
+    "doi": "10.1002/rog.v55.2",
+    "title": "",
+    "year": 2017,
+    "container": "Reviews of Geophysics",
+    "author1": "",
+    "score": 32.125576
+   },
+   {
+    "doi": "10.1002/rog.v55.1",
+    "title": "",
+    "year": 2017,
+    "container": "Reviews of Geophysics",
+    "author1": "",
+    "score": 32.1106
+   }
+  ]
+ },
+ {
+  "ref": 125,
+  "slug": "lewis2021-appgeo",
+  "topic": "basalt 6x CDR spread, reactivity, Cr/Ni",
+  "citation": "A. L. Lewis, B. Sarkar, P. Wade, S. J. Kemp, M. E. Hodson, L. L. Taylor, K. L. Yeong, K. Davies, P. N. Nelson, M. I. Bird, I. B. Kantola, M. D. Masters, E. DeLucia, J. R. Leake, S. A. Banwart and D. J. Beerling, Applied Geochemistry, 2021, 132, 105023.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.apgeochem.2021.105023",
+    "title": "Effects of mineralogy, chemistry and physical properties of basalts on carbon capture potential and plant-nutrient eleme",
+    "year": 2021,
+    "container": "Applied Geochemistry",
+    "author1": "Lewis",
+    "score": 118.3615
+   },
+   {
+    "doi": "10.1038/s41477-018-0108-y",
+    "title": "Farming with crops and rocks to address global climate, food and soil security",
+    "year": 2018,
+    "container": "Nature Plants",
+    "author1": "Beerling",
+    "score": 55.502285
+   },
+   {
+    "doi": "10.1038/s41477-018-0162-5",
+    "title": "Publisher Correction: Farming with crops and rocks to address global climate, food and soil security",
+    "year": 2018,
+    "container": "Nature Plants",
+    "author1": "Beerling",
+    "score": 53.517807
+   }
+  ]
+ },
+ {
+  "ref": 132,
+  "slug": "moller-dupla-appgeo",
+  "topic": "basalt bulk-chemistry data quality",
+  "citation": "B. M\u00f6ller and X. Dupla, Applied Geochemistry, DOI:10.1016/j.apgeochem.2025.106630.",
+  "doi_in_text": "10.1016/j"
+ },
+ {
+  "ref": 19,
+  "slug": "beerling2020-nature",
+  "topic": "0.5-2 Gt/yr, national cost curves",
+  "citation": "D. J. Beerling, E. P. Kantzas, M. R. Lomas, P. Wade, R. M. Eufrasio, P. Renforth, B. Sarkar, M. G. Andrews, R. H. James, C. R. Pearce, J. Mercure, H. Pollitt, P. B. Holden and N. R. Edwards, Nature, 2020, 583, 242\u2013248.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s41586-020-2448-9",
+    "title": "Potential for large-scale CO2 removal via enhanced rock weathering with croplands",
+    "year": 2020,
+    "container": "Nature",
+    "author1": "Beerling",
+    "score": 110.30904
+   },
+   {
+    "doi": "10.1038/s41561-022-00925-2",
+    "title": "Substantial carbon drawdown potential from enhanced rock weathering in the United Kingdom",
+    "year": 2022,
+    "container": "Nature Geoscience",
+    "author1": "Kantzas",
+    "score": 63.148666
+   },
+   {
+    "doi": "10.1038/s41586-024-08429-2",
+    "title": "Transforming US agriculture for carbon removal with enhanced weathering",
+    "year": 2025,
+    "container": "Nature",
+    "author1": "Beerling",
+    "score": 62.658955
+   }
+  ]
+ },
+ {
+  "ref": 23,
+  "slug": "strefler2018-erl",
+  "topic": "basalt $200 vs dunite $60, grinding-p80, 4.9Gt",
+  "citation": "J. Strefler, T. Amann, N. Bauer, E. Kriegler and J. Hartmann, Environmental Research Letters, DOI:10.1088/1748-9326/aaa9c4.",
+  "doi_in_text": "10.1088/1748-9326/aaa9c4"
+ },
+ {
+  "ref": 24,
+  "slug": "baek2023-earthsfuture",
+  "topic": "Africa 1.2-1.6 tCO2/ha/yr, SCEPTER",
+  "citation": "S. H. Baek, Y. Kanzaki, J. M. Lora, N. Planavsky, C. T. Reinhard and S. Zhang, Earths Future, 2023, 11, 1\u2013 12.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1029/2023ef003698",
+    "title": "Impact of Climate on the Global Capacity for Enhanced Rock Weathering on Croplands",
+    "year": 2023,
+    "container": "Earth's Future",
+    "author1": "Baek",
+    "score": 62.90095
+   },
+   {
+    "doi": "10.5194/gmd-2023-137",
+    "title": "In-silico calculation of soil pH by SCEPTER v1.0",
+    "year": 2023,
+    "container": "",
+    "author1": "Kanzaki",
+    "score": 44.250595
+   },
+   {
+    "doi": "10.5194/egusphere-egu24-21731",
+    "title": "Tracking river responses to enhanced rock weathering",
+    "year": 2025,
+    "container": "",
+    "author1": "Zhang",
+    "score": 43.294224
+   }
+  ]
+ },
+ {
+  "ref": 245,
+  "slug": "tu2026-commsust",
+  "topic": "tropical hotspots, income-group shares",
+  "citation": "Y. Tu, R. Rafols, Y. Xu, N. Butler and L. Ababneh, Communications Sustainability, 2026, 1, 1\u201312.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s44458-026-00034-w",
+    "title": "Scaling up enhanced rock weathering for equitable climate change mitigation",
+    "year": 2026,
+    "container": "Communications Sustainability",
+    "author1": "Tu",
+    "score": 56.20657
+   },
+   {
+    "doi": "10.2139/ssrn.6346598",
+    "title": "Rice Farming for Climate Change Adaptation in the Northeastern United States",
+    "year": 2026,
+    "container": "",
+    "author1": "Liao",
+    "score": 29.42315
+   },
+   {
+    "doi": "10.1038/s44458-026-00109-8",
+    "title": "Systematic review supports a spatial system framework for social ecological systems in urban sustainability science",
+    "year": 2026,
+    "container": "Communications Sustainability",
+    "author1": "Xu",
+    "score": 24.12658
+   }
+  ]
+ },
+ {
+  "ref": 517,
+  "slug": "chen2023-stoten",
+  "topic": "0.22 Gt/yr calibrated lower bound",
+  "citation": "A. Chen, Z. Chen, Z. Qiu and B. L. Lin, Science of the Total Environment, 2023, 900, 165766.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.scitotenv.2023.165766",
+    "title": "Experimentally-calibrated estimation of CO2 removal potentials of enhanced weathering",
+    "year": 2023,
+    "container": "Science of The Total Environment",
+    "author1": "Chen",
+    "score": 66.70809
+   },
+   {
+    "doi": "10.1016/j.scitotenv.2023.165913",
+    "title": "Study on the influence pattern and efficiency enhanced mechanism of acoustic\u2013chemical spray dust reduction",
+    "year": 2023,
+    "container": "Science of The Total Environment",
+    "author1": "Zhao",
+    "score": 41.376724
+   },
+   {
+    "doi": "10.1016/j.scitotenv.2023.166722",
+    "title": "Advances on micro/nanoplastics and their effects on the living organisms: A review",
+    "year": 2023,
+    "container": "Science of The Total Environment",
+    "author1": "Zhao",
+    "score": 39.21309
+   }
+  ]
+ },
+ {
+  "ref": 14,
+  "slug": "hartmann-kempe2008",
+  "topic": "0.24 Gt/yr empirical bound",
+  "citation": "J. Hartmann and S. Kempe, Naturwissenschaften, 2008, 95, 1159\u20131164.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1007/s00114-008-0434-4",
+    "title": "What is the maximum potential for CO2 sequestration by \u201cstimulated\u201d weathering on the global scale?",
+    "year": 2008,
+    "container": "Naturwissenschaften",
+    "author1": "Hartmann",
+    "score": 58.939518
+   },
+   {
+    "doi": "10.1007/s00114-009-0514-0",
+    "title": "Water input requirements of the rapidly shrinking Dead Sea",
+    "year": 2009,
+    "container": "Naturwissenschaften",
+    "author1": "Abu Ghazleh",
+    "score": 30.969322
+   },
+   {
+    "doi": "10.1007/s00114-008-0403-y",
+    "title": "The evolution of M\u00fcllerian mimicry",
+    "year": 2008,
+    "container": "Naturwissenschaften",
+    "author1": "Sherratt",
+    "score": 26.128777
+   }
+  ]
+ },
+ {
+  "ref": 17,
+  "slug": "kohler2010-pnas",
+  "topic": "olivine 3.7 Gt/yr",
+  "citation": "P. K\u00f6hler, J. Hartmann and D. A. Wolf-Gladrow, Proc. Natl. Acad. Sci. U. S. A., 2010, 107, 20228\u201320233.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1073/pnas.1000545107",
+    "title": "Geoengineering potential of artificially enhanced silicate weathering of olivine",
+    "year": 2010,
+    "container": "Proceedings of the National Academy of Sciences",
+    "author1": "K\u00f6hler",
+    "score": 91.439766
+   },
+   {
+    "doi": "10.1073/pnas.1019468108",
+    "title": "Reply to Schuiling et al.: Different processes at work",
+    "year": 2011,
+    "container": "Proceedings of the National Academy of Sciences",
+    "author1": "K\u00f6hler",
+    "score": 56.09321
+   },
+   {
+    "doi": "10.1073/pnas.0910757106",
+    "title": "Modulation of \u03b3-secretase specificity using small molecule allosteric inhibitors",
+    "year": 2009,
+    "container": "Proceedings of the National Academy of Sciences",
+    "author1": "Shelton",
+    "score": 41.220306
+   }
+  ]
+ },
+ {
+  "ref": 22,
+  "slug": "beerling2025-nature",
+  "topic": "US corn belt acidity/pH projection",
+  "citation": "D. J. Beerling, E. P. Kantzas, M. R. Lomas, L. L. Taylor, S. Zhang, Y. Kanzaki, R. M. Eufrasio, P. Renforth, J. F. Mecure, H. Pollitt, P. B. Holden, N. R. Edwards, L. Koh, D. Z. Epihov, A. Wolf, J. E. Hansen, S. A. Banwart, N. F. Pidgeon, C. T. Reinhard, N. J. Planavsky and M. Val Martin, Nature, 2025, 638, 1\u201310.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s41586-024-08429-2",
+    "title": "Transforming US agriculture for carbon removal with enhanced weathering",
+    "year": 2025,
+    "container": "Nature",
+    "author1": "Beerling",
+    "score": 118.594406
+   },
+   {
+    "doi": "10.1038/s41561-022-00925-2",
+    "title": "Substantial carbon drawdown potential from enhanced rock weathering in the United Kingdom",
+    "year": 2022,
+    "container": "Nature Geoscience",
+    "author1": "Kantzas",
+    "score": 95.43715
+   },
+   {
+    "doi": "10.1038/s41586-020-2448-9",
+    "title": "Potential for large-scale CO2 removal via enhanced rock weathering with croplands",
+    "year": 2020,
+    "container": "Nature",
+    "author1": "Beerling",
+    "score": 81.58999
+   }
+  ]
+ },
+ {
+  "ref": 20,
+  "slug": "kantzas2022-natgeo",
+  "topic": "UK RTM, pedogenic carbonate fig",
+  "citation": "E. P. Kantzas, M. V. Martin, M. R. Lomas, R. M. Eufrasio, P. Renforth, A. L. Lewis, L. L. Taylor, J. Mecure, H. Pollitt, P. V Vercoulen, N. Vakilifard, P. B. Holden, N. R. Edwards, L. Koh, N. F. Pidgeon, S. A. Banwart and D. J. Beerling, Nat. Geosci., 2022, 15, 382\u2013389.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s41561-022-00925-2",
+    "title": "Substantial carbon drawdown potential from enhanced rock weathering in the United Kingdom",
+    "year": 2022,
+    "container": "Nature Geoscience",
+    "author1": "Kantzas",
+    "score": 131.05554
+   },
+   {
+    "doi": "10.1038/s41586-024-08429-2",
+    "title": "Transforming US agriculture for carbon removal with enhanced weathering",
+    "year": 2025,
+    "container": "Nature",
+    "author1": "Beerling",
+    "score": 95.43015
+   },
+   {
+    "doi": "10.1038/s41586-020-2448-9",
+    "title": "Potential for large-scale CO2 removal via enhanced rock weathering with croplands",
+    "year": 2020,
+    "container": "Nature",
+    "author1": "Beerling",
+    "score": 77.04961
+   }
+  ]
+ },
+ {
+  "ref": 221,
+  "slug": "brantley2023-science",
+  "topic": "Arrhenius T control",
+  "citation": "S. L. Brantley, A. Shaughnessy, M. I. Lebedeva and V. N. Balashov, Science (1979)., 2023, 379, 382\u2013389.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1126/science.add2922",
+    "title": "How temperature-dependent silicate weathering acts as Earth\u2019s geological thermostat",
+    "year": 2023,
+    "container": "Science",
+    "author1": "Brantley",
+    "score": 70.83863
+   },
+   {
+    "doi": "10.1016/j.chemgeo.2007.07.008",
+    "title": "A reactive diffusion model describing transformation of bedrock to saprolite",
+    "year": 2007,
+    "container": "Chemical Geology",
+    "author1": "Lebedeva",
+    "score": 32.625103
+   },
+   {
+    "doi": "10.1016/j.geomorph.2016.09.027",
+    "title": "Toward a conceptual model relating chemical reaction fronts to water flow paths in hills",
+    "year": 2017,
+    "container": "Geomorphology",
+    "author1": "Brantley",
+    "score": 30.361256
+   }
+  ]
+ },
+ {
+  "ref": 58,
+  "slug": "deng2022-natcomm",
+  "topic": "T/runoff dependence",
+  "citation": "K. Deng, S. Yang and Y. Guo, Nat. Commun., DOI:10.1038/s41467-022-29415-0.",
+  "doi_in_text": "10.1038/s41467-022-29415-0"
+ },
+ {
+  "ref": 56,
+  "slug": "white-blum1995-gca",
+  "topic": "natural watershed T dependence",
+  "citation": "A. F. White and A. E. Blum, Geochim. Cosmochim. Acta, 1995, 59, 1729\u20131747.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/0016-7037(95)00078-e",
+    "title": "Effects of climate on chemical_ weathering in watersheds",
+    "year": 1995,
+    "container": "Geochimica et Cosmochimica Acta",
+    "author1": "White",
+    "score": 48.9171
+   },
+   {
+    "doi": "10.1016/0016-7037(85)90157-7",
+    "title": "Geochim. Cosmochim. Acta production schedule",
+    "year": 1985,
+    "container": "Geochimica et Cosmochimica Acta",
+    "author1": "",
+    "score": 40.506577
+   },
+   {
+    "doi": "10.1016/0016-7037(70)90052-9",
+    "title": "Geochim. Cosmochim. Acta",
+    "year": 1970,
+    "container": "Geochimica et Cosmochimica Acta",
+    "author1": "",
+    "score": 39.548523
+   }
+  ]
+ },
+ {
+  "ref": 222,
+  "slug": "pvstrandmann2022-frontclim",
+  "topic": "low-T dissolution rates",
+  "citation": "P. A. E. Pogge von Strandmann, C. Tooley, J. J. P. A. Mulders and P. Renforth, Frontiers in Climate, 2022, 4, 1\u201311.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.3389/fclim.2022.827698",
+    "title": "The Dissolution of Olivine Added to Soil at 4\u00b0C: Implications for Enhanced Weathering in Cold Regions",
+    "year": 2022,
+    "container": "Frontiers in Climate",
+    "author1": "Pogge von Strandmann",
+    "score": 71.9277
+   },
+   {
+    "doi": "10.3389/fclim.2024.1252210",
+    "title": "The dissolution of olivine added to soil at 32\u00b0C: the fate of weathering products and its implications for enhanced weat",
+    "year": 2024,
+    "container": "Frontiers in Climate",
+    "author1": "Iff",
+    "score": 48.06053
+   },
+   {
+    "doi": "10.1016/j.apgeochem.2015.05.016",
+    "title": "The dissolution of olivine added to soil: Implications for enhanced weathering",
+    "year": 2015,
+    "container": "Applied Geochemistry",
+    "author1": "Renforth",
+    "score": 44.27862
+   }
+  ]
+ },
+ {
+  "ref": 223,
+  "slug": "iff2024-frontclim",
+  "topic": "T dependence + Ni",
+  "citation": "N. Iff, P. Renforth and P. A. E. Pogge von Strandmann, Frontiers in Climate, 2024, 6, 1\u201318.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.3389/fclim.2024.1252210",
+    "title": "The dissolution of olivine added to soil at 32\u00b0C: the fate of weathering products and its implications for enhanced weat",
+    "year": 2024,
+    "container": "Frontiers in Climate",
+    "author1": "Iff",
+    "score": 61.569145
+   },
+   {
+    "doi": "10.3389/fclim.2022.827698",
+    "title": "The Dissolution of Olivine Added to Soil at 4\u00b0C: Implications for Enhanced Weathering in Cold Regions",
+    "year": 2022,
+    "container": "Frontiers in Climate",
+    "author1": "Pogge von Strandmann",
+    "score": 49.40164
+   },
+   {
+    "doi": "10.1016/j.apgeochem.2015.05.016",
+    "title": "The dissolution of olivine added to soil: Implications for enhanced weathering",
+    "year": 2015,
+    "container": "Applied Geochemistry",
+    "author1": "Renforth",
+    "score": 44.27862
+   }
+  ]
+ },
+ {
+  "ref": 225,
+  "slug": "white-brantley2003-chemgeo",
+  "topic": "lab-field rate gap",
+  "citation": "A. F. White and S. L. Brantley, Chem. Geol., 2003, 202, 479\u2013506.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.chemgeo.2003.03.001",
+    "title": "The effect of time on the weathering of silicate minerals: why do weathering rates differ in the laboratory and field?",
+    "year": 2003,
+    "container": "Chemical Geology",
+    "author1": "White",
+    "score": 40.567898
+   },
+   {
+    "doi": "10.1016/b0-08-043748-6/08173-1",
+    "title": "Superoxide Processing",
+    "year": 2003,
+    "container": "Comprehensive Coordination Chemistry II",
+    "author1": "Miller",
+    "score": 26.065994
+   },
+   {
+    "doi": "10.1007/978-3-662-05324-9_25",
+    "title": "Flexible Manufacturing Systems",
+    "year": 2003,
+    "container": "Petri Nets for Systems Engineering",
+    "author1": "Fzpeleta",
+    "score": 25.327332
+   }
+  ]
+ },
+ {
+  "ref": 59,
+  "slug": "west2012-geology",
+  "topic": "supply vs kinetic limitation",
+  "citation": "J. A. West, Geology, 2012, 40, 811\u2013814.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1130/g33041.1",
+    "title": "Thickness of the chemical weathering zone and implications for erosional and climatic drivers of weathering and for carb",
+    "year": 2012,
+    "container": "Geology",
+    "author1": "West",
+    "score": 37.971447
+   },
+   {
+    "doi": "10.5771/9780810883291-811",
+    "title": "17 Miscellaneous Pucciniana",
+    "year": 2012,
+    "container": "Giacomo Puccini",
+    "author1": "Flury",
+    "score": 27.35696
+   },
+   {
+    "doi": "10.1007/978-3-319-09048-1_157",
+    "title": "Search and Assessment of Decompression Zones in Landslide Slopes of the North-West Coast of the Black Sea (Ukraine)",
+    "year": 2014,
+    "container": "Engineering Geology for Society and Territory - Volume 5",
+    "author1": "Dragomyretskyy",
+    "score": 27.224539
+   }
+  ]
+ },
+ {
+  "ref": 238,
+  "slug": "maher-chamberlain2014-science",
+  "topic": "hydrologic control",
+  "citation": "K. Maher and C. P. Chamberlain, Science (1979)., 2014, 343, 1502\u20131504.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1126/science.1250770",
+    "title": "Hydrologic Regulation of Chemical Weathering and the Geologic Carbon Cycle",
+    "year": 2014,
+    "container": "Science",
+    "author1": "Maher",
+    "score": 52.792564
+   },
+   {
+    "doi": "10.1093/ref:odnb/75213",
+    "title": "Chamberlain, Joan (d. 1504?)",
+    "year": 2004,
+    "container": "Oxford Dictionary of National Biography",
+    "author1": "",
+    "score": 26.688
+   },
+   {
+    "doi": "10.1016/j.cell.2014.05.032",
+    "title": "Assembling Cell Ensembles",
+    "year": 2014,
+    "container": "Cell",
+    "author1": "Spruston",
+    "score": 26.018581
+   }
+  ]
+ },
+ {
+  "ref": 239,
+  "slug": "maher2010-epsl",
+  "topic": "residence time control",
+  "citation": "K. Maher, Earth Planet. Sci. Lett., 2010, 294, 101\u2013110.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.epsl.2010.03.010",
+    "title": "The dependence of chemical weathering rates on fluid residence time",
+    "year": 2010,
+    "container": "Earth and Planetary Science Letters",
+    "author1": "Maher",
+    "score": 40.22375
+   },
+   {
+    "doi": "10.1016/j.epsl.2009.11.038",
+    "title": "Erratum to \u201cTemperature changes in ascending kimberlite magma\u201d [Earth Planet. Sci. Lett. 286 (2009) 404\u2013413]",
+    "year": 2010,
+    "container": "Earth and Planetary Science Letters",
+    "author1": "Kavanagh",
+    "score": 28.678793
+   },
+   {
+    "doi": "10.1146/earth.2010.38.issue-1",
+    "title": "",
+    "year": 2010,
+    "container": "Annual Review of Earth and Planetary Sciences",
+    "author1": "",
+    "score": 28.600714
+   }
+  ]
+ },
+ {
+  "ref": 214,
+  "slug": "bertagni-porporato2022-stoten",
+  "topic": "alkalinisation capture efficiency (pH factor)",
+  "citation": "M. B. Bertagni and A. Porporato, Science of the Total Environment, 2022, 838, 156524.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.scitotenv.2022.156524",
+    "title": "The Carbon-Capture Efficiency of Natural Water Alkalinization: Implications For Enhanced weathering",
+    "year": 2022,
+    "container": "Science of The Total Environment",
+    "author1": "Bertagni",
+    "score": 71.79038
+   },
+   {
+    "doi": "10.1016/j.scitotenv.2024.172384",
+    "title": "The water footprint of hydrogen production",
+    "year": 2024,
+    "container": "Science of The Total Environment",
+    "author1": "Olaitan",
+    "score": 47.409195
+   },
+   {
+    "doi": "10.1016/s0048-9697(22)03862-1",
+    "title": "Editorial Board",
+    "year": 2022,
+    "container": "Science of The Total Environment",
+    "author1": "",
+    "score": 36.52027
+   }
+  ]
+ },
+ {
+  "ref": 161,
+  "slug": "power2025-frontclim",
+  "topic": "low-pH CO2 speciation, dose decline",
+  "citation": "I. M. Power, V. N. J. Hatten, M. Guo, K. Rausis and H. Klyn-hesselink, Frontiers in Climate, 2025, 6, 1\u20139.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.3389/fclim.2024.1510747",
+    "title": "Are enhanced rock weathering rates overestimated? A few geochemical and mineralogical pitfalls",
+    "year": 2025,
+    "container": "Frontiers in Climate",
+    "author1": "Power",
+    "score": 69.656975
+   },
+   {
+    "doi": "10.46427/gold2024.22423",
+    "title": "The mining industry\u2019s role in enhanced weathering and mineralization for CO<sub>2</sub> removal",
+    "year": 2024,
+    "container": "Goldschmidt2024 abstracts",
+    "author1": "Paulo",
+    "score": 45.475098
+   },
+   {
+    "doi": "10.3389/fclim.2025.1592626",
+    "title": "Enhanced weathering of kimberlite residues in a field experiment: implications for carbon removal quantification and min",
+    "year": 2025,
+    "container": "Frontiers in Climate",
+    "author1": "Schaffer",
+    "score": 30.916183
+   }
+  ]
+ },
+ {
+  "ref": 216,
+  "slug": "holden2024-stoten",
+  "topic": "tropical acidity obviates CDR, 98% strong-acid",
+  "citation": "F. J. Holden, K. Davies, M. I. Bird, R. Hume, H. Green, D. J. Beerling and P. N. Nelson, Science of the Total Environment, 2024, 955, 176568.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.scitotenv.2024.176568",
+    "title": "In-field carbon dioxide removal via weathering of crushed basalt applied to acidic tropical agricultural soil",
+    "year": 2024,
+    "container": "Science of The Total Environment",
+    "author1": "Holden",
+    "score": 86.710815
+   },
+   {
+    "doi": "10.2139/ssrn.4904649",
+    "title": "In-Field Carbon Dioxide Removal Via Weathering of Crushed Basalt Applied to Acidic Tropical Agricultural Soil",
+    "year": 2024,
+    "container": "",
+    "author1": "Holden",
+    "score": 60.075306
+   },
+   {
+    "doi": "10.46427/gold2024.22297",
+    "title": "In-field carbon dioxide removal via weathering of crushed basalt applied to acidic tropical agricultural soil",
+    "year": 2024,
+    "container": "Goldschmidt2024 abstracts",
+    "author1": "Holden",
+    "score": 56.3565
+   }
+  ]
+ },
+ {
+  "ref": 182,
+  "slug": "rimstidt2012-gca",
+  "topic": "SSA-rate relations",
+  "citation": "J. D. Rimstidt, S. L. Brantley and A. A. Olsen, Geochim. Cosmochim. Acta, 2012, 99, 159\u2013178.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.gca.2012.09.019",
+    "title": "Systematic review of forsterite dissolution rate data",
+    "year": 2012,
+    "container": "Geochimica et Cosmochimica Acta",
+    "author1": "Rimstidt",
+    "score": 62.905315
+   },
+   {
+    "doi": "10.1016/0016-7037(85)90157-7",
+    "title": "Geochim. Cosmochim. Acta production schedule",
+    "year": 1985,
+    "container": "Geochimica et Cosmochimica Acta",
+    "author1": "",
+    "score": 40.495316
+   },
+   {
+    "doi": "10.1016/0016-7037(70)90052-9",
+    "title": "Geochim. Cosmochim. Acta",
+    "year": 1970,
+    "container": "Geochimica et Cosmochimica Acta",
+    "author1": "",
+    "score": 39.533554
+   }
+  ]
+ },
+ {
+  "ref": 184,
+  "slug": "renforth2015-appgeo",
+  "topic": "GSA vs BET",
+  "citation": "P. Renforth, P. A. E. Pogge von Strandmann and G. M. Henderson, Applied Geochemistry, 2015, 61, 109\u2013 118.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.apgeochem.2015.05.016",
+    "title": "The dissolution of olivine added to soil: Implications for enhanced weathering",
+    "year": 2015,
+    "container": "Applied Geochemistry",
+    "author1": "Renforth",
+    "score": 90.706116
+   },
+   {
+    "doi": "10.1016/j.chemgeo.2020.120008",
+    "title": "The lithium and magnesium isotope signature of olivine dissolution in soil experiments",
+    "year": 2021,
+    "container": "Chemical Geology",
+    "author1": "Pogge von Strandmann",
+    "score": 45.84212
+   },
+   {
+    "doi": "10.1130/g36162.1",
+    "title": "The Li isotope response to mountain uplift",
+    "year": 2015,
+    "container": "Geology",
+    "author1": "Pogge von Strandmann",
+    "score": 45.685352
+   }
+  ]
+ },
+ {
+  "ref": 208,
+  "slug": "harrington2024-stoten",
+  "topic": "grain size not independent predictor",
+  "citation": "K. J. Harrington, G. M. Henderson and R. G. Hilton, Science of the Total Environment, 2024, 957, 177458.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.scitotenv.2024.177458",
+    "title": "Current rates of CO2 removal due to rock weathering in the UK",
+    "year": 2024,
+    "container": "Science of The Total Environment",
+    "author1": "Harrington",
+    "score": 68.59964
+   },
+   {
+    "doi": "10.1016/j.scitotenv.2024.177675",
+    "title": "Climate change and wind energy potential in South America",
+    "year": 2024,
+    "container": "Science of The Total Environment",
+    "author1": "Martinez",
+    "score": 32.449425
+   },
+   {
+    "doi": "10.1016/j.scitotenv.2024.177537",
+    "title": "Assessing phosphorus fluxes in Portugal",
+    "year": 2024,
+    "container": "Science of The Total Environment",
+    "author1": "Lima",
+    "score": 32.446007
+   }
+  ]
+ },
+ {
+  "ref": 65,
+  "slug": "harrington2023-appgeo",
+  "topic": "river carbonate 16-27% loss",
+  "citation": "K. J. Harrington, R. G. Hilton and G. M. Henderson, Applied Geochemistry, 2023, 152, 1\u201312.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.apgeochem.2023.105643",
+    "title": "Implications of the Riverine Response to Enhanced Weathering for CO2 removal in the UK",
+    "year": 2023,
+    "container": "Applied Geochemistry",
+    "author1": "Harrington",
+    "score": 52.841354
+   },
+   {
+    "doi": "10.1016/s0883-2927(23)00119-1",
+    "title": "Editorial Board",
+    "year": 2023,
+    "container": "Applied Geochemistry",
+    "author1": "",
+    "score": 32.391094
+   },
+   {
+    "doi": "10.1016/j.apgeochem.2023.105622",
+    "title": "Response to Comment from West et al. on, \u201cSoil core study indicates limited CO2 removal by enhanced weathering in dry cr",
+    "year": 2023,
+    "container": "Applied Geochemistry",
+    "author1": "Buckingham",
+    "score": 31.37122
+   }
+  ]
+ },
+ {
+  "ref": 164,
+  "slug": "gillman2002-appgeo",
+  "topic": "basalt dust CEC plateau 10-25 t/ha",
+  "citation": "G. P. Gillman, D. C. Burkett and R. J. Coventry, Applied Geochemistry, 2002, 17, 987\u20131001.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/s0883-2927(02)00078-1",
+    "title": "Amending highly weathered soils with finely ground basalt rock",
+    "year": 2002,
+    "container": "Applied Geochemistry",
+    "author1": "Gillman",
+    "score": 79.149864
+   },
+   {
+    "doi": "10.1016/s0883-2927(02)00094-x",
+    "title": "Environmental Geochemistry",
+    "year": 2002,
+    "container": "Applied Geochemistry",
+    "author1": "Fuge",
+    "score": 32.77968
+   },
+   {
+    "doi": "10.1016/s0883-2927(02)00200-7",
+    "title": "Annual Index",
+    "year": 2002,
+    "container": "Applied Geochemistry",
+    "author1": "",
+    "score": 32.238907
+   }
+  ]
+ },
+ {
+  "ref": 75,
+  "slug": "goll2021-natgeo",
+  "topic": "CDR efficiency declines with rate",
+  "citation": "D. S. Goll, P. Ciais, T. Amann, W. Buermann, J. Chang, S. Eker, J. Hartmann, I. Janssens, W. Li, M. Obersteiner, J. Penuelas, K. Tanaka and S. Vicca, Nat. Geosci., 2021, 14, 545\u2013549.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s41561-021-00798-x",
+    "title": "Potential CO2 removal from enhanced weathering by ecosystem responses to powdered rock",
+    "year": 2021,
+    "container": "Nature Geoscience",
+    "author1": "Goll",
+    "score": 132.10461
+   },
+   {
+    "doi": "10.1002/ecy.2652",
+    "title": "The bioelements, the elementome, and the biogeochemical niche",
+    "year": 2019,
+    "container": "Ecology",
+    "author1": "Pe\u00f1uelas",
+    "score": 43.033566
+   },
+   {
+    "doi": "10.1038/s41586-023-05725-1",
+    "title": "Diagnosing destabilization risk in global land carbon sinks",
+    "year": 2023,
+    "container": "Nature",
+    "author1": "Fern\u00e1ndez-Mart\u00ednez",
+    "score": 42.132347
+   }
+  ]
+ },
+ {
+  "ref": 172,
+  "slug": "calabrese-erw",
+  "topic": "dose saturation modelling",
+  "citation": "S. Calabrese, B. Wild, M. B. Bertagni, I. C. Bourg, C. White, F. Aburto, G. Cipolla, L. V. Noto and A. Porporato, Environ. Sci. Technol., 2022, 56, 15261\u201315272.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1021/acs.est.2c03163",
+    "title": "Nano- to Global-Scale Uncertainties in Terrestrial Enhanced Weathering",
+    "year": 2022,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Calabrese",
+    "score": 122.24871
+   },
+   {
+    "doi": "10.5194/egusphere-egu24-9664",
+    "title": "Carbon sequestration uncertainties: bridging the model-data gap for enhanced weathering",
+    "year": 2025,
+    "container": "",
+    "author1": "Calabrese",
+    "score": 63.957436
+   },
+   {
+    "doi": "10.22541/essoar.170559500.09183720/v1",
+    "title": "Advancing Enhanced Weathering Modeling in Soils: Systematic Comparison and Validation with Experimental Data",
+    "year": 2024,
+    "container": "",
+    "author1": "Bertagni",
+    "score": 60.862778
+   }
+  ]
+ },
+ {
+  "ref": 68,
+  "slug": "kanzaki-lag-erl",
+  "topic": "CEC/BS lag years-decades \u2014 KEY for lambda",
+  "citation": "Y. Kanzaki, N. Planavsky, S. Zhang, J. Jordan, T. J. Suhrhoff and T. Christopher, Environmental Research Letters, 2025, 20, 1\u201311.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1088/1748-9326/ade0d5",
+    "title": "Soil cation storage is a key control on the carbon removal dynamics of enhanced weathering",
+    "year": 2025,
+    "container": "Environmental Research Letters",
+    "author1": "Kanzaki",
+    "score": 61.203472
+   },
+   {
+    "doi": "10.70212/cdrxiv.2025351.v1",
+    "title": "Soil cation storage is a key control on the carbon removal dynamics of enhanced weathering",
+    "year": 2025,
+    "container": "",
+    "author1": "Kanzaki",
+    "score": 54.582615
+   },
+   {
+    "doi": "10.22541/essoar.172163224.49852060/v1",
+    "title": "Soil cation storage as a key control on the timescales of carbon dioxide removal through enhanced weathering",
+    "year": 2024,
+    "container": "",
+    "author1": "Kanzaki",
+    "score": 48.517178
+   }
+  ]
+ },
+ {
+  "ref": 354,
+  "slug": "hamilton2007-gbc",
+  "topic": "liming CO2 charge balance \u2014 F provenance",
+  "citation": "S. K. Hamilton, A. L. Kurzman, C. Arango, L. Jin and G. P. Robertson, Global Biogeochem. Cycles, 2007, 21, 1\u201312.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1029/2006gb002738",
+    "title": "Evidence for carbon sequestration by agricultural liming",
+    "year": 2007,
+    "container": "Global Biogeochemical Cycles",
+    "author1": "Hamilton",
+    "score": 68.624626
+   },
+   {
+    "doi": "10.1029/2011gb004266",
+    "title": "Correction to \u201cEvidence for carbon sequestration by agricultural liming\u201d",
+    "year": 2012,
+    "container": "Global Biogeochemical Cycles",
+    "author1": "Hamilton",
+    "score": 59.299057
+   },
+   {
+    "doi": "10.1002/gbc.v25.1",
+    "title": "",
+    "year": 2011,
+    "container": "Global Biogeochemical Cycles",
+    "author1": "",
+    "score": 42.69219
+   }
+  ]
+ },
+ {
+  "ref": 29,
+  "slug": "west-mcbride2005-aee",
+  "topic": "ag lime emission factor",
+  "citation": "T. O. West and A. C. McBride, Agric. Ecosyst. Environ., 2005, 108, 145\u2013154.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.agee.2005.01.002",
+    "title": "The contribution of agricultural lime to carbon dioxide emissions in the United States: dissolution, transport, and net ",
+    "year": 2005,
+    "container": "Agriculture, Ecosystems &amp; Environment",
+    "author1": "West",
+    "score": 35.145138
+   },
+   {
+    "doi": "10.1016/j.agee.2005.06.001",
+    "title": "Corrigendum to \u201cEnvironmental impact and economic assessment for UK sugar beet production systems\u201d [Agric. Ecosyst. Envi",
+    "year": 2005,
+    "container": "Agriculture, Ecosystems &amp; Environment",
+    "author1": "Tzilivakis",
+    "score": 25.45959
+   },
+   {
+    "doi": "10.1016/j.agee.2005.01.001",
+    "title": "Corrigendum to \u201cPhysical and social access to land: spatio-temporal patterns of agricultural expansion in Madagascar\u201d [A",
+    "year": 2005,
+    "container": "Agriculture, Ecosystems &amp; Environment",
+    "author1": "McConnell",
+    "score": 24.57005
+   }
+  ]
+ },
+ {
+  "ref": 231,
+  "slug": "dietzen-rosing2023-ijggc",
+  "topic": "conservative strong-acid proxy",
+  "citation": "C. Dietzen and M. T. Rosing, International Journal of Greenhouse Gas Control, 2023, 125, 1\u201310.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.ijggc.2023.103872",
+    "title": "Quantification of CO2 uptake by enhanced weathering of silicate minerals applied to acidic soils",
+    "year": 2023,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "Dietzen",
+    "score": 58.207367
+   },
+   {
+    "doi": "10.1016/s1750-5836(23)00068-3",
+    "title": "Editorial Board",
+    "year": 2023,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "",
+    "score": 41.879517
+   },
+   {
+    "doi": "10.1016/j.ijggc.2023.103889",
+    "title": "Puncture Failure Size Probability Distribution for CO2 Pipelines",
+    "year": 2023,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "Yi",
+    "score": 37.26335
+   }
+  ]
+ },
+ {
+  "ref": 357,
+  "slug": "brantley2025-revgeo",
+  "topic": "rates fall 10-100x over 10yr",
+  "citation": "S. L. Brantley, Reviews of Geophysics, 2025, 63, 1\u201347.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1029/2025rg000881",
+    "title": "Understanding the Lab\u2010Field Discrepancy in Mineral Dissolution From Flasks to Enhanced Rock Weathering",
+    "year": 2025,
+    "container": "Reviews of Geophysics",
+    "author1": "Brantley",
+    "score": 37.38934
+   },
+   {
+    "doi": "10.1002/rog.v63.1",
+    "title": "",
+    "year": 2025,
+    "container": "Reviews of Geophysics",
+    "author1": "",
+    "score": 33.60546
+   },
+   {
+    "doi": "10.1002/rog.20345",
+    "title": "Issue Information",
+    "year": 2024,
+    "container": "Reviews of Geophysics",
+    "author1": "",
+    "score": 31.92072
+   }
+  ]
+ },
+ {
+  "ref": 66,
+  "slug": "zhang-river-erl",
+  "topic": "river degassing <5%/>15%",
+  "citation": "S. Zhang, C. T. Reinhard, S. Liu, Y. Kanzaki and N. J. Planavsky, Environmental Research Letters , DOI:10.1088/1748-9326/ada398.",
+  "doi_in_text": "10.1088/1748-9326/ada398"
+ },
+ {
+  "ref": 31,
+  "slug": "raymond2025-natwater",
+  "topic": "SIC redissolution recovers penalty",
+  "citation": "P. Raymond, N. Planavsky and C. T. Reinhard, Nature Water, 2025, 3, 844\u2013847.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s44221-025-00473-0",
+    "title": "Using carbonates for carbon removal",
+    "year": 2025,
+    "container": "Nature Water",
+    "author1": "Raymond",
+    "score": 68.59756
+   },
+   {
+    "doi": "10.1038/s44221-025-00513-9",
+    "title": "Author Correction: Using carbonates for carbon removal",
+    "year": 2025,
+    "container": "Nature Water",
+    "author1": "Raymond",
+    "score": 49.50247
+   },
+   {
+    "doi": "10.70212/cdrxiv.2025394.v1",
+    "title": "Aggregated monitoring of enhanced weathering on agricultural lands",
+    "year": 2025,
+    "container": "",
+    "author1": "Suhrhoff",
+    "score": 33.18831
+   }
+  ]
+ },
+ {
+  "ref": 275,
+  "slug": "zhang-carrying-capacity",
+  "topic": "riverine carrying capacity",
+  "citation": "S. Zhang, N. J. Planavsky, J. Katchinoff, P. A. Raymond, Y. Kanzaki, T. Reershemius and C. T. Reinhard, Limnol. Oceanogr., 2022, 1\u201310.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1002/lno.12244",
+    "title": "River chemistry constraints on the carbon capture potential of surficial enhanced rock weathering",
+    "year": 2022,
+    "container": "Limnology and Oceanography",
+    "author1": "Zhang",
+    "score": 67.26627
+   },
+   {
+    "doi": "10.1130/abs/2021am-370182",
+    "title": "INSIGHTS FROM RIVER CHEMISTRY INTO CARBON CAPTURE POTENTIAL THROUGH SURFICIAL ENHANCED ROCK WEATHERING",
+    "year": 2021,
+    "container": "Geological Society of America Abstracts with Programs",
+    "author1": "",
+    "score": 66.66626
+   },
+   {
+    "doi": "10.7185/gold2025.29785",
+    "title": "Acidity addition in the Mississippi watershed drives agricultural CO\n                    <sub>2</sub>\n                  ",
+    "year": 2025,
+    "container": "Goldschmidt2025 abstracts",
+    "author1": "Suhrhoff",
+    "score": 55.308052
+   }
+  ]
+ },
+ {
+  "ref": 372,
+  "slug": "chiquier2022-ees",
+  "topic": "CDR payback timescales",
+  "citation": "S. Chiquier, P. Patrizio, M. Bui, N. Sunny and N. Mac Dowell, Energy Environ. Sci., 2022, 15, 4389\u20134403.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1039/d2ee01021f",
+    "title": "A comparative analysis of the efficiency, timing, and permanence of CO\n                    <sub>2</sub>\n                ",
+    "year": 2022,
+    "container": "Energy &amp; Environmental Science",
+    "author1": "Chiquier",
+    "score": 94.16406
+   },
+   {
+    "doi": "10.2139/ssrn.4298436",
+    "title": "The Efficiency, Timing and Permanence of CDR Pathways: A Comparative Analysis",
+    "year": 2022,
+    "container": "",
+    "author1": "Chiquier",
+    "score": 74.8812
+   },
+   {
+    "doi": "10.1039/d2ee90060b",
+    "title": "Correction: A comparative analysis of the efficiency, timing, and permanence of CO\n                    <sub>2</sub>\n    ",
+    "year": 2023,
+    "container": "Energy &amp; Environmental Science",
+    "author1": "Chiquier",
+    "score": 70.660034
+   }
+  ]
+ },
+ {
+  "ref": 353,
+  "slug": "kantola2023-gcb",
+  "topic": "lysimeter strong-acid 0.1-1.8%, plant uptake",
+  "citation": "I. B. Kantola, E. Blanc-Betes, M. D. Master, E. Chang, A. Marklein, C. E. Moore, A. von Haden, C. J. Bernacchi, A. Wolf, D. Z. Epihov, D. J. Beerling and E. H. Delucia, Glob. Chang. Biol., 2023, 1\u201317.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1111/gcb.16903",
+    "title": "Improved net carbon budgets in the\n                    <scp>US</scp>\n                    Midwest through direct measured",
+    "year": 2023,
+    "container": "Global Change Biology",
+    "author1": "Kantola",
+    "score": 103.83751
+   },
+   {
+    "doi": "10.7185/gold2023.15402",
+    "title": "Immobile Trace Element Based Enhanced Rock Weathering Soil Measurements of Carbon Reductions in the US Midwest",
+    "year": 2023,
+    "container": "Goldschmidt2023 abstracts",
+    "author1": "Chang",
+    "score": 93.08749
+   },
+   {
+    "doi": "10.1111/gcb.17031",
+    "title": "Validating assumptions in calculating carbon dioxide removal by enhanced rock weathering in Kantola et al.,\u00a02023",
+    "year": 2023,
+    "container": "Global Change Biology",
+    "author1": "Wolf",
+    "score": 86.48938
+   }
+  ]
+ },
+ {
+  "ref": 298,
+  "slug": "zamanian2016-esr",
+  "topic": "pedogenic carbonate review",
+  "citation": "K. Zamanian, K. Pustovoytov and Y. Kuzyakov, Earth. Sci. Rev., 2016, 157, 1\u201317.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.earscirev.2016.03.003",
+    "title": "Pedogenic carbonates: Forms and formation processes",
+    "year": 2016,
+    "container": "Earth-Science Reviews",
+    "author1": "Zamanian",
+    "score": 66.72076
+   },
+   {
+    "doi": "10.1016/j.catena.2016.03.012",
+    "title": "Cation exchange retards shell carbonate recrystallization: consequences for dating and paleoenvironmental reconstruction",
+    "year": 2016,
+    "container": "CATENA",
+    "author1": "Zamanian",
+    "score": 44.47778
+   },
+   {
+    "doi": "10.1016/j.geoderma.2016.07.013",
+    "title": "Recrystallization of shell carbonate in soil: 14 C labeling, modeling and relevance for dating and paleo-reconstructions",
+    "year": 2016,
+    "container": "Geoderma",
+    "author1": "Zamanian",
+    "score": 41.934998
+   }
+  ]
+ },
+ {
+  "ref": 286,
+  "slug": "huang-globalsic",
+  "topic": "global SIC aridity",
+  "citation": "Y. Huang, X. Song, Y. Wang, J. G. Canadell, Y. Luo, P. Ciais, A. Chen, S. Hong, Y. Wang, F. Tao, W. Li, Y. Xu, R. Mirzaeitalarposhti, H. Elbasiouny, I. Savin, D. Shchepashchenko, R. A. V. Rossel, D. S. Goll, J. Chang, B. Z. Houlton, H. Wu, F. Yang, X. Feng, Y. Chen, Y. Liu, S. Niu and G. Zhang, Science (1979)., 2024, 384, 233\u2013239.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1126/science.adi7918",
+    "title": "Size, distribution, and vulnerability of the global soil inorganic carbon",
+    "year": 2024,
+    "container": "Science",
+    "author1": "Huang",
+    "score": 110.611206
+   },
+   {
+    "doi": "10.1201/9781351047760-10",
+    "title": "Farming Technologies for Sugarcane Production in Upland Fields Yang-Rui Li,Xiu-Peng Song, Jian-Ming Wu,Chang-Ning Li,Qia",
+    "year": 2018,
+    "container": "Sustainable Sugarcane Production",
+    "author1": "",
+    "score": 41.928627
+   },
+   {
+    "doi": "10.21203/rs.3.rs-59060/v1",
+    "title": "The Trans-omics Landscape of COVID-19",
+    "year": 2020,
+    "container": "",
+    "author1": "Wu",
+    "score": 41.339725
+   }
+  ]
+ },
+ {
+  "ref": 111,
+  "slug": "klemme2022-cee",
+  "topic": "tropical peat CO2 offset",
+  "citation": "A. Klemme, T. Rixen, M. M\u00fcller, J. Notholt and T. Warneke, Commun. Earth Environ., 2022, 3, 1\u20139.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/s43247-022-00544-0",
+    "title": "Destabilization of carbon in tropical peatlands by enhanced weathering",
+    "year": 2022,
+    "container": "Communications Earth &amp; Environment",
+    "author1": "Klemme",
+    "score": 79.25876
+   },
+   {
+    "doi": "10.5194/egusphere-egu24-10324",
+    "title": "Destabilization of carbon in tropical peatlands by enhanced rock weathering",
+    "year": 2025,
+    "container": "",
+    "author1": "Klemme",
+    "score": 62.348587
+   },
+   {
+    "doi": "10.5194/bg-19-2855-2022",
+    "title": "CO\n                    <sub>2</sub>\n                    emissions from peat-draining rivers regulated by water pH",
+    "year": 2022,
+    "container": "Biogeosciences",
+    "author1": "Klemme",
+    "score": 57.399727
+   }
+  ]
+ },
+ {
+  "ref": 434,
+  "slug": "reershemius-suhrhoff2023-gcb",
+  "topic": "Kantola CDR indistinguishable from zero",
+  "citation": "T. Reershemius and T. J. Suhrhoff, Glob. Chang. Biol., 2023, 1\u20133.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1111/gcb.17025",
+    "title": "On error, uncertainty, and assumptions in calculating carbon dioxide removal rates by enhanced rock weathering in Kantol",
+    "year": 2023,
+    "container": "Global Change Biology",
+    "author1": "Reershemius",
+    "score": 31.485897
+   },
+   {
+    "doi": "10.31223/x52d7t",
+    "title": "A Review of Measurement for Quantification of Carbon Dioxide Removal by Enhanced Weathering in Soil",
+    "year": 2023,
+    "container": "",
+    "author1": "Clarkson",
+    "score": 31.349575
+   },
+   {
+    "doi": "10.70212/cdrxiv.2025394.v2",
+    "title": "Aggregated monitoring of enhanced weathering on agricultural lands",
+    "year": 2025,
+    "container": "",
+    "author1": "Suhrhoff",
+    "score": 29.182323
+   }
+  ]
+ },
+ {
+  "ref": 435,
+  "slug": "derry2025-gcb",
+  "topic": "field CDR uncertainty",
+  "citation": "L. A. Derry, O. A. Chadwick and S. Porder, Glob. Chang. Biol., 2025, 31, 1\u20133.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1111/gcb.70067",
+    "title": "Estimation of Carbon Dioxide Removal via Enhanced Weathering",
+    "year": 2025,
+    "container": "Global Change Biology",
+    "author1": "Derry",
+    "score": 44.057724
+   },
+   {
+    "doi": "10.46427/gold2024.24194",
+    "title": "Assessment of CO<sub>2</sub> consumption from basalt amendments to soils.",
+    "year": 2024,
+    "container": "Goldschmidt2024 abstracts",
+    "author1": "Derry",
+    "score": 39.6828
+   },
+   {
+    "doi": "10.1007/s10021-003-0199-8",
+    "title": "Erosion and the Rejuvenation of Weathering-derived Nutrient Supply in an Old Tropical Landscape",
+    "year": 2003,
+    "container": "Ecosystems",
+    "author1": "Vitousek",
+    "score": 28.998386
+   }
+  ]
+ },
+ {
+  "ref": 93,
+  "slug": "xu2025-gcb",
+  "topic": "SOC meta-analysis +3.8%",
+  "citation": "T. Xu, H. Li, S. Vicca, D. S. Goll, D. J. Beerling, Q. Chen, B. Bi, Z. Yang, X. Wang and Z. Yuan, Glob. Chang. Biol., 2025, 31, 1\u201315.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1111/gcb.70483",
+    "title": "Enhanced Rock Weathering Promotes Soil Organic Carbon Accumulation: A Global Meta\u2010Analysis Based on Experimental Evidenc",
+    "year": 2025,
+    "container": "Global Change Biology",
+    "author1": "Xu",
+    "score": 62.32304
+   },
+   {
+    "doi": "10.1111/gcb.17464",
+    "title": "Enhanced silicate weathering accelerates forest carbon sequestration by stimulating the soil mineral carbon pump",
+    "year": 2024,
+    "container": "Global Change Biology",
+    "author1": "Xu",
+    "score": 52.812546
+   },
+   {
+    "doi": "10.1016/j.jenvman.2024.123477",
+    "title": "Enhanced rock weathering boosts ecosystem multifunctionality via improving microbial networks complexity in a tropical f",
+    "year": 2025,
+    "container": "Journal of Environmental Management",
+    "author1": "Wang",
+    "score": 43.407955
+   }
+  ]
+ },
+ {
+  "ref": 42,
+  "slug": "wang2021-gcb",
+  "topic": "liming SOC meta-analysis",
+  "citation": "Y. Wang, Z. Yao, Y. Zhan, X. Zheng, M. Zhou, G. Yan, L. Wang, C. Werner and K. Butterbach-Bahl, Glob. Chang. Biol., 2021, 27, 2807\u20132821.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1111/gcb.15607",
+    "title": "Potential benefits of liming to acid soils on climate change mitigation and food security",
+    "year": 2021,
+    "container": "Global Change Biology",
+    "author1": "Wang",
+    "score": 79.70055
+   },
+   {
+    "doi": "10.1016/j.jenvman.2023.118276",
+    "title": "Characteristics of annual NH3 emissions from a conventional vegetable field under various nitrogen management strategies",
+    "year": 2023,
+    "container": "Journal of Environmental Management",
+    "author1": "Wang",
+    "score": 50.770893
+   },
+   {
+    "doi": "10.1016/j.envpol.2017.08.108",
+    "title": "Reducing N2O and NO emissions while sustaining crop productivity in a Chinese vegetable-cereal double cropping system",
+    "year": 2017,
+    "container": "Environmental Pollution",
+    "author1": "Yao",
+    "score": 42.936172
+   }
+  ]
+ },
+ {
+  "ref": 47,
+  "slug": "swoboda2022-stoten",
+  "topic": "rock dust agronomy review",
+  "citation": "P. Swoboda, T. F. D\u00f6ring and M. Hamer, Science of the Total Environment, 2022, 807, 1\u201318.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.scitotenv.2021.150976",
+    "title": "Remineralizing soils? The agricultural usage of silicate rock powders: A review",
+    "year": 2022,
+    "container": "Science of The Total Environment",
+    "author1": "Swoboda",
+    "score": 60.779343
+   },
+   {
+    "doi": "10.1016/s0048-9697(21)07472-6",
+    "title": "Editorial Board",
+    "year": 2022,
+    "container": "Science of The Total Environment",
+    "author1": "",
+    "score": 36.247257
+   },
+   {
+    "doi": "10.1016/s0048-9697(21)07479-9",
+    "title": "Editorial Board",
+    "year": 2022,
+    "container": "Science of The Total Environment",
+    "author1": "",
+    "score": 36.21517
+   }
+  ]
+ },
+ {
+  "ref": 650,
+  "slug": "vonuexkull-mutert1995",
+  "topic": "30% acid soils global",
+  "citation": "H. R. von Uexk\u00fcll and E. Mutert, Plant Soil, 1995, 171, 1\u201315.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1007/bf00009558",
+    "title": "Global extent, development and economic impact of acid soils",
+    "year": 1995,
+    "container": "Plant and Soil",
+    "author1": "von Uexk\u00fcll",
+    "score": 66.271164
+   },
+   {
+    "doi": "10.1007/978-94-011-0221-6_1",
+    "title": "Global extent, development and economic impact of acid soils",
+    "year": 1995,
+    "container": "Plant-Soil Interactions at Low pH: Principles and Management",
+    "author1": "von Uexk\u00fcll",
+    "score": 50.396885
+   },
+   {
+    "doi": "10.1007/bf00010295",
+    "title": "Contents volume 171 (1995)",
+    "year": 1995,
+    "container": "Plant and Soil",
+    "author1": "",
+    "score": 33.69649
+   }
+  ]
+ },
+ {
+  "ref": 620,
+  "slug": "vanstraaten2002-rocksforcrops",
+  "topic": "SSA agrominerals book",
+  "citation": "P. van Straaten, Rocks for crops: agrominerals of sub-Saharan Africa, ICRAF, University of Guelph, 2002.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.5716/wp16110.pdf",
+    "title": "Review of agricultural market information systems in sub-Saharan Africa",
+    "year": 2016,
+    "container": "",
+    "author1": "",
+    "score": 38.18484
+   },
+   {
+    "doi": "10.1016/j.fcr.2022.108677",
+    "title": "The theoretical potential for tailored fertilizer application. The case of maize in Sub-Saharan Africa",
+    "year": 2022,
+    "container": "Field Crops Research",
+    "author1": "van Heerwaarden",
+    "score": 34.650707
+   },
+   {
+    "doi": "10.5040/9780755637003.0007",
+    "title": "Turkish rapprochement with sub-Saharan Africa (2002\u201311)",
+    "year": 2021,
+    "container": "Turkey in Africa",
+    "author1": "",
+    "score": 34.52337
+   }
+  ]
+ },
+ {
+  "ref": 556,
+  "slug": "haque2024-kenya",
+  "topic": "Kenya smallholder +$326/ha",
+  "citation": "F. Haque, V. J. Clementi, B. M\u00f6ller, L. Bastianini, C. Odhiambo, S. Sagina, H. Ondolo, C. Kechir and S. Davies, Yield Increases for smallholder farmers in Sub Saharan Africa via Enhanced Rock Weathering, 2024.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.5194/egusphere-egu25-7491",
+    "title": "The agronomic impact of enhanced weathering deployments in Sub-Saharan Africa: Insights from a smallholder field trial i",
+    "year": 2025,
+    "container": "",
+    "author1": "Haque",
+    "score": 108.38168
+   },
+   {
+    "doi": "10.70212/cdrxiv.2025410.v1",
+    "title": "Agronomic Performance of Enhanced Rock Weathering in a Tropical Smallholder System: A Maize Trial in Kenya",
+    "year": 2025,
+    "container": "",
+    "author1": "Haque",
+    "score": 93.187675
+   },
+   {
+    "doi": "10.18258/73181",
+    "title": "Smallholder farmer climate adaptation with Enhanced Rock Weathering (ERW) based soil rejuvenation in sub-saharan Africa",
+    "year": 2024,
+    "container": "",
+    "author1": "Shantanu Agarwal",
+    "score": 61.232204
+   }
+  ]
+ },
+ {
+  "ref": 444,
+  "slug": "beerling-cornbelt",
+  "topic": "US corn belt field trial yield/NUE",
+  "citation": "D. J. Beerling, D. Z. Epihov, I. B. Kantola, M. D. Masters, T. Reershemius, N. J. Planavskyc, C. T. Reinhard, J. S. Jordan, S. J. Thorne, J. Weber, M. V. Martin, R. P. Freckleton, S. E. Hartley, R. H. James, C. R. Pearce, E. H. DeLucia, S. A. Banwart, N. J. Planavsky, C. T. Reinhard, J. S. Jordan, S. J. Thorne, J. Weber, M. V. Martin, R. P. Freckleton, S. E. Hartley, R. H. James, C. R. Pearce, E. H. DeLucia and S. A. Banwart, Proceedings of the National Academy of Sciences, 2024, 121, 1\u201310.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1073/pnas.2319436121",
+    "title": "Enhanced weathering in the US Corn Belt delivers carbon removal with agronomic benefits",
+    "year": 2024,
+    "container": "Proceedings of the National Academy of Sciences",
+    "author1": "Beerling",
+    "score": 100.85347
+   },
+   {
+    "doi": "10.7185/gold2025.31247",
+    "title": "Lithoautotrophy primes basalt grains for chemical dissolution in enhanced weathering field trials",
+    "year": 2025,
+    "container": "Goldschmidt2025 abstracts",
+    "author1": "Epihov",
+    "score": 63.45765
+   },
+   {
+    "doi": "10.1021/acs.est.3c10146",
+    "title": "Iron Chelation in Soil: Scalable Biotechnology for Accelerating Carbon Dioxide Removal by Enhanced Rock Weathering",
+    "year": 2024,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Epihov",
+    "score": 58.30153
+   }
+  ]
+ },
+ {
+  "ref": 388,
+  "slug": "ramos2022-geoscifront",
+  "topic": "maize field yield 1.1-1.7x",
+  "citation": "C. G. Ramos, J. C. Hower, E. Blanco, M. L. S. Oliveira and S. H. Theodoro, Geoscience Frontiers, 2022, 13, 1\u201311.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.gsf.2021.101185",
+    "title": "Possibilities of using silicate rock powder: An overview",
+    "year": 2022,
+    "container": "Geoscience Frontiers",
+    "author1": "Ramos",
+    "score": 69.48622
+   },
+   {
+    "doi": "10.1016/j.gsf.2021.101151",
+    "title": "Artisanal ceramic factories using wood combustion: A nanoparticles and human health study",
+    "year": 2022,
+    "container": "Geoscience Frontiers",
+    "author1": "Martinello",
+    "score": 46.194675
+   },
+   {
+    "doi": "10.1016/j.gsf.2021.101149",
+    "title": "Source identification and global implications of black carbon",
+    "year": 2022,
+    "container": "Geoscience Frontiers",
+    "author1": "Blanco-Donado",
+    "score": 38.877636
+   }
+  ]
+ },
+ {
+  "ref": 129,
+  "slug": "dupla2023-ejss",
+  "topic": "heavy metals thresholds/accumulation",
+  "citation": "X. Dupla, B. M\u00f6ller, P. C. Baveye and S. Grand, Eur. J. Soil Sci., 2023, 1\u201314.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1111/ejss.13343",
+    "title": "Potential accumulation of toxic trace elements in soils during enhanced rock weathering",
+    "year": 2023,
+    "container": "European Journal of Soil Science",
+    "author1": "Dupla",
+    "score": 50.952663
+   },
+   {
+    "doi": "10.1111/sum.13092",
+    "title": "Are soil carbon credits empty promises? Shortcomings of current soil carbon quantification methodologies and improvement",
+    "year": 2024,
+    "container": "Soil Use and Management",
+    "author1": "Dupla",
+    "score": 35.33744
+   },
+   {
+    "doi": "10.3389/fenvs.2015.00010",
+    "title": "Grand challenges in the research on soil processes",
+    "year": 2015,
+    "container": "Frontiers in Environmental Science",
+    "author1": "Baveye",
+    "score": 34.96447
+   }
+  ]
+ },
+ {
+  "ref": 98,
+  "slug": "tepas2023-frontclim",
+  "topic": "olivine Ni groundwater limits",
+  "citation": "E. E. E. M. te Pas, M. Hagens and R. N. J. Comans, Frontiers in Climate, 2023, 01\u201315.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.3389/fclim.2022.954064",
+    "title": "Assessment of the enhanced weathering potential of different silicate minerals to improve soil quality and sequester CO2",
+    "year": 2023,
+    "container": "Frontiers in Climate",
+    "author1": "te Pas",
+    "score": 51.028664
+   },
+   {
+    "doi": "10.7185/gold2021.4063",
+    "title": "Is the CO<sub>2</sub> hunter a green, black or white mineral?",
+    "year": 2021,
+    "container": "Goldschmidt2021 abstracts",
+    "author1": "te Pas",
+    "score": 46.80669
+   },
+   {
+    "doi": "10.7185/gold2023.19975",
+    "title": "Can combinations of enhanced weathering and biochar co-benefit crop productivity and soil CO<sub>2</sub> sequestration?",
+    "year": 2023,
+    "container": "Goldschmidt2023 abstracts",
+    "author1": "te Pas",
+    "score": 46.51098
+   }
+  ]
+ },
+ {
+  "ref": 542,
+  "slug": "mercer2024-gri",
+  "topic": "MRV cost $15-71",
+  "citation": "L. Mercer, J. Burke and S. Rodway-Dyer, Towards improved cost estimates for monitoring, reporting and verification of carbon dioxide removal, London, 2024.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1109/oceans51537.2024.10682413",
+    "title": "Technology Requirements for Monitoring Reporting and Verification of Ocean Carbon Dioxide Removal",
+    "year": 2024,
+    "container": "OCEANS 2024 - Singapore",
+    "author1": "Manley",
+    "score": 49.38867
+   },
+   {
+    "doi": "10.1021/acs.est.4c09510.s001",
+    "title": "Life Cycle Assessment in the Monitoring, Reporting and Verification of Land-Based Carbon Dioxide Removal: Gaps and Oppor",
+    "year": null,
+    "container": "",
+    "author1": "",
+    "score": 47.012726
+   },
+   {
+    "doi": "10.31219/osf.io/y5cfz",
+    "title": "Report for the  Carbon Dioxide Removal (CDR): Towards a Unified Monitoring, Measuring, Reporting and Verification (MMRV)",
+    "year": 2023,
+    "container": "",
+    "author1": "Shrestha",
+    "score": 41.87948
+   }
+  ]
+ },
+ {
+  "ref": 133,
+  "slug": "madankan-renforth2023-ijggc",
+  "topic": "basalt production/reserves",
+  "citation": "M. Madankan and P. Renforth, International Journal of Greenhouse Gas Control, 2023, 130, 104010.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.ijggc.2023.104010",
+    "title": "An inventory of UK mineral resources suitable for enhanced rock weathering",
+    "year": 2023,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "Madankan",
+    "score": 78.91095
+   },
+   {
+    "doi": "10.1016/j.ijggc.2012.06.011",
+    "title": "The potential of enhanced weathering in the UK",
+    "year": 2012,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "Renforth",
+    "score": 42.197395
+   },
+   {
+    "doi": "10.1016/s1750-5836(23)00194-9",
+    "title": "Editorial Board",
+    "year": 2023,
+    "container": "International Journal of Greenhouse Gas Control",
+    "author1": "",
+    "score": 42.079304
+   }
+  ]
+ },
+ {
+  "ref": 543,
+  "slug": "li2024-frontclim",
+  "topic": "grinding cost $/t",
+  "citation": "Z. Li, N. J. Planavsky and C. T. Reinhard, Frontiers in Climate, 2024, 6, 1\u201310.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.3389/fclim.2024.1380651",
+    "title": "Geospatial assessment of the cost and energy demand of feedstock grinding for enhanced rock weathering in the coterminou",
+    "year": 2024,
+    "container": "Frontiers in Climate",
+    "author1": "Li",
+    "score": 37.042698
+   },
+   {
+    "doi": "10.3389/fclim.2024.1346117",
+    "title": "A tool for assessing the sensitivity of soil-based approaches for quantifying enhanced weathering: a US case study",
+    "year": 2024,
+    "container": "Frontiers in Climate",
+    "author1": "Suhrhoff",
+    "score": 32.527985
+   },
+   {
+    "doi": "10.1038/s44168-025-00324-4",
+    "title": "The importance of radical transparency for responsible carbon dioxide removal",
+    "year": 2026,
+    "container": "npj Climate Action",
+    "author1": "Reinhard",
+    "score": 32.2258
+   }
+  ]
+ },
+ {
+  "ref": 428,
+  "slug": "zhang-transport-est",
+  "topic": "transport-dominated LCA",
+  "citation": "B. Zhang, J. Kroeger, N. Planavsky and Y. Yao, Environ. Sci. Technol., DOI:10.1021/acs.est.3c01658.",
+  "doi_in_text": "10.1021/acs"
+ },
+ {
+  "ref": 544,
+  "slug": "kroeger2026-est",
+  "topic": "co-benefits N2O into LCA/TEA",
+  "citation": "J. Kroeger, B. Zhang, N. Planavsky and Y. Yao, Environ. Sci. Technol., 2026, 60, 6125\u20136225.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1021/acs.est.5c14334",
+    "title": "Analyzing Co-Benefits and Rock Sourcing in Life Cycle and Techno-Economic Assessment of Enhanced Rock Weathering",
+    "year": 2026,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Kroeger",
+    "score": 51.247772
+   },
+   {
+    "doi": "10.1021/acs.est.3c01658",
+    "title": "Techno-Economic and Life Cycle Assessment of Enhanced Rock Weathering: A Case Study from the Midwestern United States",
+    "year": 2023,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Zhang",
+    "score": 42.561314
+   },
+   {
+    "doi": "10.1021/acs.est.3c09200",
+    "title": "Correction to \u201cTechno-Economic and Life Cycle Assessment of Enhanced Rock Weathering: A Case Study from the Midwestern U",
+    "year": 2023,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Zhang",
+    "score": 42.018517
+   }
+  ]
+ },
+ {
+  "ref": 209,
+  "slug": "lefebvre-lca",
+  "topic": "ERW LCA Brazil",
+  "citation": "D. Lefebvre, P. Goglio, A. Williams, D. A. C. Manning, A. C. de Azevedo, M. Bergmann, J. Meersmans and P. Smith, J. Clean. Prod., 2019, 233, 468\u2013481.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.jclepro.2019.06.099",
+    "title": "Assessing the potential of soil carbonation and enhanced weathering through Life Cycle Assessment: A case study for Sao ",
+    "year": 2019,
+    "container": "Journal of Cleaner Production",
+    "author1": "Lefebvre",
+    "score": 78.33351
+   },
+   {
+    "doi": "10.1038/s41598-020-76470-y",
+    "title": "Modelling the potential for soil carbon sequestration using biochar from sugarcane residues in Brazil",
+    "year": 2020,
+    "container": "Scientific Reports",
+    "author1": "Lefebvre",
+    "score": 43.05868
+   },
+   {
+    "doi": "10.1016/j.jclepro.2021.127764",
+    "title": "An anticipatory life cycle assessment of the use of biochar from sugarcane residues as a greenhouse gas removal technolo",
+    "year": 2021,
+    "container": "Journal of Cleaner Production",
+    "author1": "Lefebvre",
+    "score": 38.242676
+   }
+  ]
+ },
+ {
+  "ref": 408,
+  "slug": "moosdorf2014-est",
+  "topic": "transport LCA global",
+  "citation": "N. Moosdorf, P. Renforth and J. Hartmann, Environ. Sci. Technol., 2014, 48, 4809\u20134816.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1021/es4052022",
+    "title": "Carbon Dioxide Efficiency of Terrestrial Enhanced Weathering",
+    "year": 2014,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Moosdorf",
+    "score": 80.67426
+   },
+   {
+    "doi": "10.1021/acs.est.8b00300",
+    "title": "Silicon Decreases Dimethylarsinic Acid Concentration in Rice Grain and Mitigates Straighthead Disorder",
+    "year": 2018,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Limmer",
+    "score": 32.10547
+   },
+   {
+    "doi": "10.1021/acs.est.6b05942",
+    "title": "Olivine Dissolution in Seawater: Implications for CO\n                    <sub>2</sub>\n                    Sequestration ",
+    "year": 2017,
+    "container": "Environmental Science &amp; Technology",
+    "author1": "Montserrat",
+    "score": 30.354517
+   }
+  ]
+ },
+ {
+  "ref": 414,
+  "slug": "taylor2015-natcc",
+  "topic": "spreading-dominated cost",
+  "citation": "L. L. Taylor, J. Quirk, R. M. S. Thorley, P. A. Kharecha, J. Hansen, A. Ridgwell, M. R. Lomas, S. A. Banwart and D. J. Beerling, Nat. Clim. Chang., 2015, 6, 402\u2013406.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1038/nclimate2882",
+    "title": "Enhanced weathering strategies for stabilizing climate and averting ocean acidification",
+    "year": 2015,
+    "container": "Nature Climate Change",
+    "author1": "Taylor",
+    "score": 103.965744
+   },
+   {
+    "doi": "10.5194/bg-11-321-2014",
+    "title": "Weathering by tree-root-associating fungi diminishes under simulated Cenozoic atmospheric CO\n                    <sub>2<",
+    "year": 2014,
+    "container": "Biogeosciences",
+    "author1": "Quirk",
+    "score": 38.78478
+   },
+   {
+    "doi": "10.5194/bgd-10-15779-2013",
+    "title": "Weathering by tree root-associating fungi diminishes under simulated Cenozoic atmospheric CO\n                  <sub>2</s",
+    "year": 2013,
+    "container": "",
+    "author1": "Quirk",
+    "score": 40.51232
+   }
+  ]
+ },
+ {
+  "ref": 559,
+  "slug": "oppon2023-ecolecon",
+  "topic": "Global South distributional",
+  "citation": "E. Oppon, J. S. Richter, S. C. L. Koh and H. Nabayiga, Ecological Economics, 2023, 204, 107636.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1016/j.ecolecon.2022.107636",
+    "title": "Macro-level economic and environmental sustainability of negative emission technologies; Case study of crushed silicate ",
+    "year": 2023,
+    "container": "Ecological Economics",
+    "author1": "Oppon",
+    "score": 77.648834
+   },
+   {
+    "doi": "10.1016/j.ecolecon.2018.01.030",
+    "title": "Modelling Multi-regional Ecological Exchanges: The Case of UK and Africa",
+    "year": 2018,
+    "container": "Ecological Economics",
+    "author1": "Oppon",
+    "score": 40.64111
+   },
+   {
+    "doi": "10.1007/s11367-023-02196-4",
+    "title": "Towards sustainable food production and climate change mitigation: an attributional life cycle assessment comparing indu",
+    "year": 2023,
+    "container": "The International Journal of Life Cycle Assessment",
+    "author1": "Oppon",
+    "score": 32.81921
+   }
+  ]
+ },
+ {
+  "ref": 110,
+  "slug": "kanzaki2022-gmd-scepter",
+  "topic": "SCEPTER model",
+  "citation": "Y. Kanzaki, S. Zhang, N. J. Planavsky and C. T. Reinhard, Geosci. Model Dev., 2022, 15, 4959\u20134990.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.5194/gmd-15-4959-2022",
+    "title": "Soil Cycles of Elements simulator for Predicting TERrestrial regulation of greenhouse gases: SCEPTER v0.9",
+    "year": 2022,
+    "container": "Geoscientific Model Development",
+    "author1": "Kanzaki",
+    "score": 77.55825
+   },
+   {
+    "doi": "10.5194/gmd-17-4515-2024",
+    "title": "In silico calculation of soil pH by SCEPTER v1.0",
+    "year": 2024,
+    "container": "Geoscientific Model Development",
+    "author1": "Kanzaki",
+    "score": 54.458363
+   },
+   {
+    "doi": "10.5194/egusphere-egu24-21731",
+    "title": "Tracking river responses to enhanced rock weathering",
+    "year": 2025,
+    "container": "",
+    "author1": "Zhang",
+    "score": 43.203186
+   }
+  ]
+ },
+ {
+  "ref": 252,
+  "slug": "bertagni-smew-james",
+  "topic": "SMEW model",
+  "citation": "M. B. Bertagni, S. Calabrese, G. Cipolla, L. Valerio Noto and A. M. Porporato, J. Adv. Model. Earth Syst., 2025, 17, 1\u201319.",
+  "doi_in_text": null,
+  "crossref_candidates": [
+   {
+    "doi": "10.1029/2024ms004224",
+    "title": "Advancing Enhanced Weathering Modeling in Soils: Critical Comparison With Experimental Data",
+    "year": 2024,
+    "container": "Journal of Advances in Modeling Earth Systems",
+    "author1": "Bertagni",
+    "score": 79.74447
+   },
+   {
+    "doi": "10.5194/egusphere-egu24-9664",
+    "title": "Carbon sequestration uncertainties: bridging the model-data gap for enhanced weathering",
+    "year": 2025,
+    "container": "",
+    "author1": "Calabrese",
+    "score": 71.67309
+   },
+   {
+    "doi": "10.22541/essoar.170559500.09183720/v1",
+    "title": "Advancing Enhanced Weathering Modeling in Soils: Systematic Comparison and Validation with Experimental Data",
+    "year": 2024,
+    "container": "",
+    "author1": "Bertagni",
+    "score": 60.863083
+   }
+  ]
+ }
+]
