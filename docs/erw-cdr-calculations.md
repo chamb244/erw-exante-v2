@@ -196,21 +196,28 @@ $$
 $$
 
 $$
-f_{\text{MAT}} = \mathrm{clamp}\!\left(\tfrac{\text{MAT}}{11},\,0.3,\,3.0\right),
+f_{\text{MAT}} = \mathrm{clamp}\!\left(
+\exp\!\Big[-\tfrac{E_a}{R}\Big(\tfrac{1}{T} - \tfrac{1}{T_{\text{ref}}}\Big)\Big],
+\,0.3,\,3.0\right),
 \qquad
-f_{\text{MAP}} = \mathrm{clamp}\!\left(\tfrac{\text{MAP}}{1000},\,0.3,\,3.0\right).
+f_{\text{MAP}} = \mathrm{clamp}\!\left(\tfrac{\text{MAP}}{1000},\,0.3,\,3.0\right),
 $$
 
-**Temperature term.** Silicate dissolution is thermally activated (Arrhenius),
-so warmer soils weather faster; the linear-in-$T$ multiplier is a first-order
-surrogate for that acceleration. Basalt-specific dissolution experiments give the
-activation energies directly: Gudbrandsson et al. (2011) [40] measured crystalline
-basalt over 5–75 °C, and Gíslason & Oelkers (2003) [41] basaltic glass over
-6–150 °C, both confirming strong Arrhenius acceleration; Palandri & Kharaka (2004)
-[42] tabulate the activation energies used in reactive-transport ERW models. The
-general temperature control on weathering flux is established by White & Brantley
-(2003) [11] and Brantley et al. (2008) [12], and the climate control on ERW CDR
-capacity specifically is mapped by Baek et al. (2023) [5].
+with $T$ in kelvin, $E_a = 68.8$ kJ mol⁻¹, and $T_{\text{ref}} = 284.15$ K (11 °C).
+
+**Temperature term (Arrhenius; headline since 2026-09).** Silicate dissolution is
+thermally activated, so the model applies the standard kinetic form directly,
+normalized to 1 at $T_{\text{ref}}$. The activation energy is the silicate value
+of White & Blum (1995) [43], the same value used by Cascade Climate's Weathering
+Potential Explorer. Basalt-specific dissolution experiments support the form:
+Gudbrandsson et al. (2011) [40] measured crystalline basalt over 5–75 °C, and
+Gíslason & Oelkers (2003) [41] basaltic glass over 6–150 °C; Palandri & Kharaka
+(2004) [42] tabulate the activation energies used in reactive-transport ERW
+models, and Brantley et al. (2023) [57] and Deng et al. (2022) [58] establish the
+exponential temperature control at watershed and global scale. The former linear
+multiplier clamp(MAT/11) is retained in `erw-9` as a conservative sensitivity
+variant (`CLIMATE_TEMP_MODE <- "linear"`); area-weighted over SSA, Arrhenius
+raises gross CDR by ~27% (capped) relative to it.
 
 **Moisture term.** Weathering export requires water moving through the profile;
 CDR flux rises with precipitation and drainage. The canonical field demonstration
@@ -224,27 +231,33 @@ The standard three-mechanism rate law,
 $r = k_{\text{acid}}\,a_{\text{H}^+}^{\,n} + k_{\text{neutral}} + k_{\text{base}}\,a_{\text{H}^+}^{-m}$,
 is compiled by Palandri & Kharaka (2004) [42]; basalt-specific pH data
 (Gíslason & Oelkers 2003 [41]; Gudbrandsson et al. 2011 [40]) show dissolution
-rate rising sharply below neutral pH. The model uses a triangular factor peaking
-near pH 5:
+rate rising sharply below neutral pH. But dissolution is only half of CDR: the
+carbon-capture *efficiency* of the generated alkalinity collapses below pH ~5,
+where DIC is almost entirely dissolved CO₂ and dissolution first neutralizes
+standing acidity rather than exporting bicarbonate (Bertagni & Porporato 2022
+[54]; Holden et al. 2024 [55]; Power et al. 2025 [56]). The model therefore uses
+a unimodal (triangular) factor peaking at pH 6.0 — between the pH-5
+capture-collapse threshold and carbonic-acid pK$_{a1}$ = 6.35 (moved from a
+peak of 5.0 in v2.2 and earlier):
 
 $$
 f_{\text{pH}} =
 \begin{cases}
 0.5 & \text{pH} < 4\\
-0.5 + 0.5(\text{pH}-4) & 4 \le \text{pH} < 5\\
-1.0 - 0.25(\text{pH}-5) & 5 \le \text{pH} < 7\\
-0.5 & \text{pH} \ge 7
+0.5 + 0.25(\text{pH}-4) & 4 \le \text{pH} < 6\\
+1.0 - 0.25(\text{pH}-6) & 6 \le \text{pH} < 8\\
+0.5 & \text{pH} \ge 8
 \end{cases}
 $$
 
-The rise from pH 4$\rightarrow$5 and the ~2× suppression on calcareous soils (pH > 7) follow
-the acid-catalyzed dissolution kinetics of White & Brantley (2003) [11] and
-Brantley et al. (2008) [12]. The peak near pH 5 and the roll-off below it is a
-modelling compromise: true rate is monotone in H⁺, but very low pH in these
-soils co-occurs with Al toxicity and low base status, so the factor is capped.
-This whole factor is flagged in code as a **v1 empirical proxy** to be replaced
-by a reactive-transport surrogate (Kanzaki et al. 2023 [10]) when calibration
-data allow.
+The declining arm above pH 6 follows the acid-catalyzed dissolution kinetics of
+White & Brantley (2003) [11] and Brantley et al. (2008) [12]; the rising arm
+below pH 6 encodes the capture-efficiency collapse. The 0.5 floor below pH 4
+(rather than 0) reflects that low-pH capture is a lag/discounting problem, not a
+permanent zero (Kanzaki et al. 2025 [59]). The piecewise-linear form and floor
+value remain modelling choices; the whole factor is flagged in code as a **v1
+empirical proxy** to be replaced by a reactive-transport surrogate (Kanzaki et
+al. 2023 [10]) when calibration data allow.
 
 ---
 
@@ -405,24 +418,26 @@ The same per-hectare removal is credited under three temporal regimes (in
 
 ## 11. Worked example (illustrative pixel)
 
-A warm, wet, moderately acid cropland pixel: MAT = 25 °C, MAP = 1200 mm,
-soil pH = 6.0, humid ($p_{\text{ped}}=0$), targeted rate $D=15$ t ha⁻¹,
+A warm, wet, moderately acid cropland pixel: MAT = 20 °C, MAP = 1200 mm,
+soil pH = 5.0, humid ($p_{\text{ped}}=0$), targeted rate $D=15$ t ha⁻¹,
 standing acidity $S_{\text{std}}=3.0$ t CaCO₃ ha⁻¹, maintenance
-$S_{\text{maint}}=0.30$ t CaCO₃ ha⁻¹.
+$S_{\text{maint}}=0.30$ t CaCO₃ ha⁻¹. (Numbers on the 2026-09 Arrhenius +
+pH-6.0 basis.)
 
 | Step | Computation | Result |
 |---|---|---|
-| $f_{\text{MAT}}$ | clamp(25/11) | 2.27 |
+| $f_{\text{MAT}}$ | clamp(exp[−8275.7·(1/293.15 − 1/284.15)]) | 2.45 |
 | $f_{\text{MAP}}$ | clamp(1200/1000) | 1.20 |
-| $f_{\text{pH}}$ | $1-0.25(6-5)$ | 0.75 |
-| $\Phi$ | min(0.283·2.27·1.20·0.75, 1) | 0.578 |
-| $c$ (per t) | 0.578·309.8·(1−0) | 179 kg t⁻¹ |
-| Gross CDR | 15·179/1000 | 2.69 t ha⁻¹ |
-| Net (year-1) | max(2.69 − 0.88·3.0, 0) | **0.05 t ha⁻¹** |
-| Net (equilibrium) | max(2.69 − 0.88·0.30, 0) | **2.43 t ha⁻¹** |
+| $f_{\text{pH}}$ | $0.5+0.25(5-4)$ | 0.75 |
+| $\Phi$ | min(0.283·2.45·1.20·0.75, 1) | 0.623 |
+| $c$ (per t) | 0.623·309.8·(1−0) | 193 kg t⁻¹ |
+| Gross CDR | 15·193/1000 | 2.90 t ha⁻¹ |
+| Net (year-1) | max(2.90 − 0.88·3.0, 0) | **0.26 t ha⁻¹** |
+| Net (equilibrium) | max(2.90 − 0.88·0.30, 0) | **2.63 t ha⁻¹** |
 
-The collapse from 2.69 $\rightarrow$ 0.05 t ha⁻¹ in year-1, and its survival at equilibrium,
-is the net-export effect in miniature.
+The collapse from 2.90 $\rightarrow$ 0.26 t ha⁻¹ in year-1 (91% of gross consumed by the
+standing acidity), and its survival at equilibrium, is the net-export effect in
+miniature.
 
 ---
 
@@ -481,8 +496,8 @@ modelling choice / convention rather than a single measured value.
 | Reference effective CDR | 87.6 kg t⁻¹ | `erw-3.R:132` |
 | $\phi_{\text{ref}}=\phi_0 g$ | 0.283 | `erw-9.R:48` |
 | $T_{\text{ref}}, P_{\text{ref}}$ | 11 °C, 1000 mm | `erw-9.R:83–84` (US Corn Belt normal) |
-| $f_{\text{MAT}}, f_{\text{MAP}}$ clamp [0.3, 3.0] | — | `erw-9.R:86–87` |
-| $f_{\text{pH}}$ triangular, peak ≈ 5 | — | `erw-9.R:90–93` |
+| $f_{\text{MAT}}$ Arrhenius, $E_a$ = 68.8 kJ/mol, clamp [0.3, 3.0] | — | `erw-9.R` §3 (White & Blum 1995 [43]) |
+| $f_{\text{pH}}$ triangular, peak 6.0 | — | `erw-9.R` §3 (Bertagni & Porporato [54]; Holden [55]) |
 | $\text{climate\_factor}=f_{\text{MAT}}f_{\text{MAP}}f_{\text{pH}}$ | — | `erw-9.R:96` |
 | Pedogenic fractions 0.90/0.70/0.40/0.15/0 | — | `erw-9.R:152–163` (bands from §13.3) |
 | Reactive fraction cap at 1 | — | `erw-9.R:181` |
@@ -553,10 +568,16 @@ therefore marked **A**.
 46. Dupla, X., Bertagni, M. B., & Grand, S. (2025). Three years of field trials indicate a sustained enhanced rock weathering signal with limited CO₂ removal. *Environmental Science & Technology*, 59(48), 25751–25764. https://doi.org/10.1021/acs.est.5c09820
 47. Harrington, K. J., Hilton, R. G., & Henderson, G. M. (2023). Implications of the riverine response to enhanced weathering for CO₂ removal in the UK. *Applied Geochemistry*, 152, 105643. https://doi.org/10.1016/j.apgeochem.2023.105643
 48. Dietzen, C., & Rosing, M. T. (2023). Quantification of CO₂ uptake by enhanced weathering of silicate minerals applied to acidic soils. *International Journal of Greenhouse Gas Control*, 125, 103872. https://doi.org/10.1016/j.ijggc.2023.103872
-49. Suhrhoff, T. J., Reershemius, T., Wang, J., Jordan, J. S., Reinhard, C. T., & Planavsky, N. J. (2024). Measuring enhanced weathering: inorganic carbon-based approaches may be required to complement cation-based approaches. *Frontiers in Climate*, 6, 1352825. https://doi.org/10.3389/fclim.2024.1352825
+49. Suhrhoff, T. J., Reershemius, T., Wang, J., Jordan, J. S., Reinhard, C. T., & Planavsky, N. J. (2024). A tool for assessing the sensitivity of soil-based approaches for quantifying enhanced weathering: a US case study. *Frontiers in Climate*, 6, 1346117. https://doi.org/10.3389/fclim.2024.1346117
 50. Reershemius, T., Kelland, M. E., Jordan, J. S., et al. (2023). Initial validation of a soil-based mass-balance approach for empirical monitoring of enhanced rock weathering rates. *Environmental Science & Technology*, 57(48), 19497–19507. https://doi.org/10.1021/acs.est.3c03609
-51. Zhang, S., Planavsky, N. J., Katchinoff, J., Raymond, P. A., Kanzaki, Y., Reershemius, T., & Reinhard, C. T. (2022). River chemistry constraints on the carbon capture potential of surficial enhanced rock weathering. *Limnology & Oceanography*, 67(S1), S148–S157. https://doi.org/10.1002/lno.12244
+51. Zhang, S., Planavsky, N. J., Katchinoff, J., Raymond, P. A., Kanzaki, Y., Reershemius, T., & Reinhard, C. T. (2022). River chemistry constraints on the carbon capture potential of surficial enhanced rock weathering. *Limnology & Oceanography*, 67(S2), S148–S157. https://doi.org/10.1002/lno.12244
 52. Prohaska, T., Irrgeher, J., Benefield, J., et al. (2022). Standard atomic weights of the elements 2021 (IUPAC Technical Report). *Pure and Applied Chemistry*, 94(5), 573–600. https://doi.org/10.1515/pac-2019-0603
 53. IPCC (2019). Desertification (Chapter 3). In *Climate Change and Land: an IPCC Special Report (SRCCL)*. Mirzabaev, A., Wu, J., Evans, J., et al. https://www.ipcc.ch/srccl/chapter/chapter-3/
+54. Bertagni, M. B., & Porporato, A. (2022). The carbon-capture efficiency of natural water alkalinization: implications for enhanced weathering. *Science of The Total Environment*, 838, 156524. https://doi.org/10.1016/j.scitotenv.2022.156524
+55. Holden, F. J., Davies, K., Bird, M. I., Hume, R., Green, H., Beerling, D. J., & Nelson, P. N. (2024). In-field carbon dioxide removal via weathering of crushed basalt applied to acidic tropical agricultural soil. *Science of The Total Environment*, 955, 176568. https://doi.org/10.1016/j.scitotenv.2024.176568
+56. Power, I. M., Hatten, V. N. J., Guo, M., Schaffer, Z. R., Rausis, K., & Klyn-Hesselink, H. (2025). Are enhanced rock weathering rates overestimated? A few geochemical and mineralogical pitfalls. *Frontiers in Climate*, 6, 1510747. https://doi.org/10.3389/fclim.2024.1510747
+57. Brantley, S. L., Shaughnessy, A., Lebedeva, M. I., & Balashov, V. N. (2023). How temperature-dependent silicate weathering acts as Earth's geological thermostat. *Science*, 379(6630), 382–389. https://doi.org/10.1126/science.add2922
+58. Deng, K., Yang, S., & Guo, Y. (2022). A global temperature control of silicate weathering intensity. *Nature Communications*, 13, 1521. https://doi.org/10.1038/s41467-022-29415-0
+59. Kanzaki, Y., Planavsky, N. J., Zhang, S., Jordan, J., Suhrhoff, T. J., & Reinhard, C. T. (2025). Soil cation storage is a key control on the carbon removal dynamics of enhanced weathering. *Environmental Research Letters*, 20(7), 074055. https://doi.org/10.1088/1748-9326/ade0d5
 
-*References [1]–[37] match the master catalogue in `docs/erw-parameters.md`. [38]–[53] were added and DOI-verified for this report to source the weathering-kinetics, stoichiometry, net-export, and constant-provenance items specifically. Page/table/equation loci in §13.3 were located by direct inspection of each source; items marked **A** were confirmable only at the abstract because the full text is paywalled.*
+*References [1]–[37] match the master catalogue in `docs/erw-parameters.md`. [38]–[59] were added and DOI-verified for this report to source the weathering-kinetics, stoichiometry, net-export, and constant-provenance items specifically. Page/table/equation loci in §13.3 were located by direct inspection of each source; items marked **A** were confirmable only at the abstract because the full text is paywalled.*

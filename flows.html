@@ -1131,7 +1131,7 @@
          "key_constants":[
            {"name":"T_ref","value":"11 C","notes":"Reference MAT anchor (US Corn Belt)."},
            {"name":"P_ref","value":"1000 mm","notes":"Reference MAP anchor."},
-           {"name":"f_pH","value":"triangular peak ~ pH 5.0","notes":"Acid-catalysed dissolution scaling."},
+           {"name":"f_pH","value":"triangular peak at pH 6.0 (2026-09; was 5.0)","notes":"Acid-catalysed dissolution scaling."},
            {"name":"pedogenic_frac","value":"CGIAR-CSI AI-binned 0-90% (MAP-only fallback)","notes":"Primary: UNEP 1992 aridity bands keyed on the CGIAR-CSI Global Aridity Index raster (data/cgiar_aridity_index.tif or ai_v31_yr.tif), with 65535 nodata masking and auto-detected integer scaling. Fallback to MAP-only proxy when AI raster absent."}
          ]},
         {"id":"erw-basalt-access","file":"erw/erw-basalt-access.R","name":"Basalt access","purpose":"Per-pixel delivered basalt price ($/t) = quarry-gate price + cost-distance from basalt sources x $/min/t. Uses GLiM lithology (basic volcanic) and the Malaria Atlas Project friction surface.","inputs":["gadm_ssa.gpkg","soilgrids_properties_all.tif (reference grid)","spam_harv_area_processed.tif (cropland mask)","GLiM v1.0 lithology shapefile (external, PANGAEA)","MAP friction surface 2019 (external)"],"outputs":["basalt_source_mask.tif","basalt_traveltime_min.tif","basalt_transport_km.tif","basalt_transport_cost_usd_t.tif","basalt_delivered_price_usd_t.tif"],"depends_on":["erw-1","erw-2"],

@@ -85,7 +85,6 @@
 \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{#1}}
 \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{#1}}}}
 \usepackage{longtable,booktabs,array}
-\newcounter{none} % for unnumbered tables
 \usepackage{calc} % for calculating minipage widths
 % Correct order of tables after \paragraph or \subparagraph
 \usepackage{etoolbox}
@@ -151,7 +150,7 @@
 \makeatother
 \subtitle{Profitability maps and tables under different assumptions}
 \author{}
-\date{2026-05-26}
+\date{2026-09-01}
 
 \begin{document}
 \maketitle
@@ -177,9 +176,13 @@ returns over the reapplication interval) · equilibrium (steady-state
 maintenance dose). \textbf{Allocations:} \texttt{targeted} (LiTAS dose
 only on acid pixels above each crop's tolerance) · \texttt{uniform\_10}
 / \texttt{uniform\_20} / \texttt{uniform\_50} (uniform t basalt / ha
-across all cropland regardless of soil acidity). \textbf{Default
-parameters (refreshed 2026-05-26):} carbon price \$150 / tCO₂, MRV
-\textbf{\$20 / tCO₂} (lowered from \$30), \textbf{grain size 50 µm}
+across all cropland regardless of soil acidity). \textbf{Model basis
+(refreshed 2026-09-01):} Arrhenius temperature factor (\(E_a\) = 68.8
+kJ/mol, headline; linear retained as sensitivity), triangular soil-pH
+factor peaking at \textbf{pH 6.0} (was 5.0), yield-sensitivity sweep
+capped at 1.8×. All maps and tables below are from the 2026-09-01 run.
+\textbf{Default parameters (set 2026-05-26):} carbon price \$150 / tCO₂,
+MRV \textbf{\$20 / tCO₂} (lowered from \$30), \textbf{grain size 50 µm}
 (lowered from 100 µm; the Strefler grinding-curve anchor), \$10 / t
 quarry gate, country-level electricity tariffs and grid CI, spatial
 delivered-transport costs, year-1 agronomic return \textbf{summed over
@@ -200,7 +203,6 @@ loss-making.
 \subsubsection{1.1 By return regime (LiTAS-targeted
 allocation)}\label{by-return-regime-litas-targeted-allocation}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -223,12 +225,10 @@ Equilibrium
 &
 \includegraphics[width=2in,height=\textheight,keepaspectratio]{maps/profitability/ssa_gm_equilibrium_targeted.png} \\
 \end{longtable}
-}
 
 \subsubsection{1.2 By allocation rule (NPV
 regime)}\label{by-allocation-rule-npv-regime}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\centering\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
   >{\centering\arraybackslash}p{(\linewidth - 6\tabcolsep) * \real{0.2500}}
@@ -256,7 +256,6 @@ Uniform 50 t/ha
 &
 \includegraphics[width=1.6in,height=\textheight,keepaspectratio]{maps/profitability/ssa_gm_npv_uniform_50.png} \\
 \end{longtable}
-}
 
 The targeted allocation prunes the action set to acidic pixels and pays
 the LiTAS-calibrated dose; uniform rules pay a fixed rate across all
@@ -271,7 +270,6 @@ Binary masks showing where the crop-weighted GM is strictly positive.
 These are the candidate pixels for the supply-ranked deployment in
 \texttt{erw-supply}.
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\centering\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
@@ -318,7 +316,6 @@ Equilibrium &
 &
 \includegraphics[width=1.4in,height=\textheight,keepaspectratio]{maps/profitability/profitable_mask_equilibrium_uniform_50.png} \\
 \end{longtable}
-}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -329,7 +326,6 @@ crop-weighted GM to zero, holding all other defaults constant (MRV \$20
 / tCO₂, grain size 50 µm, etc.). Pixels with no CDR potential are
 masked; the legend caps at \$500 / tCO₂ for legibility.
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -352,7 +348,6 @@ Equilibrium
 &
 \includegraphics[width=2in,height=\textheight,keepaspectratio]{maps/profitability/breakeven_carbon_equilibrium_targeted.png} \\
 \end{longtable}
-}
 
 The equilibrium regime tends to need higher carbon prices because the
 maintenance dose recurs forever, while year-1 / NPV amortise the
@@ -365,7 +360,6 @@ targeted)}\label{per-crop-gross-margin-selected-crops-targeted}
 
 The five highest-acreage crops, year-1 and NPV regimes:
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
   >{\centering\arraybackslash}p{(\linewidth - 4\tabcolsep) * \real{0.3333}}
@@ -403,7 +397,6 @@ Wheat (WHEA) &
 &
 \includegraphics[width=2.4in,height=\textheight,keepaspectratio]{maps/profitability/crop_gm_WHEA_npv_targeted.png} \\
 \end{longtable}
-}
 
 \begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
 
@@ -416,7 +409,6 @@ filter unless the column says ``profitable''). Source:
 
 \begin{small}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
   >{\raggedright\arraybackslash}p{(\linewidth - 16\tabcolsep) * \real{0.1111}}
@@ -451,32 +443,31 @@ CDR on profitable (Mt)
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-year1 & targeted & 18439.6 & 30219.9 & 21545.4 & 10565.7 & 81.27 &
-137.87 & 58.41 \\
-npv & targeted & -1106.7 & 12029.7 & 21545.4 & 8390.7 & 81.27 & 132.41 &
-37.43 \\
-equilibrium & targeted & 1965.3 & 6044 & 7363.9 & 3442 & 26.48 & 134.88
-& 13.6 \\
-year1 & uniform\_10 & 19950.3 & 30219.9 & 75918.2 & 13742.4 & 105.71 &
-127.07 & 81.59 \\
-npv & uniform\_10 & -6106.2 & 5494.5 & 75918.2 & 10913.5 & 105.71 &
-119.24 & 68.31 \\
-equilibrium & uniform\_10 & -4200.4 & 6044 & 75918.2 & 13742.4 & 105.71
-& 120.61 & 71.02 \\
-year1 & uniform\_20 & 9712.2 & 30219.9 & 151836.4 & 27484.8 & 211.42 &
-124.08 & 153.67 \\
-npv & uniform\_20 & -17701.2 & 5494.5 & 151836.4 & 21827 & 211.42 &
-117.41 & 130.4 \\
-equilibrium & uniform\_20 & -14438.5 & 6044 & 151836.4 & 27484.8 &
-211.42 & 118.64 & 135.36 \\
-year1 & uniform\_50 & -21002 & 30219.9 & 379591 & 68712.1 & 528.55 &
-120.61 & 355.11 \\
-npv & uniform\_50 & -52486.3 & 5494.5 & 379591 & 54567.4 & 528.55 &
-116.07 & 314.58 \\
-equilibrium & uniform\_50 & -45152.7 & 6044 & 379591 & 68712.1 & 528.55
-& 117.09 & 325.44 \\
+year1 & targeted & 12,371 & 30,220 & 21,545 & 4,483 & 34.5 & 7.36 &
+25.6 \\
+year1 & uniform\_10 & 14,357 & 30,220 & 75,918 & 11,512 & 88.6 & 10.61 &
+1.1 \\
+year1 & uniform\_20 & 1,422 & 30,220 & 151,836 & 27,978 & 215.2 & 8.07 &
+7.6 \\
+year1 & uniform\_50 & -25,337 & 30,220 & 379,591 & 92,169 & 709.0 & 6.65
+& 50.5 \\
+npv & targeted & -5,926 & 12,030 & 21,545 & 3,560 & 34.5 & 2.55 &
+16.9 \\
+npv & uniform\_10 & -10,548 & 5,494 & 75,918 & 9,142 & 88.6 & 3.23 &
+0.4 \\
+npv & uniform\_20 & -24,285 & 5,494 & 151,836 & 22,218 & 215.2 & 1.86 &
+2.4 \\
+npv & uniform\_50 & -55,929 & 5,494 & 379,591 & 73,196 & 709.0 & 1.98 &
+19.3 \\
+equilibrium & targeted & 1,772 & 6,044 & 7,364 & 3,248 & 25.0 & 6.45 &
+12.4 \\
+equilibrium & uniform\_10 & -3,774 & 6,044 & 75,918 & 17,967 & 138.2 &
+7.75 & 15.7 \\
+equilibrium & uniform\_20 & -11,850 & 6,044 & 151,836 & 40,188 & 309.1 &
+6.32 & 29.2 \\
+equilibrium & uniform\_50 & -36,049 & 6,044 & 379,591 & 107,153 & 824.2
+& 4.92 & 63.2 \\
 \end{longtable}
-}
 
 \end{small}
 
@@ -491,7 +482,6 @@ by total GM under the NPV-targeted scenario.
 
 \begin{small}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}
   >{\raggedleft\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
   >{\raggedright\arraybackslash}p{(\linewidth - 8\tabcolsep) * \real{0.2000}}
@@ -514,16 +504,15 @@ Total CDR (Mt)
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-1 & BEAN & 1285.63 & 4.749 & 17.142 \\
-2 & GROU & 874.78 & 10.537 & 11.838 \\
-3 & POTA & 872.05 & 1.408 & 2.793 \\
-4 & SWPO & 48.11 & 2.963 & 4.925 \\
-5 & LENT & 20.98 & 0.103 & 0.068 \\
-6 & WHEA & 14.07 & 2.904 & 0.687 \\
-7 & BARL & 6.45 & 1.212 & 0.256 \\
-8 & CHIC & 5.2 & 0.41 & 0.114 \\
+1 & POTA & 731 & 0.26 & 1.42 \\
+2 & BEAN & 594 & 0.78 & 10.41 \\
+3 & GROU & 435 & 0.68 & 7.57 \\
+4 & LENT & 18 & 0.01 & 0.04 \\
+5 & CHIC & -0 & 0.01 & 0.06 \\
+6 & TEAS & -1 & 0.00 & 0.00 \\
+7 & TOBA & -6 & 0.01 & 0.02 \\
+8 & BARL & -13 & 0.00 & 0.07 \\
 \end{longtable}
-}
 
 \end{small}
 
@@ -539,7 +528,6 @@ NPV-targeted scenario.
 
 \begin{small}
 
-{\def\LTcaptype{none} % do not increment counter
 \begin{longtable}[]{@{}rlrrr@{}}
 \toprule\noalign{}
 Rank & ISO3 & GM (M\$) & Profitable area (Mha) & Total CDR (Mt) \\
@@ -547,20 +535,19 @@ Rank & ISO3 & GM (M\$) & Profitable area (Mha) & Total CDR (Mt) \\
 \endhead
 \bottomrule\noalign{}
 \endlastfoot
-1 & CMR & 3313.11 & 0.843 & 17.56 \\
-2 & GIN & 567.24 & 0.561 & 3.974 \\
-3 & RWA & 369.48 & 0.418 & 3.121 \\
-4 & ETH & 297.15 & 0.654 & 5.271 \\
-5 & BDI & 154.63 & 0.275 & 2.109 \\
-6 & SLE & 41.2 & 0.112 & 1.526 \\
-7 & ZAF & 24.08 & 0.072 & 0.051 \\
-8 & GAB & 12.61 & 0.017 & 0.411 \\
-9 & SWZ & 0.59 & 0.005 & 0.024 \\
-10 & GNQ & -1.17 & 0.009 & 0.196 \\
-11 & MDG & -1.27 & 0.1 & 0.813 \\
-12 & SEN & -1.56 & 0 & 0.003 \\
+1 & CMR & 2,602 & 0.64 & 10.66 \\
+2 & GIN & 362 & 0.32 & 1.99 \\
+3 & RWA & 103 & 0.23 & 0.50 \\
+4 & ZAF & 19 & 0.06 & 0.00 \\
+5 & BWA & 0 & 0.00 & 0.00 \\
+6 & DJI & 0 & 0.00 & 0.00 \\
+7 & ERI & 0 & 0.00 & 0.00 \\
+8 & GMB & 0 & 0.00 & 0.00 \\
+9 & MRT & 0 & 0.00 & 0.00 \\
+10 & NAM & 0 & 0.00 & 0.00 \\
+11 & SDN & 0 & 0.00 & 0.00 \\
+12 & SOM & 0 & 0.00 & 0.00 \\
 \end{longtable}
-}
 
 \end{small}
 

@@ -208,7 +208,7 @@
             },
             {
               "name": "f_pH",
-              "value": "triangular peak ~ pH 5.0",
+              "value": "triangular peak at pH 6.0 (2026-09; was 5.0)",
               "notes": "Acid-catalysed dissolution scaling."
             },
             {
@@ -706,7 +706,7 @@
       ]
     },
     "supply_curves": {
-      "comment": "Pixels ranked descending by GM per tonne basalt. Post-refresh, year-1 deployment is profitable out to 250 Mt/yr; NPV peaks at the 100 Mt/yr cap; equilibrium slips negative between 50 and 100 Mt/yr.",
+      "comment": "Pixels ranked descending by GM per tonne basalt. On the 2026-09 Arrhenius + pH-6 basis, year-1 deployment is profitable out to ~250 Mt/yr; NPV peaks at the 100 Mt/yr cap; equilibrium slips negative between 50 and 100 Mt/yr.",
       "year1": {
         "break_even_cap_Mt": 250,
         "peak_total_gm_Musd": 19648,
@@ -734,7 +734,7 @@
     },
     "key_findings": [
       "Post-refresh, pixel-mean gross margin under LiTAS-targeted allocation flips positive for 12 / 23 crops in year-1, 8 / 23 in NPV, and 19 / 23 in equilibrium. Acid-tolerant cereals (sorghum, millet) and coffee / cocoa stay negative because the EcoCrop response is already saturated on most of their SSA cropland.",
-      "Year-1 supply curve peaks at $19.6 B total gross margin at 250 Mt basalt/yr (was $2.0 B at 100 Mt/yr at the pre-refresh defaults).",
+      "Year-1 supply curve peaks at $16.2 B total gross margin at 250 Mt basalt/yr (2026-09 run).",
       "NPV at 100 Mt/yr now gives $5.0 B total GM with 27.2 Mt CDR/yr (was $3.8 B / 22.7 Mt at the pre-refresh defaults).",
       "Equilibrium regime saturates at 145 Mt basalt/yr (the targeted-deployable-cropland ceiling at maintenance rate); marginal pixel slips negative between 50 and 100 Mt/yr.",
       "Unconstrained SSA capacity is 443 Mt basalt/yr (year-1, NPV) or 145 Mt/yr (equilibrium), cumulative CDR 102 Mt and 34 Mt respectively. Unconstrained NPV is −$1.1 B (was −$9.8 B before the refresh) — still net-negative because deep-tail pixels remain cost-binding."
@@ -779,7 +779,7 @@
       "erw-5": {"refreshed": true, "date": "2026-05-26", "note": "All 23 crops × 2 responses regenerated under the new per-crop max_ph cliff."},
       "erw-9": {"refreshed": true, "date": "2026-05-26", "note": "Refreshed at new grain size + with CGIAR-CSI Global Aridity Index for the pedogenic deduction (was MAP-only proxy). Mean cumulative CDR under LiTAS-targeted 3.52 t CO2/ha (was 2.02)."},
       "erw-7": {"refreshed": true, "date": "2026-05-26", "note": "276 rasters regenerated under the new defaults (MRV $20, year-1 horizon-scaled agronomic return, all upstream changes folded in)."},
-      "erw-supply": {"refreshed": true, "date": "2026-05-26", "note": "Three supply curves refreshed; year-1 peaks at 250 Mt/yr ($19.6 B GM); NPV peaks at 100 Mt/yr ($5.0 B GM); equilibrium slips negative between 50 and 100 Mt/yr."},
+      "erw-supply": {"refreshed": true, "date": "2026-05-26", "note": "Refreshed 2026-09-01 (Arrhenius + pH-6 basis): year-1 peaks at 250 Mt/yr ($16.2 B GM); NPV peaks at 100 Mt/yr ($3.9 B GM); equilibrium peaks at 50 Mt/yr ($3.0 B GM), negative between 50 and 100."},
       "erw-8": {"completed": false, "note": "Not re-run at the new defaults; default scope is ≈6–8 h wall time (≈14k profit() calls)."}
     }
   }

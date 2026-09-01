@@ -12,7 +12,11 @@ reapplication interval) · equilibrium (steady-state maintenance dose).
 **Allocations:** `targeted` (LiTAS dose only on acid pixels above each crop's
 tolerance) · `uniform_10` / `uniform_20` / `uniform_50` (uniform t basalt / ha
 across all cropland regardless of soil acidity).
-**Default parameters (refreshed 2026-05-26):** carbon price \$150 / tCO₂,
+**Model basis (refreshed 2026-09-01):** Arrhenius temperature factor
+($E_a$ = 68.8 kJ/mol, headline; linear retained as sensitivity), triangular
+soil-pH factor peaking at **pH 6.0** (was 5.0), yield-sensitivity sweep capped
+at 1.8×. All maps and tables below are from the 2026-09-01 run.
+**Default parameters (set 2026-05-26):** carbon price \$150 / tCO₂,
 MRV **\$20 / tCO₂** (lowered from \$30), **grain size 50 µm** (lowered from
 100 µm; the Strefler grinding-curve anchor), \$10 / t quarry gate,
 country-level electricity tariffs and grid CI, spatial delivered-transport
@@ -101,7 +105,18 @@ unless the column says "profitable"). Source: `docs/tables/output-ssa-summary.cs
 
 | Regime | Allocation | Total GM (M\$) | Agro return (M\$) | Basalt cost (M\$) | CDR revenue (M\$) | Total CDR (Mt) | Profitable area (Mha) | CDR on profitable (Mt) |
 |---|---|--:|--:|--:|--:|--:|--:|--:|
-| _filled by erw-10 from output-ssa-summary.csv_ |
+| year1 | targeted | 12,371 | 30,220 | 21,545 | 4,483 | 34.5 | 7.36 | 25.6 |
+| year1 | uniform_10 | 14,357 | 30,220 | 75,918 | 11,512 | 88.6 | 10.61 | 1.1 |
+| year1 | uniform_20 | 1,422 | 30,220 | 151,836 | 27,978 | 215.2 | 8.07 | 7.6 |
+| year1 | uniform_50 | -25,337 | 30,220 | 379,591 | 92,169 | 709.0 | 6.65 | 50.5 |
+| npv | targeted | -5,926 | 12,030 | 21,545 | 3,560 | 34.5 | 2.55 | 16.9 |
+| npv | uniform_10 | -10,548 | 5,494 | 75,918 | 9,142 | 88.6 | 3.23 | 0.4 |
+| npv | uniform_20 | -24,285 | 5,494 | 151,836 | 22,218 | 215.2 | 1.86 | 2.4 |
+| npv | uniform_50 | -55,929 | 5,494 | 379,591 | 73,196 | 709.0 | 1.98 | 19.3 |
+| equilibrium | targeted | 1,772 | 6,044 | 7,364 | 3,248 | 25.0 | 6.45 | 12.4 |
+| equilibrium | uniform_10 | -3,774 | 6,044 | 75,918 | 17,967 | 138.2 | 7.75 | 15.7 |
+| equilibrium | uniform_20 | -11,850 | 6,044 | 151,836 | 40,188 | 309.1 | 6.32 | 29.2 |
+| equilibrium | uniform_50 | -36,049 | 6,044 | 379,591 | 107,153 | 824.2 | 4.92 | 63.2 |
 
 ```{=latex}
 \end{small}
@@ -121,7 +136,14 @@ under the NPV-targeted scenario.
 
 | Rank | Crop | Total GM (M\$) | Profitable area (Mha) | Total CDR (Mt) |
 |--:|---|--:|--:|--:|
-| _filled by erw-10 from output-crop-ranking.csv_ |
+| 1 | POTA | 731 | 0.26 | 1.42 |
+| 2 | BEAN | 594 | 0.78 | 10.41 |
+| 3 | GROU | 435 | 0.68 | 7.57 |
+| 4 | LENT | 18 | 0.01 | 0.04 |
+| 5 | CHIC | -0 | 0.01 | 0.06 |
+| 6 | TEAS | -1 | 0.00 | 0.00 |
+| 7 | TOBA | -6 | 0.01 | 0.02 |
+| 8 | BARL | -13 | 0.00 | 0.07 |
 
 ```{=latex}
 \end{small}
@@ -141,7 +163,18 @@ scenarios). Below: the top dozen by aggregate GM in the NPV-targeted scenario.
 
 | Rank | ISO3 | GM (M\$) | Profitable area (Mha) | Total CDR (Mt) |
 |--:|---|--:|--:|--:|
-| _filled by erw-10 from output-country-summary.csv_ |
+| 1 | CMR | 2,602 | 0.64 | 10.66 |
+| 2 | GIN | 362 | 0.32 | 1.99 |
+| 3 | RWA | 103 | 0.23 | 0.50 |
+| 4 | ZAF | 19 | 0.06 | 0.00 |
+| 5 | BWA | 0 | 0.00 | 0.00 |
+| 6 | DJI | 0 | 0.00 | 0.00 |
+| 7 | ERI | 0 | 0.00 | 0.00 |
+| 8 | GMB | 0 | 0.00 | 0.00 |
+| 9 | MRT | 0 | 0.00 | 0.00 |
+| 10 | NAM | 0 | 0.00 | 0.00 |
+| 11 | SDN | 0 | 0.00 | 0.00 |
+| 12 | SOM | 0 | 0.00 | 0.00 |
 
 ```{=latex}
 \end{small}

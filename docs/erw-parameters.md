@@ -128,29 +128,40 @@ weathering rates [S8, S9].
 ### 2.2 Climate-factor functional form
 
 ```
-f_climate = clamp(MAT / T_ref, 0.3, 3.0)
+f_climate = clamp(exp(-(Ea/R) · (1/(MAT+273.15) − 1/(T_ref+273.15))), 0.3, 3.0)
           × clamp(MAP / P_ref, 0.3, 3.0)
           × f_pH
 ```
 
-Clamp bounds prevent runaway scaling at extreme grid cells and reflect the
-empirical range over which the linear-multiplier approximation holds. Source: Kanzaki et
-al. 2023 PNAS Nexus reactive-transport surrogates [S10]; this is a v1 proxy and should be
-replaced by the full Kanzaki form when calibration data permits.
+**Temperature term (headline: Arrhenius, since 2026-09).** Standard kinetic form with a
+silicate activation energy Ea = 68.8 kJ/mol (White & Blum 1995 GCA), normalized to f = 1
+at T_ref = 11 °C. Arrhenius-type exponential temperature dependence is the
+literature-supported formulation for silicate dissolution (Brantley et al. 2023 Science;
+Deng et al. 2022 Nat. Commun.); the former linear MAT/T_ref multiplier is retained in
+erw-9 as a conservative sensitivity variant (`CLIMATE_TEMP_MODE <- "linear"`). The 1000 mm
+P_ref matches the median precipitation across compiled ERW studies (Suhrhoff et al. 2026
+ESROC review). Clamp bounds [0.3, 3.0] prevent runaway scaling at extreme grid cells;
+they are a modelling assumption.
 
-### 2.3 pH factor (triangular, peak ≈ 5.0)
+### 2.3 pH factor (triangular, peak 6.0; moved from 5.0 on 2026-09)
 
 ```
 ph < 4.0  → 0.5
-ph 4.0–5.0 → linear 0.5 → 1.0
-ph 5.0–7.0 → linear 1.0 → 0.5
-ph > 7.0  → 0.5
+ph 4.0–6.0 → linear 0.5 → 1.0
+ph 6.0–8.0 → linear 1.0 → 0.5
+ph > 8.0  → 0.5
 ```
 
-**Source.** Acid-catalysed silicate dissolution literature: White & Brantley 2003 [S11];
-Brantley et al. 2008 [S12]. Peak at pH ~5 is a defensible midpoint; calcareous soils
-(pH > 7) suppress reactivity by ~half because the H⁺ activity is several orders of
-magnitude lower.
+**Source.** The unimodal shape is the product of two opposing mechanisms: acid-catalysed
+dissolution kinetics rise below pH ~5.5 (Palandri & Kharaka 2004; Bandstra & Brantley
+2008; White & Brantley 2003 [S11]), while the carbon-capture efficiency of the generated
+alkalinity collapses below pH ~5 — DIC is almost entirely dissolved CO₂, and dissolution
+first neutralizes standing acidity (Bertagni & Porporato 2022 STOTEN; Holden et al. 2024
+STOTEN; Power et al. 2025 Front. Clim.). Their product peaks between the pH-5
+capture-collapse threshold and carbonic-acid pKa₁ = 6.35; we take 6.0. The 0.5 floor
+below pH 4 (rather than 0) reflects that low-pH capture is a lag/discounting problem,
+not a permanent zero (Kanzaki et al. 2025 ERL). The specific piecewise-linear form and
+floor value remain modelling assumptions.
 
 ### 2.4 Pedogenic-carbonate deduction
 
@@ -287,7 +298,7 @@ LCA(px) = grinding_kWh × grid_CI(px)
 | Code path | Default | Units | Source |
 |---|---|---|---|
 | `CARBON_PRICE_USD_T`   | 150 | $/t CO₂ | Mid of 2024–25 ERW credit market — Frontier Climate offtake [S30]; CDR.fyi public-price index 2025 [S31]. Range $80–500/tCO₂. |
-| `MRV_COST_USD_T_CO2`   | 20  | $/t CO₂ | Sampling + lab + verification + registry. Levy et al. 2024 [S32] benchmarks $25–40/tCO₂ for current pilots; Isometric / Puro forecast $10–15/tCO₂ at scale once aggregator-pooled protocols industrialise. Default lowered from $30 → $20 on 2026-05-26 as a midpoint between "first-of-kind" and "at-scale 2027+". |
+| `MRV_COST_USD_T_CO2`   | 20  | $/t CO₂ | Sampling + lab + verification + registry. Mercer, Burke & Rodway-Dyer 2024 (LSE Grantham Research Institute) report EW MRV averages of $15/tCO₂ (GRI dataset, 2024) to $71/tCO₂ (Frontier dataset, 2024) and call MRV "a major uncertainty driver". Default $20 sits at the low end of that $15–71 band; erw-8 sweeps $0–80. (Earlier attribution of a "$25–40 pilot benchmark" to Levy et al. 2024 was incorrect — that paper contains no cost figures; corrected 2026-09.) |
 | `DISCOUNT_RATE_PCT`    | 10  | %       | Project-level assumption; not citation-backed. 10% is the conventional rate used in multilateral ag-investment appraisal but no single authoritative source is claimed here. |
 
 ### 5.4 Time-resolved CDR phasing
@@ -327,7 +338,7 @@ equilibrium) and all 23 SPAM crops.
 | Sweep | Range / values | Source |
 |---|---|---|
 | **Prices**     | crop_mult × basalt_mult × carbon_price grid: each of {0.5, 0.75, 1, 1.25, 1.5, 2}; carbon ∈ {0, 50, 100, 150, 250} $/tCO₂ | Frontier offtake price range [S30]; FAOSTAT historical price volatility [S33] |
-| **Yields**     | yield-factor ∈ seq(1, 2.5, 0.25)             | Yield-gap closure scenarios — Mueller et al. 2012 Nature [S34] |
+| **Yields**     | yield-factor ∈ seq(1, 1.8, 0.2)              | Capped at the ~1.7× field-trial envelope (Beerling et al. 2024 PNAS; Haque et al. 2025; Suhrhoff et al. 2026 ESROC synthesis); was 1.0–2.5 pre-2026-09 |
 | **MRV**        | MRV cost ∈ {0, 15, 30, 50, 80} $/tCO₂        | Levy et al. 2024 [S32] |
 | **Grain size** | {10, 30, 50, 100, 200, 500} µm                | Strefler 2018 [S4]; Lewis 2021 [S1] |
 | **Allocation** | {targeted, uniform_10, uniform_20, uniform_50} | This pipeline (matches Beerling 2020 [S2] and the four `erw-3` branches) |
@@ -355,12 +366,12 @@ standard error (measurement-error syntax via `brms::se()`).
 
 | Prior | Distribution | Source / rationale |
 |---|---|---|
-| Intercept   | Normal(0.10, 0.20)  | ~10% baseline uplift, weakly informative. Aramburu Merlos 2023 [S35]. |
+| Intercept   | Normal(0.10, 0.20)  | ~10% baseline uplift, weakly informative. Assumption (order of magnitude consistent with the 1.1–1.7× field-trial envelope; Suhrhoff et al. 2026 ESROC synthesis). |
 | `log_rate`  | Normal(0.05, 0.05)  | A doubling of rate → ~3.5% extra uplift. Beerling 2018 Nat. Plants [S20]. |
 | `pH_baseline` | Normal(0, 0.05)   | Near zero on log scale per unit pH; small effect expected. |
 | `MAT_C`     | Normal(0, 0.005)    | Per-°C effect; small. |
 | `MAP_mm`    | Normal(0, 0.0005)   | Per-mm effect; very small. |
-| `log_grain` | Normal(−0.05, 0.05) | Negative — finer grain → more uplift. Strefler 2018 [S4]. |
+| `log_grain` | Normal(−0.05, 0.05) | Negative — finer grain → more uplift. Assumption; no yield-response-by-grain-size source exists (Strefler 2018 covers grinding cost, not yields). |
 | Group SDs   | Exponential(5)      | Weakly regularising. |
 
 **Methodological references.** Aramburu Merlos et al. 2023 Geoderma [S35] — meta-regression structure; Beerling et al. 2018 Nat. Plants [S20] — log-ratio response; Bürkner 2017 [S36] — `brms` hierarchical modelling.

@@ -129,7 +129,7 @@ natbibapa
 \makeatother
 \subtitle{\textsc{\large \textbf{An end-to-end technical report on the modelling
 approach: workflow, equations, assumptions, and results}}}
-\author{\href{mailto:bismignot@gmail.com}{Bisrat Haile}\\CIMMYT}
+\author{\href{mailto:bismignot@gmail.com}{Bisrat Haile}  \href{mailto:j.chamberlin@cgiar.org}{\& Jordan Chamberlin}\\CIMMYT}
 \date{Last updated: \today}
 
 \begin{document}
@@ -168,14 +168,8 @@ credit-grade numbers require mechanistic reactive-transport modelling and field
 measurement (\autoref{ch:roadmap}). Read the tonnages as a way to compare
 pixels, not to certify them.
 
-\textbf{Relationship to the other documents.} Two companion documents go deeper
-on specific pieces: the \emph{Carbon Dioxide Removal --- Technical Derivation}
-(\texttt{erw-cdr-calculations.pdf}) sources every step of the CDR stoichiometry
-and net-export accounting; the \emph{parameters and assumptions} catalogue
-(\texttt{erw-parameters.md}) is the master list of constants with citations.
-This report is the integrating narrative that ties the whole pipeline together.
 
-Headline numbers are quoted from the model run dated 2026-05-26 unless stated
+Headline numbers are quoted from the model run dated 2026-09-01 unless stated
 otherwise. Where a worked example uses earlier defaults, this is flagged; the
 equations are unchanged, only the input constants differ.
 
@@ -565,29 +559,49 @@ summarised in \autoref{fig:cascade}.
 Dissolution speeds up with temperature and moisture and depends on pH. The model
 uses interpretable multipliers, referenced to the US Corn Belt ($T_{\text{ref}}
 = 11^{\circ}$C, $P_{\text{ref}} = 1000$\,mm) where the reactive fraction was
-calibrated \citep{lewis2021}:
+calibrated \citep{lewis2021}. The temperature response is the standard Arrhenius
+kinetic form with a silicate activation energy $E_a = 68.8$\,kJ/mol
+\citep{whiteblum1995}, normalised to 1 at $T_{\text{ref}}$ ($T$ and
+$T_{\text{ref}} = 284.15$\,K in kelvin, $R$ the gas constant):
 %
 \begin{align}
-f_{\text{MAT}} &= \mathrm{clamp}\!\left(\frac{\mathrm{MAT}}{11}, 0.3, 3.0\right),
+f_{\text{MAT}} &= \mathrm{clamp}\!\left(
+  \exp\!\left[-\frac{E_a}{R}\left(\frac{1}{T}-\frac{1}{T_{\text{ref}}}\right)\right],
+  0.3, 3.0\right),
 \qquad
 f_{\text{MAP}} = \mathrm{clamp}\!\left(\frac{\mathrm{MAP}}{1000}, 0.3, 3.0\right),
 \label{eq:fmatmap}\\[2pt]
 f_{\text{pH}} &=
 \begin{cases}
 0.5 & \mathrm{pH} < 4\\
-0.5 + 0.5(\mathrm{pH}-4) & 4 \le \mathrm{pH} < 5\\
-1.0 - 0.25(\mathrm{pH}-5) & 5 \le \mathrm{pH} < 7\\
-0.5 & \mathrm{pH} \ge 7
+0.5 + 0.25(\mathrm{pH}-4) & 4 \le \mathrm{pH} < 6\\
+1.0 - 0.25(\mathrm{pH}-6) & 6 \le \mathrm{pH} < 8\\
+0.5 & \mathrm{pH} \ge 8
 \end{cases}
 \label{eq:fph}\\[2pt]
 f_{\text{climate}} &= f_{\text{MAT}}\cdot f_{\text{MAP}}\cdot f_{\text{pH}}.
 \label{eq:fclimate}
 \end{align}
 %
-The pH term (\autoref{eq:fph}) is triangular, peaking near pH 5 --- acid
-catalysis is strongest on the acidic soils that also have the most agronomic
-demand \citep{whitebrantley2003, brantley2008}. The effective reactive fraction
-is then capped at unity,
+Arrhenius-type exponential temperature dependence is the literature-supported
+formulation for silicate dissolution; the former linear $\mathrm{MAT}/T_{\text{ref}}$
+multiplier is retained as a conservative sensitivity variant (area-weighted, the
+Arrhenius form raises SSA gross CDR by $\sim$27\%, capped by the same
+$[0.3, 3.0]$ clamp).
+
+The pH term (\autoref{eq:fph}) is triangular, peaking at pH 6.0. The unimodal
+shape is the product of two opposing mechanisms: acid-catalysed silicate
+dissolution kinetics rise with acidity below pH $\sim$5.5
+\citep{palandri2004, brantley2008}, while the carbon-capture efficiency of the
+generated alkalinity collapses below pH $\sim$5 --- there, dissolved inorganic
+carbon is almost entirely aqueous \co, and dissolution first neutralises
+standing acidity rather than exporting bicarbonate
+\citep{bertagni2022, holden2024, power2025}. Their product peaks in the
+moderately acidic window between the pH-5 capture-collapse threshold and the
+carbonic-acid $\mathrm{p}K_{a1} = 6.35$; the model takes 6.0. The 0.5 floor
+(rather than zero) below pH 4 and above pH 8 reflects that low-pH capture is a
+lag-and-discounting problem, not a permanent zero \citep{kanzaki2025}. The
+effective reactive fraction is then capped at unity,
 %
 \begin{equation}
 \phi_{\text{eff}} = \min\!\big(1.0,\; \phi_0\, f_{\text{grain}}\,
@@ -917,7 +931,7 @@ Constant & Value & Source \\
 \midrule
 \endhead
 Carbon price $p_{\co}$ & \$150/\tco & VCM mid 2024--25 \citep{levy2024} \\
-MRV cost & \$20/\tco & \citet{levy2024} \\
+MRV cost & \$20/\tco & \citet{mercer2024}: EW MRV \$15--71/\tco \\
 Discount rate & 10\% & Conventional \\
 Project horizon & 5\,yr & Accreditation window \\
 CDR phasing & 0.30/0.25/0.20/0.15/0.10 & \citet{kanzaki2023} \\
@@ -995,13 +1009,21 @@ breakeven surface.
 \end{figure}
 
 \begin{keybox}
-\textbf{Worked intuition (pre-refresh defaults, for teaching).} Pixel A near
-Kisumu, Kenya (pH 5.2, warm and wet, 150\,km haul) reaches
-$\mathrm{CDR_{px}}\approx 172$\,kg/t and $\sim$4.6\,\tco/ha net; Pixel B near
-Kaya, Burkina Faso (pH 6.0, semi-arid, 500\,km haul) reaches only
-$\sim$58\,kg/t --- and there the lifecycle emissions exceed the gross capture, so
-net CDR is zero. The lesson: basalt cost dominates, climate is the second-largest
-lever, and \emph{which pixel} you pick matters more than the average price.
+\textbf{Worked intuition (illustrative).} Pixel A near Kisumu, Kenya (pH 5.2,
+MAT $\sim$23\,$^{\circ}$C, MAP $\sim$1400\,mm, humid, 150\,km haul):
+$f_{\text{pH}} = 0.5 + 0.25(5.2-4) = 0.80$, Arrhenius $f_{\text{MAT}} = 3.25
+\rightarrow$ clamped to 3.0, $f_{\text{MAP}} = 1.4$, so $f_{\text{climate}}
+\approx 3.36$, $\phi_{\text{eff}} = \min(1,\, 0.2\times 1.414\times 3.36)
+\approx 0.95$, and $\mathrm{CDR_{px}} \approx 0.95\times 310 \approx
+295$\,kg/t. Pixel B near Kaya, Burkina Faso (pH 6.0 --- now exactly at the
+$f_{\text{pH}}$ peak --- but semi-arid, MAT $\sim$29\,$^{\circ}$C, MAP
+$\sim$700\,mm, 500\,km haul): $f_{\text{climate}} = 3.0\times 0.7\times 1.0 =
+2.1$, $\phi_{\text{eff}} \approx 0.59$, and the 40\% semi-arid pedogenic loss
+leaves $\mathrm{CDR_{px}} \approx 110$\,kg/t --- little over a third of Pixel
+A --- while 500\,km of diesel haulage ($\approx 60$\,kg\,\co/t) plus grinding
+on a fossil-heavy grid consumes most of what remains. The lesson: basalt cost
+dominates, climate is the second-largest lever, and \emph{which pixel} you pick
+matters more than the average price.
 \end{keybox}
 
 % ==================================================================
@@ -1053,7 +1075,8 @@ Sweep & Grid \\
 \endhead
 Prices & crop $\times$ basalt price multipliers $\{0.5\ldots2.0\}$,
 carbon $\{0,50,100,150,250\}$ \\
-Yields & yield-gap factor $\{1.0,1.25,\ldots,2.5\}$ \\
+Yields & yield-gap factor $\{1.0,1.2,\ldots,1.8\}$ (capped at the
+$\sim$1.7$\times$ field-trial envelope) \\
 MRV & $\{0,15,30,50,80\}$\,\$/\tco \\
 Grain & $\{10,30,50,100,200,500\}$\,\um\ (reactivity vs.\ grinding) \\
 Allocation & targeted, uniform 10/20/50 \\
@@ -1105,13 +1128,14 @@ stream alone suffices but stacked they do), and \textbf{neither}.
 \subsection{Robustness and the core targeting area}
 
 Because the intersection is parameter-sensitive, \texttt{erw-11} recomputes it
-analytically over a 240-point grid --- delivered cost $\times\{0.5\text{--}2.0\}$,
-carbon price $\{\$50\text{--}250\}$, yield $\times\{0.5\text{--}2.0\}$, CDR rate
-$\times\{0.5\text{--}1.5\}$ --- and scores each pixel by the fraction of that grid
-over which it remains in the intersection. The \textbf{core} targeting area is the
-land that survives $\ge 50\%$ of the grid; \textbf{candidate} land survives
-$\ge 33\%$. A separate plausible-central-band cross-check gives an independent
-robust-core estimate.
+analytically over a 180-point grid on the four \emph{effective} knobs the
+intersection actually depends on --- the yield/delivered-cost ratio $y/c$
+$\{0.5\text{--}2.0\}$, the net-price/cost ratio $(p-m)/c$ $\{30\text{--}230\}$,
+the CDR-rate multiplier $\{0.5\text{--}1.5\}$, and the net-export partition
+$\lambda$ $\{0\text{--}1\}$ --- and scores each pixel by the fraction of that
+grid over which it remains in the intersection. The \textbf{core} targeting area
+is the land that survives $\ge 50\%$ of the grid; \textbf{candidate} land
+survives $\ge 33\%$.
 
 \subsection{What binds the public envelope}
 
@@ -1135,8 +1159,9 @@ more than a higher carbon price does (quantified in \autoref{sec:envelopes-resul
 % ==================================================================
 \chapter{Results}\label{ch:results}
 
-Headline numbers below are from the run dated 2026-05-26 (carbon \$150, MRV \$20,
-50\,\um, spatial logistics, country energy, per-crop EcoCrop pH cliffs).
+Headline numbers below are from the run dated 2026-09-01 (carbon \$150, MRV \$20,
+50\,\um, Arrhenius temperature response, pH-6.0 weathering optimum, spatial
+logistics, country energy, per-crop EcoCrop pH cliffs).
 
 \section{Continent-wide totals}
 
@@ -1149,55 +1174,56 @@ Regime & Allocation & GM (\$M) & CDR rev (\$M) & CDR (Mt) & Prof.\ (Mha) &
 CDR on prof.\ (Mt) \\
 \midrule
 \endhead
-\textbf{year-1} & \textbf{targeted} & \textbf{+18,440} & 10,566 & 81.3 & 137.9 & 58.4 \\
-NPV & targeted & $-$1,107 & 8,391 & 81.3 & 132.4 & 37.4 \\
-equilibrium & targeted & +1,965 & 3,442 & 26.5 & 134.9 & 13.6 \\
-year-1 & uniform 10 & +19,950 & 13,742 & 105.7 & 127.1 & 81.6 \\
-NPV & uniform 10 & $-$6,106 & 10,914 & 105.7 & 119.2 & 68.3 \\
-year-1 & uniform 20 & +9,712 & 27,485 & 211.4 & 124.1 & 153.7 \\
-NPV & uniform 20 & $-$17,701 & 21,827 & 211.4 & 117.4 & 130.4 \\
-year-1 & uniform 50 & $-$21,002 & 68,712 & 528.6 & 120.6 & 355.1 \\
-NPV & uniform 50 & $-$52,486 & 54,567 & 528.6 & 116.1 & 314.6 \\
-equilibrium & uniform 50 & $-$45,153 & 68,712 & 528.6 & 117.1 & 325.4 \\
+\textbf{year-1} & \textbf{targeted} & \textbf{+12,371} & 4,483 & 34.5 & 7.4 & 25.6 \\
+NPV & targeted & $-$5,926 & 3,560 & 34.5 & 2.6 & 16.9 \\
+equilibrium & targeted & +1,772 & 3,248 & 25.0 & 6.5 & 12.4 \\
+year-1 & uniform 10 & +14,357 & 11,512 & 88.6 & 10.6 & 1.1 \\
+NPV & uniform 10 & $-$10,548 & 9,143 & 88.6 & 3.2 & 0.4 \\
+equilibrium & uniform 10 & $-$3,774 & 17,967 & 138.2 & 7.8 & 15.7 \\
+year-1 & uniform 20 & +1,422 & 27,978 & 215.2 & 8.1 & 7.6 \\
+NPV & uniform 20 & $-$24,285 & 22,218 & 215.2 & 1.9 & 2.4 \\
+equilibrium & uniform 20 & $-$11,850 & 40,188 & 309.1 & 6.3 & 29.2 \\
+year-1 & uniform 50 & $-$25,337 & 92,169 & 709.0 & 6.7 & 50.5 \\
+NPV & uniform 50 & $-$55,929 & 73,196 & 709.0 & 2.0 & 19.3 \\
+equilibrium & uniform 50 & $-$36,049 & 107,153 & 824.3 & 4.9 & 63.2 \\
 \bottomrule
 \end{longtable}
 }
 
-Reading \autoref{tbl:ssa}: year-1 targeted leads at \textbf{+\$18.4\,B} on
-137.9\,Mha; uniform-10 is marginally higher in absolute terms but at far greater
-basalt spend; NPV-targeted is only mildly negative ($-$\$1.1\,B); and uniform-50
-is negative in every regime --- the over-application penalty in numbers. The
-number of crops with a positive pixel-mean margin rises from 1 (pre-refresh) to
-12 (year-1 targeted) and 19 (equilibrium targeted). The committed
-\emph{area} totals here are flagged stale relative to the current rasters (the
-current-data footprint is single-digit Mha; see the caveat in
-\autoref{sec:envelopes-results}), so read this table for the relative ranking of
-regimes and allocations rather than the absolute hectares.
+Reading \autoref{tbl:ssa}: year-1 targeted posts \textbf{+\$12.4\,B} of gross
+margin on 7.4\,Mha of profitable land; uniform-10 year-1 is higher in absolute
+terms (+\$14.4\,B) but at $3.5\times$ the basalt spend; NPV-targeted is negative
+($-$\$5.9\,B); equilibrium targeted is the only allocation that stays positive
+in steady state (+\$1.8\,B); and uniform-50 is negative in every regime --- the
+over-application penalty in numbers. Thirteen of the 23 crops post a positive
+SSA-total margin under year-1 targeted, and fourteen under equilibrium
+targeted.
 
 \section{Which crops clear}
 
 \begin{longtable}[]{@{}lrrr@{}}
-\caption{Top crops by LiTAS-targeted pixel-mean gross margin (\$/ha).}\label{tbl:crops}\\
+\caption{Top crops by LiTAS-targeted SSA-total gross margin (\$M).}\label{tbl:crops}\\
 \toprule
 Crop & Year-1 (5-yr cum.) & NPV & Equilibrium \\
 \midrule
 \endhead
-Potato & 10,560 & 3,017 & 1,984 \\
-Tobacco & 4,884 & 807 & 798 \\
-Sweet potato & 2,867 & 358 & 450 \\
-Lentil & 2,628 & 885 & 491 \\
-Groundnut & 2,216 & 377 & 401 \\
-Cassava & 2,018 & $-$27 & 170 \\
-Common bean & 1,990 & 286 & 359 \\
-Chickpea & 1,719 & 368 & 299 \\
-Wheat & 1,662 & 74 & 225 \\
+Common bean & 4,906 & 594 & 1,004 \\
+Groundnut & 3,972 & 435 & 778 \\
+Potato & 2,489 & 731 & 503 \\
+Sweet potato & 1,437 & $-$276 & 231 \\
+Cassava & 1,402 & $-$442 & 106 \\
+Soybean & 152 & $-$70 & 21 \\
+Wheat & 50 & $-$40 & 17 \\
+Cowpea & 46 & $-$163 & $-$9 \\
+Lentil & 40 & 18 & 8 \\
 \bottomrule
 \end{longtable}
 
-High-value roots, tubers, and legumes on acidic soils clear most easily;
-acid-tolerant cereals (sorghum, millet) and the tree commodities (coffee, cocoa)
-stay negative because their EcoCrop response is already saturated, leaving carbon
-revenue to shoulder the entire basalt cost.
+High-value legumes, roots, and tubers on acidic soils clear most easily ---
+common bean and groundnut lead on sheer harvested area, potato on per-hectare
+value; acid-tolerant cereals (sorghum, millet) and the tree commodities (coffee,
+cocoa) stay negative because their EcoCrop response is already saturated, leaving
+carbon revenue to shoulder the entire basalt cost.
 
 \section{Supply curves}
 
@@ -1208,56 +1234,59 @@ gross margin.}\label{tbl:supply}\\
 Regime & 10\,Mt & 50\,Mt & 100\,Mt & 250\,Mt & Peak total GM \\
 \midrule
 \endhead
-year-1 & +186 & +117 & +79 & +21 & \$19,648M @ 250\,Mt \\
-NPV @10\% & +86 & +46 & +16 & $-$16 & \$5,018M @ 100\,Mt \\
-equilibrium & +91 & +20 & $-$14 & $-$60 & \$3,145M @ 100\,Mt \\
+year-1 & +173 & +104 & +66 & +5 & \$16,241M @ 250\,Mt \\
+NPV @10\% & +76 & +34 & +4 & $-$27 & \$3,894M @ 100\,Mt \\
+equilibrium & +89 & +18 & $-$16 & $-$61 & \$3,008M @ 50\,Mt \\
 \bottomrule
 \end{longtable}
 
-The marginal pixel turns unprofitable at roughly 250\,Mt/yr (year-1),
-100\,Mt/yr (NPV), and 50--100\,Mt/yr (equilibrium) --- an economically
-meaningful deployment frontier well below the physically available tonnage.
+The marginal pixel turns unprofitable between 250 and 500\,Mt/yr (year-1),
+just above 100\,Mt/yr (NPV), and between 50 and 100\,Mt/yr (equilibrium) --- an
+economically meaningful deployment frontier well below the physically available
+tonnage.
 
 \section{Private, public, and combined envelopes}\label{sec:envelopes-results}
 
 Applying the sufficiency tests of \autoref{sec:envelopes-method}
-(\autoref{eq:privsuf}--\autoref{eq:combsuf}) to the baseline (year-1 targeted,
-\$150/\tco, MRV \$20, area-weighted across the 23 crops sharing each pixel) gives
-the three envelopes in \autoref{tbl:envelopes}.
+(\autoref{eq:privsuf}--\autoref{eq:combsuf}) to the headline basis (equilibrium
+net-export, targeted, \$150/\tco, MRV \$20, area-weighted across the 23 crops
+sharing each pixel) gives the three envelopes in \autoref{tbl:envelopes}.
 
 {\footnotesize
 \begin{longtable}[]{@{}llrrrr@{}}
 \caption{Private, public, and combined return envelopes: area-weighted footprint,
-farms reached, gross value of crop production on the affected land, and cumulative
-net CDR (\texttt{erw-11}, year-1 baseline).}\label{tbl:envelopes}\\
+farms reached, gross value of crop production on the affected land, and durable
+net-export CDR (\texttt{erw-11}, equilibrium net-export baseline).}\label{tbl:envelopes}\\
 \toprule
 Allocation & Envelope & Area (Mha) & Farms (M) & Value (\$M) & Net CDR (Mt) \\
 \midrule
 \endhead
-Targeted & Private & 8.22 & 6.5 & 8,590 & 47.9 \\
-Targeted & Public & 2.23 & 1.6 & 1,680 & 25.0 \\
-Targeted & \textbf{Intersection} & \textbf{1.85} & \textbf{1.3} & \textbf{1,486} & \textbf{22.2} \\
-Targeted & Combined $>0$ & 11.95 & 9.1 & 10,761 & 65.3 \\
-Uniform 20 & Private & 7.98 & 6.4 & 8,966 & 30.1 \\
-Uniform 20 & Public & 3.51 & 2.6 & 2,746 & 17.8 \\
-Uniform 20 & \textbf{Intersection} & \textbf{1.97} & \textbf{1.3} & \textbf{1,669} & \textbf{10.7} \\
-Uniform 20 & Combined $>0$ & 13.12 & 10.2 & 13,955 & 51.5 \\
+Targeted & Private & 4.31 & 3.73 & 4,651 & 8.4 \\
+Targeted & Public & 1.95 & 1.41 & 1,481 & 5.6 \\
+Targeted & \textbf{Intersection} & \textbf{1.32} & \textbf{0.83} & \textbf{1,104} & \textbf{4.3} \\
+Targeted & Combined $>0$ & 7.61 & 6.31 & 7,745 & 13.9 \\
+Uniform 20 & Private & 1.29 & 1.02 & 1,502 & 5.9 \\
+Uniform 20 & Public & 3.95 & 3.01 & 3,094 & 20.4 \\
+Uniform 20 & \textbf{Intersection} & \textbf{0.75} & \textbf{0.46} & \textbf{716} & \textbf{4.2} \\
+Uniform 20 & Combined $>0$ & 6.38 & 5.42 & 6,145 & 29.2 \\
 \bottomrule
 \end{longtable}
 }
 
 Decomposing the targeted case into the five-way typology (harvested area):
-\textbf{private-only 6.37\,Mha} (yield gains alone justify investment --- carbon
-credits here are non-additional), \textbf{public-only 0.38\,Mha}, \textbf{both
-(intersection) 1.85\,Mha}, and \textbf{combined-only 3.35\,Mha} (neither stream
+\textbf{private-only 2.99\,Mha} (yield gains alone justify investment --- carbon
+credits here are non-additional), \textbf{public-only 0.63\,Mha}, \textbf{both
+(intersection) 1.32\,Mha}, and \textbf{combined-only 2.67\,Mha} (neither stream
 alone suffices, but stacked they do --- the band where blended carbon-plus-agronomic
 finance is genuinely pivotal). The headline tension is that the private case is
-far larger than the public case (8.2 vs.\ 2.2\,Mha): most agronomically-attractive
-land would \emph{not} depend on carbon credits, while the land where carbon finance
-is decisive is precisely where the private case falls short. Allocation mostly
-trades CDR depth for footprint --- uniform-20 widens the combined footprint (13.1
-vs.\ 12.0\,Mha) but roughly halves intersection CDR (10.7 vs.\ 22.2\,Mt) by
-spreading a fixed dose onto near-neutral soils with a weak agronomic response.
+more than twice the public case (4.31 vs.\ 1.95\,Mha): most
+agronomically-attractive land would \emph{not} depend on carbon credits, while
+the land where carbon finance is decisive is precisely where the private case
+falls short. Allocation trades the two envelopes against each other: a flat
+20\,t\,ha$^{-1}$ collapses the private envelope (1.29 vs.\ 4.31\,Mha ---
+over-dosing land whose lime demand is small) but doubles the public envelope
+(3.95 vs.\ 1.95\,Mha) and more than triples its durable CDR (20.4 vs.\
+5.6\,Mt), on a narrower combined footprint (6.38 vs.\ 7.61\,Mha).
 
 \begin{figure}
   \centering
@@ -1271,21 +1300,21 @@ spreading a fixed dose onto near-neutral soils with a weak agronomic response.
   \end{subfigure}
   \caption{Where each return carries the investment (left) and the robustness-based
   core targeting area (right). Maps use the conservative equilibrium, net-export
-  accounting; the core concentrates in Cameroon, Guinea, the Ethiopian highlands,
-  and coastal Madagascar.}
+  accounting; the core concentrates in Cameroon and Guinea, with smaller pockets
+  in Tanzania and the Ethiopian highlands.}
   \label{fig:envelopes}
 \end{figure}
 
 \subsection{The robust core}
 
-No pixel stays in the intersection across more than 57\% of the 240-point
+No pixel stays in the intersection across more than 61\% of the 180-point
 robustness grid --- the doubly-justified case is inherently parameter-sensitive.
-On the robustness gradient (\autoref{tbl:core}), a plausible-central-band
-cross-check independently gives $\sim$0.81\,Mha, so the two methods converge on
-$\sim$0.7--0.8\,Mha of genuinely robust core land. It concentrates where acidic
+On the robustness gradient (\autoref{tbl:core}), $\sim$0.65\,Mha of genuinely
+robust core land survives at least half the grid. It concentrates where acidic
 soils, warm-wet climate, basalt proximity, and decent crop prices coincide:
-Cameroon (0.42\,Mha core), Guinea (0.25), the Ethiopian highlands (0.05), and
-Tanzania (0.02).
+Cameroon (0.455\,Mha core), Guinea (0.162), Tanzania (0.022), and the Ethiopian
+highlands (0.005); four-fifths of the wider candidate tier sits in Cameroon and
+Guinea alone.
 
 {\footnotesize
 \begin{longtable}[]{@{}l>{\raggedright\arraybackslash}p{4.3cm}rrrr@{}}
@@ -1294,8 +1323,8 @@ Tanzania (0.02).
 Tier & Definition & Area (Mha) & Farms (M) & Value (\$M) & CDR (Mt) \\
 \midrule
 \endhead
-Core & intersection under $\ge 50\%$ of grid & 0.74 & 0.45 & 663 & 13.1 \\
-Candidate & intersection under $\ge 33\%$ of grid & 1.73 & 1.16 & 1,409 & 21.5 \\
+Core & intersection under $\ge 50\%$ of grid & 0.65 & 0.38 & 602 & 2.7 \\
+Candidate & intersection under $\ge 33\%$ of grid & 1.22 & 0.76 & 1,060 & 4.06 \\
 \bottomrule
 \end{longtable}
 }
@@ -1303,12 +1332,16 @@ Candidate & intersection under $\ge 33\%$ of grid & 1.73 & 1.16 & 1,409 & 21.5 \
 \subsection{What binds the public envelope}
 
 The public envelope is small because durable removal is expensive per tonne, not
-because the credit price is low. The area-weighted marginal-abatement cost
-(\autoref{eq:mac}) across treated cropland is \textbf{p25 \$247, median \$305, p75
-\$476/\tco} (\autoref{fig:mac}) --- set against a net credit price of only \$130
-(\$150 less \$20 MRV). Only the cheapest $\sim$10--15\% of land clears, which is
-why the public envelope is just 2.2\,Mha, and the price ladder is steeply convex
-(\autoref{tbl:priceladder}).
+because the credit price is low. The area-weighted \emph{median}
+marginal-abatement cost (\autoref{eq:mac}) of durable net-export CDR across
+treated cropland is \textbf{\$330/\tco\ under the targeted allocation, \$276
+under uniform-20, and \$259 under uniform-50} ($\sim$\$843 on the NPV basis;
+\autoref{fig:mac}) --- set against a net credit price of only \$130 (\$150 less
+\$20 MRV). Only the cheapest $\sim$11--12\% of treated land clears, which is why
+the public envelope is just 1.95\,Mha targeted (3.95\,Mha uniform-20), and the
+price ladder is steeply convex (\autoref{tbl:priceladder}): most of the mass
+unlocks only between \$250 and \$350, where the uniform-20 envelope jumps from
+7.0 to 23.1\,Mha.
 
 \begin{figure}
   \centering
@@ -1319,41 +1352,49 @@ why the public envelope is just 2.2\,Mha, and the price ladder is steeply convex
   \label{fig:mac}
 \end{figure}
 
-\begin{longtable}[]{@{}rrr@{}}
-\caption{Public-sufficient area and cumulative CDR as the VCM price
-rises.}\label{tbl:priceladder}\\
+\begin{longtable}[]{@{}rrrrr@{}}
+\caption{Public-sufficient area and durable CDR as the VCM price rises
+(equilibrium net-export).}\label{tbl:priceladder}\\
 \toprule
-VCM price (\$/\tco) & Public area (Mha) & Cumulative CDR (Mt) \\
+& \multicolumn{2}{c}{Targeted} & \multicolumn{2}{c}{Uniform-20} \\
+VCM price (\$/\tco) & Area (Mha) & CDR (Mt) & Area (Mha) & CDR (Mt) \\
 \midrule
 \endhead
-150 (current) & 2.23 & 25 \\
-250 & 3.57 & 31 \\
-300 & 7.52 & 51 \\
-500 & 13.15 & 73 \\
-1000 & 16.6 & 81 \\
+100 & 0.49 & 2.2 & 1.40 & 7.8 \\
+150 (current) & 1.95 & 5.6 & 3.95 & 20.4 \\
+250 & 2.88 & 7.0 & 7.00 & 33.3 \\
+350 & 8.35 & 17.5 & 23.06 & 100.6 \\
+500 & 13.42 & 23.3 & 27.98 & 115.6 \\
 \bottomrule
 \end{longtable}
 
-A lever comparison settles which knob matters: $+33\%$ carbon price widens the
-public envelope by $+26\%$, $-33\%$ delivered cost by $+33\%$, $+33\%$ CDR rate by
-$+23\%$ --- but \textbf{doubling the realised CDR rate widens it by $+181\%$}
-(2.23 $\rightarrow$ 6.27\,Mha), beyond any plausible price or cost move. And a
-one-at-a-time tornado on the intersection area confirms \textbf{delivered basalt
-cost is the single dominant lever} (swing 5.62\,Mha over $\times0.5$--$2.0$),
-larger than carbon price (2.80), CDR rate (2.38), and yield (0.89) --- so
-targeting is first a logistics problem. Reassuringly, the yield benefit is the
-\emph{least} sensitive input, which matters because it is also the most uncertain
-(the Bayesian arm is prior-dominated).
+A lever comparison settles which knob matters. Near the central point the
+uniform-20 public envelope has an elasticity of $\sim$1.1 to the net price/cost
+ratio and $\sim$1.3 to the realised CDR rate --- and the response is convex:
+$+25\%$ CDR rate widens the envelope from 3.95 to 5.07\,Mha, $+50\%$ to
+6.37\,Mha, but \textbf{doubling the realised CDR rate widens it to 22.49\,Mha}
+($5.7\times$), beyond any plausible price or cost move. A one-at-a-time tornado
+on the targeted intersection area tells the same public-side story: the
+net-price/cost ratio $(p-m)/c$ and the CDR rate are effectively tied as the
+largest levers (swings 1.73 and 1.72\,Mha), against 0.96 for the yield/cost
+ratio and 0.22 for the net-export partition $\lambda$. Expressed as a raw
+delivered-cost swing, cost still moves the most (2.78\,Mha over
+$\times0.5$--$2.0$) --- but only because it is the one parameter that moves both
+ratios at once (a 1.94\,Mha public channel plus a 0.96\,Mha private channel) ---
+so targeting remains first a logistics problem. Reassuringly, the yield benefit
+is the \emph{least} sensitive economic input, which matters because it is also
+the most uncertain (the Bayesian arm is prior-dominated).
 
 \begin{keybox}
-\textbf{Caveat on absolute area.} The committed \texttt{output-ssa-summary.csv}
-figures reproduced in \autoref{tbl:ssa} (e.g.\ 137.9\,Mha ``profitable'') are
-flagged \emph{stale} relative to the current \texttt{economics\_erw} rasters:
-recomputing \texttt{erw-10}'s own definition on today's data gives
-$\sim$9.9\,Mha combined-positive, consistent with the single-digit-Mha envelope
-areas above. Read \autoref{tbl:ssa} for the \emph{relative} ranking of regimes and
-allocations, and this section for the current-data footprint. Year-1 is also the
-most optimistic regime; NPV and equilibrium shrink every envelope.
+\textbf{Note on accounting basis.} Every table in this chapter is computed on
+the same fresh 2026-09-01 raster stack, and the envelope figures use the
+conservative \emph{equilibrium, net-export} basis --- the regime on which a
+durable-carbon case should be led. Year-1 gross accounting is the most
+optimistic lens; NPV and equilibrium shrink every envelope. The net-export
+correction is the biggest single haircut on a first application, removing
+$\sim$70\% of credited CDR (targeted: 99 $\rightarrow$ 29\,Mt), but only
+$\sim$10--25\% at equilibrium (targeted: 32 $\rightarrow$ 25\,Mt; uniform-20:
+135 $\rightarrow$ 121\,Mt) --- durable CDR is mostly an equilibrium phenomenon.
 \end{keybox}
 
 \section{What the results say}
@@ -1368,10 +1409,10 @@ or a cheaper/finer feedstock to clear on carbon alone.
 (\autoref{fig:schematic}): the same acidity gradient that maximises yield relief
 minimises exported carbon, and vice versa.
 \item \textbf{The private case is larger than the public case}
-(\autoref{sec:envelopes-results}): 8.2 vs.\ 2.2\,Mha targeted. Carbon finance is
-decisive mainly on the 3.35\,Mha combined-only band, and \emph{least additional}
+(\autoref{sec:envelopes-results}): 4.31 vs.\ 1.95\,Mha targeted. Carbon finance is
+decisive mainly on the 2.67\,Mha combined-only band, and \emph{least additional}
 on the doubly-justified intersection --- with a robust core of only
-$\sim$0.7--0.8\,Mha.
+$\sim$0.65\,Mha.
 \item \textbf{Ranking and cap dominate the average}: a positive top decile exists
 even where the mean is negative.
 \end{enumerate}
@@ -1385,11 +1426,16 @@ The CDR stream in particular is a first-order parameterisation. Each proxy below
 is a deliberate, sourced simplification, not an oversight:
 %
 \begin{enumerate}
-\item \textbf{Linear climate multipliers} (\autoref{eq:fmatmap}) stand in for
-full reactive-transport kinetics; to be replaced by a Kanzaki-class form when
+\item \textbf{Interpretable climate multipliers} (\autoref{eq:fmatmap}) stand in
+for full reactive-transport kinetics: the temperature response is now the
+Arrhenius kinetic form (the former linear $\mathrm{MAT}/T_{\text{ref}}$
+multiplier is retained as a conservative sensitivity variant), while moisture
+remains a linear MAP ratio; to be replaced by a Kanzaki-class form when
 calibration data allow \citep{kanzaki2023}.
-\item \textbf{Triangular pH factor} peaked at pH 5 (\autoref{eq:fph}) is a
-defensible midpoint, not a calibrated curve.
+\item \textbf{Triangular pH factor} peaked at pH 6.0 (\autoref{eq:fph}) is
+anchored to the product of acid-catalysed dissolution kinetics and the
+alkalinity carbon-capture efficiency \citep{bertagni2022, holden2024,
+power2025}, but it is a stylised proxy, not a calibrated curve.
 \item \textbf{Reactive fraction $\phi_0 = 0.20$} is anchored to a single
 temperate mesocosm \citep{lewis2021}.
 \item \textbf{Grain-size exponent $\beta=0.5$} is the midpoint of an empirical
