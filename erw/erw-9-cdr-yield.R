@@ -83,18 +83,19 @@ ph     <- terra::resample(ph, ref)
 T_ref <- 11
 P_ref <- 1000
 
-# Temperature response of gross weathering. Default "linear" (MAT/T_ref).
-# "arrhenius" uses the standard kinetic form exp(-Ea/R (1/T - 1/T_ref)) with a
-# silicate activation energy Ea = 68.8 kJ/mol (White & Blum 1995) -- the same
-# value Cascade Climate's Weathering Potential Explorer uses. Both are normalized
-# to f = 1 at T_ref and clamped to [0.3, 3.0] for comparability. The Arrhenius
-# form is steeper in temperature and, area-weighted, raises SSA gross CDR by
-# ~27% (capped) over the linear default. Carried as a SENSITIVITY VARIANT: for
-# the analytic sweep in erw-11/erw-12, pass the pre-computed per-pixel multiplier
-# data/cdr_climate_arrhenius_multiplier.tif (= f_arr/f_lin) as `rmult` to cdr_net()
-# instead of re-running this script. See paper/analysis/erw_arrhenius_variant.py
-# and paper/cascade-comparison-memo.md.
-CLIMATE_TEMP_MODE <- "linear"          # "linear" | "arrhenius"
+# Temperature response of gross weathering. HEADLINE mode is "arrhenius": the
+# standard kinetic form exp(-Ea/R (1/T - 1/T_ref)) with a silicate activation
+# energy Ea = 68.8 kJ/mol (White & Blum 1995 GCA; same value as Cascade
+# Climate's Weathering Potential Explorer). Arrhenius-type exponential
+# temperature dependence is the literature-supported formulation for silicate
+# dissolution (Brantley et al. 2023 Science; Deng et al. 2022 Nat. Commun.;
+# Pogge von Strandmann et al. 2022 / Iff et al. 2024 Front. Clim. report
+# order-of-magnitude contrasts between <10 and >20 degC). The former "linear"
+# default (MAT/T_ref) is retained as a conservative sensitivity variant. Both
+# are normalized to f = 1 at T_ref and clamped to [0.3, 3.0]; area-weighted,
+# Arrhenius raises SSA gross CDR ~27% (capped) over linear. See
+# paper/analysis/erw_arrhenius_variant.py and paper/cascade-comparison-memo.md.
+CLIMATE_TEMP_MODE <- "arrhenius"       # "arrhenius" (headline) | "linear" (sensitivity)
 Ea <- 68800; Rgas <- 8.314             # J/mol ; J/mol/K
 if (CLIMATE_TEMP_MODE == "arrhenius") {
   f_mat <- exp(-(Ea / Rgas) * (1 / (mat + 273.15) - 1 / (T_ref + 273.15)))
@@ -105,10 +106,22 @@ if (CLIMATE_TEMP_MODE == "arrhenius") {
 names(f_mat) <- 'f_MAT'
 f_map <- terra::clamp(map_yr / P_ref, 0.3, 3.0); names(f_map) <- 'f_MAP'
 
-# triangular pH factor peaking at pH ~5.0
+# Triangular pH factor peaking at pH 6.0. The unimodal shape reflects the
+# product of two opposing mechanisms: silicate dissolution kinetics rise with
+# acidity below pH ~5.5 (Palandri & Kharaka 2004; Bandstra & Brantley 2008),
+# while the carbon-capture efficiency of the generated alkalinity collapses
+# below pH ~5 -- DIC is almost entirely dissolved CO2, and dissolution first
+# neutralizes standing acidity rather than exporting bicarbonate (Bertagni &
+# Porporato 2022 STOTEN; Holden et al. 2024 STOTEN; Power et al. 2025 Front.
+# Clim.). Their product peaks in the moderately acidic window between the
+# pH-5 capture-collapse threshold and carbonic-acid pKa1 = 6.35; we take 6.0.
+# The 0.5 floor (rather than 0) below pH ~4 reflects that low-pH capture is
+# a lag/discounting problem, not a permanent zero (Kanzaki et al. 2025 ERL).
+# (v2.2 and earlier peaked at 5.0; moved per the ESROC-anchored citation
+# review, litrature/citation-review.md #4.1.)
 f_ph <- terra::ifel(ph < 4.0, 0.5,
-        terra::ifel(ph < 5.0, 0.5 + (ph - 4.0) * 0.5,
-        terra::ifel(ph < 7.0, 1.0 - (ph - 5.0) * 0.25,
+        terra::ifel(ph < 6.0, 0.5 + (ph - 4.0) * 0.25,
+        terra::ifel(ph < 8.0, 1.0 - (ph - 6.0) * 0.25,
                               0.5)))
 names(f_ph) <- 'f_pH'
 
@@ -244,6 +257,14 @@ cdr_yield_uniform_50         <- write_cdr(basalt_uniform_50, 'cdr_yield_uniform_
 # NOTE: first-order (sequential) bound -- assumes the acidity sink is filled
 # before any alkalinity exports. The truth lies between this and the gross CDR
 # above; durable CDR is therefore mostly an equilibrium/maintenance phenomenon.
+# ACCOUNTING ORDER: the pedogenic deduction (exported_fraction) is applied to
+# ALL weathered alkalinity upstream, and F*S is then subtracted in full here.
+# Where the two co-occur (pedogenic_frac > 0 AND S > 0 -- arid AND acid, 1.28%
+# of SSA pixels on the 2026-09 run) this over-deducts by F*S*p relative to the
+# clean sequential order (G - F*S)*(1-p). The bias is conservative (slightly
+# under-credits) and confined to that overlap; kept for consistency with the
+# erw-11/erw-12 analytic reconstruction, per the ESROC double-counting check
+# (litrature/citation-review.md, decision 5).
 # erw-7 can consume either the gross (cdr_yield_*) or net (cdr_yield_*_netexport)
 # rasters; the latter is the recommended default for the carbon (public) case.
 # ------------------------------------------------------------------------------

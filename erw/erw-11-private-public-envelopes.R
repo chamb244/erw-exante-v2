@@ -63,7 +63,7 @@ dir.create(TBL_OUT, recursive = TRUE, showWarnings = FALSE)
 # "equilibrium" is the manuscript headline (steady-state, net-export CDR now baked
 # into erw-7's _cdr_net_tha layer). Switch to "year1" for the upper-bound contrast.
 REGIME      <- "equilibrium"
-ALLOCS      <- c("targeted", "uniform_20")
+ALLOCS      <- c("targeted", "uniform_10", "uniform_20", "uniform_50")
 MRV         <- 20      # $/tCO2  (erw-7 default)
 CARBON_BASE <- 150     # $/tCO2
 
@@ -260,7 +260,7 @@ for (alloc in ALLOCS) {
     sprintf("Intersection (both sufficient) - %s", alloc),
     c(0,1), c("grey85","#7d1f8c"), c("outside","intersection"))
   plot_cat(typ, sprintf("env_typology_%s.png",alloc),
-    sprintf("Return typology - year-1, %s", alloc),
+    sprintf("Return typology - %s, %s", REGIME, alloc),
     c(1,2,3,4,5), c("#7d1f8c","#1a7d3c","#2156a8","#e8a33d","grey88"),
     c("both","private only","public only","combined only","neither"))
 
@@ -363,9 +363,11 @@ write.csv(core_summary, file.path(TBL_OUT,"output-core-priority-summary.csv"), r
 
 ha_c  <- zonal(ifel(core & ok, P$WSUM, 0), country_r, "sum", na.rm=TRUE)
 vop_c <- zonal(ifel(core & ok, P$VOP,  0), country_r, "sum", na.rm=TRUE)
+ha_cd <- zonal(ifel(cand & ok, P$WSUM, 0), country_r, "sum", na.rm=TRUE)
 fs <- farm_ha[ha_c[[1]]]; fs[is.na(fs)] <- FARM_DEFAULT
 core_country <- data.frame(iso3=ha_c[[1]], core_Mha=round(ha_c[[2]]/1e6,3),
-  core_farms_M=round(ha_c[[2]]/fs/1e6,3), core_vop_Musd=round(vop_c[[2]]/1e6,1))
+  core_farms_M=round(ha_c[[2]]/fs/1e6,3), core_vop_Musd=round(vop_c[[2]]/1e6,1),
+  candidate_Mha=round(ha_cd[[2]]/1e6,3))
 core_country <- core_country[order(-core_country$core_Mha),]
 write.csv(core_country, file.path(TBL_OUT,"output-core-priority-by-country.csv"), row.names=FALSE)
 

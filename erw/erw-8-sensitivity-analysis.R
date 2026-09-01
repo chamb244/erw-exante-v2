@@ -6,7 +6,7 @@
 # sweep dimension:
 #
 #   1) prices      — crop_price × basalt_cost × carbon_price grid
-#   2) yields      — yield-factor 1.0–2.5
+#   2) yields      — yield-factor 1.0–1.8 (field-trial envelope cap)
 #   3) mrv         — MRV cost 0–80 $/tCO2
 #   4) grain       — grain size 10, 30, 50, 100, 200, 500 µm
 #                    (affects BOTH grinding cost and CDR rate per t basalt)
@@ -92,8 +92,13 @@ write.csv(do.call(rbind, rows), paste0(output_path, '/output-erw-sensitivity-pri
 
 # ------------------------------------------------------------------------------
 # 2) yield factor — closing the yield gap
+# Capped at 1.8: the reviewed field-trial envelope tops out at ~1.7x
+# (Beerling et al. 2024 PNAS corn belt; Haque et al. 2025 CDRXIV Kenya;
+# Ramos et al. 2022; Suhrhoff et al. 2026 ESROC synthesis) -- values above
+# that are extrapolation beyond the published evidence. (Was 1.0-2.5 in
+# v2.2; see litrature/citation-review.md #4.4.)
 
-yld <- seq(1, 2.5, 0.25)
+yld <- seq(1, 1.8, 0.2)
 rows <- list()
 for (r_f in REGIMES) {
   cat('yields |', r_f, '\n')
