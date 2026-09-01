@@ -476,13 +476,13 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
       <div class="cs"><div class="n">44</div><div class="l">SSA countries on a per-pixel grid</div></div>
       <div class="cs"><div class="n">23</div><div class="l">SPAM crops, area-weighted to each pixel</div></div>
       <div class="cs"><div class="n">~0.083&#176;</div><div class="l">grid resolution of the decision object</div></div>
-      <div class="cs"><div class="n">2.1 Mha</div><div class="l">combined-only band, the policy object</div></div>
+      <div class="cs"><div class="n">2.7 Mha</div><div class="l">combined-only band, the policy object</div></div>
     </div>
     <div class="cover-meta">
       <div><div class="label-row">Authors</div><div class="value-row">B. H. Gebrekidan (CIMMYT-Ethiopia) &#183; J. Chamberlin (CIMMYT-Kenya)</div></div>
       <div><div class="label-row">Method</div><div class="value-row">Decomposed per-pixel gross margin</div></div>
-      <div><div class="label-row">Headline regime</div><div class="value-row">Equilibrium &#215; targeted, net-export</div></div>
-      <div><div class="label-row">Status</div><div class="value-row">Working draft &#183; Agricultural Economics</div></div>
+      <div><div class="label-row">Headline regime</div><div class="value-row">Equilibrium, net-export &#183; targeted / uniform-20</div></div>
+      <div><div class="label-row">Status</div><div class="value-row">Working draft &#183; Agricultural Economics &#183; 2026-09 run</div></div>
     </div>
   </section>
 
@@ -608,7 +608,7 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
       <tr class="hl"><td class="lead">Transport (haulage)</td><td style="text-align:left;">travel-time &#215; $0.04/min/t</td><td style="text-align:left;">variable</td><td style="text-align:left;">30 t truck over MAP friction surface</td></tr>
       <tr><td class="lead">Spreading</td><td style="text-align:left;">$8 / t</td><td style="text-align:left;">fixed</td><td style="text-align:left;">on-farm application</td></tr>
       <tr><td class="lead">Delivered cost / t</td><td style="text-align:left;">quarry + grinding + transport + spreading</td><td style="text-align:left;">= sum</td><td style="text-align:left;">the delivered $/t consumed per pixel</td></tr>
-      <tr><td class="lead">MRV (netted separately)</td><td style="text-align:left;">$20 / tCO&#8322;</td><td style="text-align:left;">per tCO&#8322;</td><td style="text-align:left;">netted from carbon price; Levy et al. 2024 pilot $30</td></tr>
+      <tr><td class="lead">MRV (netted separately)</td><td style="text-align:left;">$20 / tCO&#8322;</td><td style="text-align:left;">per tCO&#8322;</td><td style="text-align:left;">netted from carbon price; low end of the $15&#8211;71/tCO&#8322; range (Mercer et al. 2024)</td></tr>
     </table>
     <p class="source-note">* Grinding cost varies with the country electricity tariff. Transport is the only spatially varying term: it drives where ERW is deployable. Life-cycle CO&#8322; of grinding, transport, and spreading is separately deducted from gross removal.</p>
     <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
@@ -623,18 +623,18 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="split s55" style="margin-top:6px;">
       <div>
         <p class="small dim"><em>p</em> = VCM carbon price ($/tCO&#8322;) &#183; <em>m</em> = per-tonne MRV cost</p>
-        <p class="small" style="margin-top:10px;">Baseline today&#8217;s price is <strong>$150/tCO&#8322;</strong>, but we sweep a full price ladder. Price is one of the three levers that move the public envelope (Results).</p>
-        <div class="card hl" style="margin-top:14px;"><p class="small">At $150 the durable public envelope is <strong>1.65 Mha</strong> (9.4% of treated cropland); it only becomes large at prices well above today&#8217;s.</p></div>
+        <p class="small" style="margin-top:10px;">Baseline today&#8217;s price is <strong>$150/tCO&#8322;</strong>, but we sweep a full price ladder. Price, MRV and delivered cost move the public envelope through a single ratio, (p &minus; m)/c; the only other lever is durable removal per tonne (Results).</p>
+        <div class="card hl" style="margin-top:14px;"><p class="small">At $150 the durable public envelope is <strong>1.95 Mha</strong> (11.1% of treated cropland); under a uniform-20 dose it widens to 3.95 Mha (12.1%), because the lime-requirement dose is CDR-minimal by construction.</p></div>
       </div>
       <div>
         <p class="small dim" style="margin-bottom:6px;">Public envelope grows with price &#183; equilibrium, targeted</p>
         <table class="compact">
           <tr><th style="text-align:left;">$/tCO&#8322;</th><th>Public Mha</th><th>% treated</th><th>Durable CDR (Mt)</th></tr>
-          <tr><td class="lead">$100</td><td>0.35</td><td>2.0%</td><td>1.7</td></tr>
-          <tr class="hl"><td class="lead">$150</td><td>1.65</td><td>9.4%</td><td>4.8</td></tr>
-          <tr><td class="lead">$250</td><td>2.51</td><td>14.3%</td><td>6.1</td></tr>
-          <tr><td class="lead">$350</td><td>4.84</td><td>27.6%</td><td>11.0</td></tr>
-          <tr><td class="lead">$500</td><td>8.76</td><td>49.9%</td><td>15.8</td></tr>
+          <tr><td class="lead">$100</td><td>0.49</td><td>2.8%</td><td>2.2</td></tr>
+          <tr class="hl"><td class="lead">$150</td><td>1.95</td><td>11.1%</td><td>5.6</td></tr>
+          <tr><td class="lead">$250</td><td>2.88</td><td>16.4%</td><td>7.0</td></tr>
+          <tr><td class="lead">$350</td><td>8.35</td><td>47.5%</td><td>17.5</td></tr>
+          <tr><td class="lead">$500</td><td>13.42</td><td>76.4%</td><td>23.3</td></tr>
         </table>
       </div>
     </div>
@@ -649,11 +649,11 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="split s55">
       <div>
         <div class="eq small">\[ \text{durable CDR} \;=\; \max(\,\text{gross CDR} - F\!\cdot\!S,\; 0\,) \]</div>
-        <p class="small dim"><em>F</em> = 0.88 tCO&#8322; per tCaCO&#8322;-eq &#183; <em>S</em> = acidity sink (standing / maintenance)</p>
+        <p class="small dim"><em>F</em> = 0.88 tCO&#8322; per tCaCO&#8323;-eq &#183; <em>S</em> = acidity sink (standing / maintenance)</p>
         <p class="small" style="margin-top:12px;">Alkalinity spent neutralizing soil acidity re-releases its CO&#8322;, exactly as agricultural lime does, so it must be deducted. A first-order sequential bound.</p>
         <div class="card hl" style="margin-top:14px;">
           <span class="label-tag">Why it matters</span>
-          <p class="small"><strong>&#8776; 80%</strong> of credited removal is cut at first application once acidity neutralization is netted out. Durable removal is largely a steady-state phenomenon, which is why the headline uses the equilibrium regime.</p>
+          <p class="small"><strong>&#8776; 70%</strong> of credited removal is cut at first application once acidity neutralization is netted out. Durable removal is largely a steady-state phenomenon (equilibrium retention 77&#8211;90%), which is why the headline uses the equilibrium regime.</p>
         </div>
       </div>
       <div class="chart-wrap"><img src="figures/fig-netexport.png" alt="Net-export CDR accounting: gross vs net-export CDR against soil pH"></div>
@@ -670,7 +670,7 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
       <div>
         <div class="card" style="margin-bottom:12px;"><span class="label-tag">Mechanism</span><p class="small">Beyond the lime requirement, pH is pushed past the crop optimum; the EcoCrop response applies a yield haircut at the post-application pH.</p></div>
         <div class="card" style="margin-bottom:12px;"><span class="label-tag">Buffered shift</span><p class="small">pH change is damped by soil buffering (&beta; = k<sub>&beta;</sub>&#183;ECEC); reacted alkalinity A = gross CDR / F.</p></div>
-        <div class="card hl" style="margin-bottom:12px;"><span class="label-tag">Effect</span><p class="small">Concentrated on high uniform doses. Central estimate trims the targeted private return only modestly (4.31 &#8594; 4.02 Mha, &minus;7%).</p></div>
+        <div class="card hl" style="margin-bottom:12px;"><span class="label-tag">Effect</span><p class="small">Concentrated on high uniform doses. Central estimate trims the targeted private return only modestly (&minus;7%, band 6&#8211;10%); at uniform-50 the central hit is 20% with a 3&#8211;99% band.</p></div>
         <div class="card"><span class="label-tag">Sensitivity</span><p class="small">A low&#8211;high band over (k<sub>&beta;</sub>, realized-alkalinity) is carried; the uniform-50 case is where it bites hardest.</p></div>
       </div>
       <div class="chart-wrap"><img src="figures/fig-overliming.png" alt="Over-liming penalty on the private return: central estimate and sensitivity band"></div>
@@ -702,7 +702,7 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="topbar"><span class="brand">Design space</span><span class="section">Regimes &#215; allocation rules</span></div>
     <div class="eyebrow">Design space</div>
     <h2>Temporal regimes &#215; allocation rules.</h2>
-    <p class="lead">Two axes are swept alongside the assumption sets; the headline is <strong>equilibrium &#215; targeted, net-export</strong>.</p>
+    <p class="lead">Two axes are swept alongside the assumption sets; the headline is <strong>equilibrium, net-export</strong>: targeted leads the private and intersection geography, uniform-20 the carbon case. Kinetics: Arrhenius (<em>E</em><sub>a</sub> = 68.8 kJ/mol) &#183; pH optimum 6.0 (2026-09 basis).</p>
     <h3 style="margin-top:18px; color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Temporal regimes</h3>
     <div class="phases three" style="margin-top:8px;">
       <div class="phase"><div class="phase-label">Year-1</div><div class="phase-body">One-time dose &amp; cost; durable CDR net of standing acidity. Most conservative on carbon.</div></div>
@@ -812,8 +812,8 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
       <div>
         <p class="lead">Land where durable, net-export CDR at $150/tCO&#8322; covers cost with no yield benefit.</p>
         <div class="stats" style="margin-top:18px; gap:22px;">
-          <div class="stat"><div class="num">1.7<span class="unit">Mha</span></div><div class="label">durable public area</div></div>
-          <div class="stat"><div class="num">9.4<span class="unit">%</span></div><div class="label">of treated cropland</div></div>
+          <div class="stat"><div class="num">1.95<span class="unit">Mha</span></div><div class="label">durable public area (targeted)</div></div>
+          <div class="stat"><div class="num">11.1<span class="unit">%</span></div><div class="label">of treated cropland &#183; 3.95 Mha (12.1%) under uniform-20</div></div>
         </div>
         <div class="card hl" style="margin-top:18px;"><p class="small">Smaller than the private envelope, and price-conditional. Net-export accounting and today&#8217;s VCM price keep the carbon-only case tightly bound, the reason the combined case matters.</p></div>
       </div>
@@ -829,11 +829,11 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="split s40">
       <div class="chart-wrap"><img src="figures/fig-intersection.png" alt="Intersection map, equilibrium, net-export CDR"></div>
       <div>
-        <div class="card hl" style="margin-bottom:16px;"><span class="label-tag">2.1 Mha &#183; combined-only</span><p class="small">Neither the yield return nor the carbon return alone covers cost, yet together the margin is positive.</p></div>
+        <div class="card hl" style="margin-bottom:16px;"><span class="label-tag">2.7 Mha &#183; combined-only</span><p class="small">Neither the yield return nor the carbon return alone covers cost, yet together the margin is positive.</p></div>
         <div class="stats" style="gap:14px; grid-template-columns:repeat(3,1fr);">
           <div class="stat"><div class="num">4.3</div><div class="label">private (Mha)</div></div>
-          <div class="stat"><div class="num">1.7</div><div class="label">public (Mha)</div></div>
-          <div class="stat"><div class="num">6.9</div><div class="label">combined (Mha)</div></div>
+          <div class="stat"><div class="num">2.0</div><div class="label">public (Mha)</div></div>
+          <div class="stat"><div class="num">7.6</div><div class="label">combined (Mha)</div></div>
         </div>
         <p class="small dim" style="margin-top:16px;">The economic point: voluntary carbon finance is not a bonus on an already-profitable practice; it is the marginal revenue that unlocks an otherwise-unprofitable, yield-improving investment.</p>
       </div>
@@ -849,7 +849,7 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="split s40">
       <div class="chart-wrap"><img src="figures/fig-mac.png" alt="Marginal abatement cost of durable net-export CDR map, equilibrium, targeted"></div>
       <div>
-        <div class="stat" style="margin-bottom:16px;"><div class="num">$446<span class="unit">/tCO&#8322;</span></div><div class="label" style="max-width:320px;">median marginal abatement cost, well above today&#8217;s $150 VCM price</div></div>
+        <div class="stat" style="margin-bottom:16px;"><div class="num">$330<span class="unit">/tCO&#8322;</span></div><div class="label" style="max-width:320px;">area-weighted median MAC (targeted; $276 under uniform-20), at the upper edge of published cost syntheses and well above today&#8217;s $150 VCM price</div></div>
         <div class="card" style="margin-bottom:12px;"><p class="small">MAC = delivered cost per tonne of rock &divide; durable CDR per tonne. The public envelope is exactly the land where <strong>MAC &lt; net price</strong> (p &minus; m).</p></div>
         <div class="card hl"><p class="small">So the carbon case is limited by how much CO&#8322; a tonne of rock verifiably removes, the largest and least-resolved lever, and the clear field-calibration priority.</p></div>
       </div>
@@ -864,9 +864,9 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <h2>What shifts the public envelope outward.</h2>
     <div class="split s55">
       <div>
-        <div class="card" style="margin-bottom:12px;"><span class="label-tag">1 &#183; Higher VCM price (p)</span><p class="small">Public area climbs from 2% of treated cropland at $100 to ~50% at $500. The most direct lever.</p></div>
-        <div class="card" style="margin-bottom:12px;"><span class="label-tag">2 &#183; Lower delivered cost (C)</span><p class="small">Transport-cost reductions (e.g. solar haulage) lower MAC pixel-by-pixel; see Assumption 1.</p></div>
-        <div class="card hl"><span class="label-tag">3 &#183; More durable CDR per tonne</span><p class="small">Raising verified removal per tonne of rock cuts MAC directly. Kinetic saturation is second-order here.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">1 &#183; Higher VCM price (p)</span><p class="small">Public area climbs from 2.8% of treated cropland at $100 to 76% at $500. The most direct lever.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">2 &#183; Lower delivered cost (C)</span><p class="small">Transport-cost reductions (e.g. solar haulage) lower MAC pixel-by-pixel; they act through the same (p &minus; m)/c ratio as price. See Assumption 1.</p></div>
+        <div class="card hl"><span class="label-tag">3 &#183; More durable CDR per tonne</span><p class="small">Raising verified removal per tonne cuts MAC directly, and super-linearly: doubling the rate widens the uniform-20 public envelope ~6&#215;. Kinetic saturation is second-order here.</p></div>
       </div>
       <div class="chart-wrap"><img src="figures/fig-supply-curve.png" alt="Public envelope vs carbon price, targeted, MRV $20"></div>
     </div>
@@ -898,9 +898,9 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
       <div>
         <p class="lead">Intersecting the envelope across the plausible parameter grid isolates land that stays viable under most assumptions.</p>
         <div class="stats" style="margin-top:16px; gap:14px; grid-template-columns:repeat(3,1fr);">
-          <div class="stat"><div class="num">~0.8<span class="unit">Mha</span></div><div class="label">robust core-priority cropland</div></div>
-          <div class="stat"><div class="num">~0.5<span class="unit">M</span></div><div class="label">farms reached</div></div>
-          <div class="stat"><div class="num">~$0.75<span class="unit">B</span></div><div class="label">crop value at stake</div></div>
+          <div class="stat"><div class="num">0.65<span class="unit">Mha</span></div><div class="label">robust core-priority cropland (candidate tier 1.22)</div></div>
+          <div class="stat"><div class="num">0.38<span class="unit">M</span></div><div class="label">farms reached</div></div>
+          <div class="stat"><div class="num">~$0.60<span class="unit">B</span></div><div class="label">crop value at stake</div></div>
         </div>
         <div class="card hl" style="margin-top:16px;"><p class="small">This is the geography one would deploy first, and the base to expand as price rises or cost falls.</p></div>
       </div>
@@ -914,9 +914,9 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
     <div class="eyebrow">Takeaways</div>
     <h2>ERW is a coupled agronomic-and-carbon proposition.</h2>
     <div class="two-col" style="row-gap:16px;">
-      <div class="card"><span class="label-tag">1</span><h3 style="font-size:15px;">The two returns rarely each suffice alone</h3><p class="small">But together they make a meaningful area of SSA cropland profitable that neither would, the 2.1 Mha combined-only band.</p></div>
+      <div class="card"><span class="label-tag">1</span><h3 style="font-size:15px;">The two returns rarely each suffice alone</h3><p class="small">But together they make a meaningful area of SSA cropland profitable that neither would, the 2.7 Mha combined-only band.</p></div>
       <div class="card hl"><span class="label-tag">2</span><h3 style="font-size:15px;">Carbon finance is the margin, not a bonus</h3><p class="small">On most viable land, VCM revenue is what unlocks a yield-improving investment. That reframes ERW away from a pure CDR supply curve.</p></div>
-      <div class="card"><span class="label-tag">3</span><h3 style="font-size:15px;">The binding constraint is durable CDR per tonne</h3><p class="small">Net-export accounting cuts first-application removal ~80%; median MAC is $446. Price, delivered cost, and verified removal are the three levers.</p></div>
+      <div class="card"><span class="label-tag">3</span><h3 style="font-size:15px;">The binding constraint is durable CDR per tonne</h3><p class="small">Net-export accounting cuts first-application removal ~70%; the area-weighted median MAC is $330 (targeted) / $276 (uniform-20). The price&#8211;cost ratio and verified removal per tonne are the two structural levers.</p></div>
       <div class="card"><span class="label-tag">4</span><h3 style="font-size:15px;">Treating it as coupled changes the answer</h3><p class="small">It changes both where to deploy first (the robust core) and what to invest in to expand it (field calibration of removal).</p></div>
     </div>
     <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
@@ -936,9 +936,9 @@ ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
       </div>
       <div>
         <h3 style="color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Next</h3>
-        <div class="ask" style="margin-top:10px;"><h3>Sensitivity sweep</h3><p>Expand around the parameters that move results most: removal per tonne, price, delivered cost, k<sub>&beta;</sub>, K<sub>d</sub>.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>Registry-grade accounting</h3><p>Align the net-export bound with VCM methodology counterfactuals: liming substitution, financial-additionality screens.</p></div>
         <div class="ask" style="margin-top:12px;"><h3>Optimal-rate maps</h3><p>Fold the pixel-specific private and combined optimal-rate maps into the manuscript.</p></div>
-        <div class="ask" style="margin-top:12px;"><h3>Share &amp; collaborate</h3><p>Push erw-exante-v2 to GitHub for coauthor review; manuscript points to the repo.</p></div>
+        <div class="ask" style="margin-top:12px;"><h3>Share &amp; collaborate</h3><p>The repo is on GitHub; the interactive envelope explorer reproduces every lever of this analysis in one self-contained HTML file.</p></div>
       </div>
     </div>
     <div class="footer"><span>ERW public &amp; private returns &#183; SSA</span><span class="pageno"></span></div>
