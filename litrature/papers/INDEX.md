@@ -73,6 +73,9 @@ PDFs live in `litrature/papers/`. Items marked PAYWALLED have verified DOIs but 
 | 620 | vanstraaten2002-rocksforcrops | | | P. van Straaten, Rocks for crops: agrominerals of sub-Saharan Africa, ICRAF, University of | [link](https://apps.worldagroforestry.org/downloads/Publications/PDFS/B13327.pdf) | see URL |
 | 650 | vonuexkull-mutert1995 | 1995 | H. R. von Uexküll | Global extent, development and economic impact of acid soils | [10.1007/bf00009558](https://doi.org/10.1007/bf00009558) | PAYWALLED |
 
+Anchor review (downloaded 2026-09-02):
+- `../ew-esroc-cdrxiv417.pdf` (git-ignored, 7.9 MB) + `../ew-esroc-cdrxiv417.txt` — Suhrhoff et al. 2026, *An Ecosystem of CDR Reviews – Part 3: Enhanced Weathering*, CDRXIV preprint 417 v1, DOI 10.70212/cdrxiv.2026417.v1, CC BY 4.0. Manuscript cites it by section number (`\citep[\S…]{suhrhoff2026esroc}`).
+
 Additional grey items downloaded:
 - `556_haque2025-kenya-cdrxiv.pdf` — Haque et al. 2025, CDRXIV preprint 410, DOI 10.70212/cdrxiv.2025410.v1 (Kenya smallholder maize trial; ESROC ref 556).
 - `999_jordan2026-cdrxiv502.pdf` — Jordan et al. 2026, CDRXIV preprint 502, DOI 10.70212/cdrxiv.2026502.v1 (= manuscript's `jordan2026`; fixes its missing DOI).

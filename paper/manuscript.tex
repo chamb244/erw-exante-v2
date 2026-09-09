@@ -18,6 +18,13 @@
 \usepackage{lineno}
 \usepackage[colorlinks=true,allcolors=blue]{hyperref}
 \usepackage{xcolor}
+% --- Draft watermark: comment out these five lines at submission -----------
+\usepackage{draftwatermark}
+\SetWatermarkText{DRAFT -- DO NOT CIRCULATE}
+\SetWatermarkFontSize{1.3cm}
+\SetWatermarkScale{1}
+\SetWatermarkAngle{45}
+\SetWatermarkColor[gray]{0.85}
 
 \newcommand{\todo}[1]{\textcolor{red}{[#1]}}
 \newcommand{\tco}{\,t\,CO\textsubscript{2}}
@@ -34,7 +41,9 @@ Enhanced Rock Weathering in Sub-Saharan Africa}}
   Jordan Chamberlin\thanks{CIMMYT--Kenya. \texttt{j.chamberlin@cgiar.org}.} \and
   \todo{Author Three}\thanks{Affiliation to be added (enhanced-weathering processes).}
 }
-\date{Draft: \today}
+\date{Draft: \today\\[3pt]
+  {\small\color{red!75!black}Preliminary draft -- please do not cite or
+  circulate without the authors' permission.}}
 
 \begin{document}
 \maketitle
@@ -114,6 +123,14 @@ spatial opportunity sets. The absence of explicit, comparable estimates is thus
 a barrier to investment and targeting. One concrete version of the targeting
 problem is the question a carbon-market investor would ask: where can payments
 for carbon sequestration also deliver benefits to smallholder farmers?
+The most recent systematic synthesis of the field reaches the same conclusion
+from the geochemical side. Having compiled more than 500 flux estimates that
+span several orders of magnitude, \citet[\S14.2]{suhrhoff2026esroc} argue that
+ERW ``should no longer be framed simply as a question of whether it can work in
+the field, but rather where, when, and how it can be made to work most
+effectively,'' and that agronomic benefits offer ``a pathway for scaling EW that
+is not dependent on CDR value alone.'' Those two propositions are, respectively,
+the spatial question and the financing question this paper takes up.
 
 In this paper we take a spatially explicit, \emph{ex ante} modeling approach to
 characterize the benefit streams that ERW would generate across different
@@ -225,6 +242,21 @@ quantification and permanence uncertainties and the monitoring needed to resolve
 them \citep{schiedung2026,levy2024,beerling2025nree,suhrhoff2026esroc}. This body of work is rich on
 the geochemistry but typically frames ERW as a carbon supply curve, abstracting
 from the farm economy in which deployment must actually occur.
+The distinction can be stated in the standard vocabulary of potentials.
+\citet[\S5.2.1]{suhrhoff2026esroc} separate a \emph{technical} potential
+(biophysical and geochemical constraints only), an \emph{economic} potential (the
+part that survives costs, logistics, and monitoring requirements), and a
+\emph{sustainable} potential (adding environmental and governance limits), and
+conclude that no existing ERW assessment can be fully classified into any of
+them. The global literature nonetheless converges on a maximum technical
+potential of roughly 0.2--2~Gt\co{}/yr, with compiled field fluxes (median
+0.84~t\co{}/ha/yr across 511 estimates) clustering toward the lower end of what
+large-scale projections assume \citep[\S5.1--5.2]{suhrhoff2026esroc}. Integrated
+assessment models, for their part, carry ERW as an intermediate-cost,
+intermediate-potential option and, with one experimental exception, do not
+represent its agronomic co-benefit at all \citep[\S11]{suhrhoff2026esroc}. What
+we estimate is a spatially resolved \emph{economic} potential for one region,
+with the agronomic return carried as a first-class term.
 
 \paragraph{Application rates in comparable assessments.}
 Spatially explicit assessments of ERW on croplands have almost universally
@@ -285,7 +317,15 @@ analyses of the multi-year economics and greenhouse-gas trade-offs of liming, fo
 example in western Kenya \citep{hijbeek2021}. We adapt this integrated, spatially
 explicit framework, reconfiguring its costs and crop-response functions for
 basalt and adding the carbon-removal benefit and the delivered-cost geography that
-ERW introduces.
+ERW introduces. The systematic evidence on rock-flour agronomy supports the
+constraint-relief logic on which that template rests: across the 166 agronomic
+studies compiled by \citet[\S7.3]{suhrhoff2026esroc}, 129 report positive yield
+or biomass effects against 11 negative, field responses in maize cluster at
+1.1--1.7$\times$, and responses ``do not scale simply with application rate''
+but with whether a limiting soil constraint, most often low pH, is relieved.
+That is the case for sizing the dose to the lime requirement rather than
+applying a flat rate, and it is why we model the agronomic return as a response
+to acidity relief rather than to tonnes of rock.
 
 \paragraph{Adoption and smallholder finance.}
 Whether any of this potential is realized depends on who can finance it. The
@@ -304,7 +344,14 @@ where.
 \paragraph{Voluntary carbon markets and additionality.}
 The most discussed external financing channel for ERW is the voluntary carbon
 market, where buyers increasingly favor removals that are durable, well
-quantified, and accompanied by development co-benefits. Two considerations bear
+quantified, and accompanied by development co-benefits. That market is still
+thin and concentrated: cumulative ERW credit sales reached roughly 0.8~Mt\co{}
+by early 2026, about 1--2\% of all durable-removal credits sold since 2022,
+dominated by two buyers, and with well under half of even the earliest vintages
+yet delivered \citep[\S5.3]{suhrhoff2026esroc}. Suppliers report needing roughly
+\$349/\tco{} to be profitable while buyers already describe \$271 as expensive
+\citep[\S6.3]{suhrhoff2026esroc}, an affordability gap that our conservative
+\$150 baseline sits well below. Two considerations bear
 directly on our analysis. First, integrity and measurement: because durable
 removal is uncertain and partly offset by soil processes, conservative net
 accounting matters for what can credibly be sold \citep{schiedung2026,levy2024},
@@ -469,7 +516,9 @@ non-carbonic weathering consumed nearly all of the weathered alkalinity
 \citep{holden2024}, and modeled carbon-capture efficiency approaches zero in
 strongly acid soils \citep{bertagni2022}. A recent systematic review notes that
 this acidity demand ``is not considered in all global and regional model
-estimates'' \citep{suhrhoff2026esroc}. Durable removal is therefore only the
+estimates,'' and that in strongly weathered tropical soils ``apparent CDR may
+remain low until accumulated soil acidity is neutralised and base saturation
+increases'' \citep[\S3.4.3, \S5.2.4]{suhrhoff2026esroc}. Durable removal is therefore only the
 alkalinity that exports \emph{beyond} the soil's acidity demand. We credit
 \begin{equation}
   \rho_{\text{net}} \;=\; \max\!\big(\rho_{\text{gross}} - F\,S,\; 0\big),
@@ -494,7 +543,12 @@ cation-exchange capacity, base saturation, and hydrology \citep{kanzaki2025} --
 so $\rho_{\text{net}}$ is best read as a conservative bound on removal realized
 within a crediting horizon and $\rho_{\text{gross}}$ as the long-run ceiling;
 the partition $\lambda \in [0,1]$ swept in Section~\ref{sec:robust} spans the
-two, and we report both. The acidity-sink and pedogenic-carbonate deductions
+two, and we report both. This is also how the review frames the crediting
+problem: because attribution of delayed removal from models alone is ``not
+MRV-ready,'' conservative crediting ``must either discount delayed CDR \emph{ex
+ante} or rely on \emph{ex post} verification of alkalinity export''
+\citep[\S3.4.6]{suhrhoff2026esroc}; $\lambda=1$ is the \emph{ex ante}
+discount. The acidity-sink and pedogenic-carbonate deductions
 apply to essentially disjoint alkalinity pools -- the two co-occur on only
 1.3\% of pixels (soils both arid and acid), where our sequential ordering
 over-deducts slightly and therefore conservatively. A direct corollary, central to the
@@ -699,7 +753,14 @@ naive model would place \emph{both} returns on the same low-pH land. Once the
 acidity sink is deducted, the durable-carbon return shifts toward \emph{less}
 acidic soils -- where less alkalinity is spent on neutralization and more
 exports -- so the private and public returns become spatially complementary
-(Figure~\ref{fig:schematic}). The corollary for deployment design: because the
+(Figure~\ref{fig:schematic}). This is the spatial expression of the trade-off
+between reaction kinetics and system capacity that
+\citet[\S5.2.4]{suhrhoff2026esroc} identify as the blind spot of
+climate-optimized siting: the warm, humid, acid soils that maximize dissolution
+are also those in which the most alkalinity is spent before any carbon exports,
+so that in such settings ``deployment strategies may prioritize soil fertility
+improvement and pH buffering, with CDR emerging as a co-benefit of agronomic
+management.'' The corollary for deployment design: because the
 lime-requirement dose is sized to the acidity demand, it is carbon-minimal;
 maximizing durable removal requires applying \emph{beyond} agronomic need, so the
 two objectives imply different optimal rates and the carbon payment must cover the
@@ -891,7 +952,10 @@ Transport is the largest single component of delivered cost (\(\sim\)55\% on
 average, median \(\sim\)66\%) and is wholly variable in distance -- consistent
 with life-cycle and techno-economic assessments in which transport dominates
 both cost and embodied emissions under long hauls
-\citep{zhang2023est,kroeger2026}. We evaluate an at-scale solar-electric haulage
+\citep{zhang2023est,kroeger2026}. Across the harmonized cost corpus, variable
+operating cost is the largest component (median 62\%, against 6\% for capital),
+which is why cost-side levers act mainly through fuel and haulage rather than
+plant \citep[\S6.2]{suhrhoff2026esroc}. We evaluate an at-scale solar-electric haulage
 scenario that displaces the fuel/energy portion of trucking cost. Grounding the
 energy share in trucking-cost data and the diesel-to-solar-electric energy gap
 implies a feasible \(\sim\)25\% reduction in the transport term (range
@@ -1053,7 +1117,29 @@ pure carbon transaction. This both strengthens the additionality claim on that
 land (the practice does not happen without the payment) and reframes the
 distributional question: the credit buyer effectively subsidizes a private
 yield gain, and program design must decide how that joint surplus is split
-between buyer and farmer.
+between buyer and farmer. The policy synthesis in
+\citet[\S13]{suhrhoff2026esroc} arrives at the same instrument from the other
+direction, listing among the elements of a holistic ERW policy ``large-scale
+subsidies for deployment where on-farm benefits do not fully cover the cost of
+feedstock, spreading, and measurement'' and noting that liming is already
+subsidized in many jurisdictions. The combined-only band is the map of where
+that condition holds in SSA; and because the same review judges voluntary
+demand alone ``unlikely to support EW deployment at the multi-gigatonne scale''
+\citep[\S5.3.2]{suhrhoff2026esroc}, our carbon-price ladder is best read as a
+schedule over any per-tonne payment, public or private, not over VCM prices
+alone.
+
+\paragraph{Who captures the co-benefit.} The review is explicit that the
+highest modeled potential sits in the Global South, and that this raises
+concerns about unequal burden-sharing, extractive pressure, and benefits flowing
+from developing to developed economies \citep[\S7.1,
+\S10.2]{suhrhoff2026esroc}; it also argues that prioritizing agronomic
+co-benefits in tropical settings ``may align with principles of climate
+justice'' \citep[\S5.2.4]{suhrhoff2026esroc}. The decomposition here makes that
+alignment auditable. On the combined-only band the yield gain stays on the farm
+whoever pays for the rock, and the private-return totals in
+Table~\ref{tab:envelopes} bound how much of the joint surplus accrues on-farm
+rather than to the credit buyer.
 
 \paragraph{The carbon case is CDR-quantification risk, not price risk.}
 Equation~\eqref{eq:mac} and Figure~\ref{fig:cdrrate} show that the public envelope
@@ -1074,7 +1160,15 @@ measurement, reporting, and verification (quantity and durability). It also
 reframes MRV: the \$20/\tco{} MRV cost is not merely a deduction but the mechanism
 that converts an uncertain $\delta_t$ into a sellable, high-integrity tonne.
 Investment in cheaper, tighter measurement raises the \emph{effective} CDR rate that
-can be monetized -- exactly where the leverage lies.
+can be monetized -- exactly where the leverage lies. This matches the readiness
+assessment in \citet[\S12]{suhrhoff2026esroc}: the physical supply chain of
+quarrying, grinding, haulage, and spreading is mature and borrowed from the
+aggregates and liming sectors, so that ``existing liming equipment, established
+logistics networks, and proximity between rock resources and agricultural land
+could enable relatively rapid operational scaling,'' while the constraint on
+readiness is MRV and the scarcity of verified field data. In SSA, where a
+liming supply chain is itself only emerging, both constraints bind, but the
+second is the one a carbon buyer cannot contract around.
 
 \paragraph{Targeting and sequencing.} The robustness analysis points to a small
 core geography that is attractive across a wide range of assumptions, and a
@@ -1103,7 +1197,15 @@ change the targeting map \emph{least}, because the private envelope is robust to
 Field effort is best spent on the carbon quantity rather than the agronomic one, and
 concentrated in the candidate-tier geography, where a measurement is most likely to
 change a deployment decision rather than confirm one. The economic frontier and the
-scientific frontier are, once again, the same quantity.
+scientific frontier are, once again, the same quantity. The geography of the
+evidence base sharpens the point. The review finds ERW research led
+overwhelmingly from the United Kingdom, the United States, and Germany, with
+large parts of Africa ``sparsely represented,'' even as many rock-flour field
+trials are in fact conducted in the Global South
+\citep[\S2.5]{suhrhoff2026esroc}, and it cautions that short experiments mostly
+capture the lag-dominated phase in which dissolution and bicarbonate export are
+decoupled \citep[\S3.4.6]{suhrhoff2026esroc}. The measurements that would move
+our map are therefore multi-year, and sited in the candidate tier.
 
 \paragraph{Limitations.} The year-1 accounting is the most optimistic and the
 NPV the most conservative; we report both. Farm counts use national average

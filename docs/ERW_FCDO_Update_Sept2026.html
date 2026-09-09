@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERW modelling update · FCDO · September 2026 · work in progress</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=ranade@400,500,600,700&display=swap" rel="stylesheet">
+<!-- KaTeX for properly typeset equations -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #1B3A2F;
+  --primary-soft: #2D5544;
+  --primary-pale: #E8EFEB;
+  --accent: #B8862A;
+  --accent-soft: #D9A93D;
+  --accent-pale: #F5E9CB;
+  --bg: #FAF7F0;
+  --bg-deep: #0F1A14;
+  --text: #1A1A1A;
+  --text-muted: #5A5A5A;
+  --text-faint: #8A8A8A;
+  --neg: #A93B2A;
+  --rule: rgba(27, 58, 47, 0.18);
+  --rule-strong: rgba(27, 58, 47, 0.34);
+  --shadow: 0 1px 2px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.07);
+  /* CIMMYT brand strips (segment colors/proportions from cimmyt-templete.pptx master) */
+  --strip-top: linear-gradient(to right, #6BC32F 0 13.4%, #356270 13.4% 27.4%, #90C6CA 27.4% 41%, #68441B 41% 48%, #F9B737 48% 54.9%, #6BC32F 54.9% 100%);
+  --strip-bottom: linear-gradient(to right, #6BC32F 0 10%, #356270 10% 19.9%, #90C6CA 19.9% 29.5%, #68441B 29.5% 34.4%, #F9B737 34.4% 39.3%, #6BC32F 39.3% 100%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: #2a2a26;
+  font-family: "Ranade", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+}
+.deck {
+  position: relative;
+  width: min(100%, 1280px);
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 48px);
+  background: var(--bg);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  overflow: hidden;
+  border-radius: 4px;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 48px 72px 60px;
+  display: none;
+  flex-direction: column;
+  background: rgba(255,255,255,0.7); /* soft white over the cream deck base */
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+/* CIMMYT header strip (top right) and footer strip (full width), as in the slide master */
+.slide::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  width: 39.5%;
+  height: 17px;
+  background: var(--strip-top);
+  z-index: 5;
+}
+.slide::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 12px;
+  height: 10px;
+  background: var(--strip-bottom);
+  z-index: 5;
+}
+/* White box interrupting the bottom strip, logo centered on the strip line (as in the master) */
+.cimmyt-foot-logo {
+  position: absolute;
+  right: 100px;
+  bottom: 0;
+  z-index: 6;
+  background: #fff;
+  padding: 5px 18px;
+}
+.cimmyt-foot-logo img { height: 28px; display: block; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 22px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.topbar .brand { color: var(--primary); }
+.topbar .section { color: var(--text-faint); }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.deck h1 {
+  font-size: 54px;
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+.deck h2 {
+  font-size: 32px;
+  line-height: 1.14;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--primary);
+  margin-bottom: 18px;
+  max-width: 1040px;
+}
+.deck h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.deck p, .deck li {
+  font-size: 16px;
+  line-height: 1.52;
+  color: var(--text);
+}
+.deck p.lead { font-size: 16px; line-height: 1.5; max-width: 980px; }
+.deck p.dim { color: var(--text-muted); }
+.deck p.small, .deck li.small { font-size: 13.5px; line-height: 1.46; }
+.deck strong { font-weight: 700; color: var(--primary); }
+.deck em { font-style: italic; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--primary-pale);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+ul.clean, ol.clean { list-style: none; }
+ul.clean li, ol.clean li { position: relative; padding-left: 22px; margin-bottom: 10px; }
+ul.clean li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 9px;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+ol.clean { counter-reset: step; }
+ol.clean li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 2px;
+  width: 18px; height: 18px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+ul.clean.small li, ol.clean.small li { font-size: 13.3px; line-height: 1.44; margin-bottom: 8px; padding-left: 20px; }
+ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  margin-top: 8px;
+}
+.stat { border-top: 3px solid var(--primary); padding-top: 14px; }
+.stat .num { font-size: 44px; line-height: 1; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
+.stat .num .unit { font-size: 22px; font-weight: 600; color: var(--accent); margin-left: 3px; }
+.stat .label { margin-top: 10px; font-size: 13px; color: var(--text-muted); line-height: 1.42; max-width: 250px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.split { display: grid; gap: 40px; flex: 1; min-height: 0; align-items: center; grid-template-rows: minmax(0, 1fr); }
+.split > * { min-width: 0; min-height: 0; }
+.split.s60 { grid-template-columns: 1.5fr 1fr; }
+.split.s55 { grid-template-columns: 1.2fr 1fr; }
+.split.s40 { grid-template-columns: 1fr 1.5fr; }
+
+.card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 6px 6px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.card.hl { background: var(--accent-pale); border-top-color: var(--accent); }
+.card .label-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.ask {
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 6px 6px;
+  box-shadow: var(--shadow);
+}
+.ask.hl { background: var(--accent-pale); border-top-color: var(--accent); }
+.ask h3 { font-size: 15px; margin-bottom: 6px; }
+.ask p { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+.deck table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.deck table th {
+  text-align: right;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  padding: 9px 12px 9px 0;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.deck table th:first-child, .deck table td:first-child { text-align: left; }
+.deck table td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+  line-height: 1.45;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.deck table td.lead { font-weight: 600; color: var(--primary); text-align: left; }
+.deck table tr.hl td { background: var(--accent-pale); font-weight: 600; }
+.deck table .neg { color: var(--neg); }
+.deck table.compact td, .deck table.compact th { padding-top: 6.5px; padding-bottom: 6.5px; font-size: 13.5px; }
+.deck table.dense td, .deck table.dense th { padding-top: 4px; padding-bottom: 4px; font-size: 12.5px; }
+
+.phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.phases.three { grid-template-columns: repeat(3, 1fr); }
+.phase {
+  padding: 16px 18px;
+  border-top: 3px solid var(--primary);
+  background: white;
+  box-shadow: var(--shadow);
+  border-radius: 0 0 6px 6px;
+}
+.phase.active { border-top-color: var(--accent); background: var(--accent-pale); }
+.phase .phase-label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.phase .phase-title { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 6px; line-height: 1.25; }
+.phase .phase-body { font-size: 12.5px; color: var(--text-muted); line-height: 1.42; }
+
+.eq {
+  background: white;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 16px 22px;
+  margin: 14px 0;
+  font-family: "Ranade", serif;
+  font-size: 23px;
+  text-align: center;
+  color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.eq .rm { color: var(--text-muted); font-weight: 500; }
+.eq sub, .eq sup { font-size: 0.62em; }
+.eq.small { font-size: 18px; padding: 12px 18px; }
+/* KaTeX rendering: route math through the house palette and control sizes */
+.deck .katex { color: var(--primary); font-size: 1.06em; }
+.eq .katex { font-size: 1.5em; }
+.eq.small .katex { font-size: 1.2em; }
+.eq .katex-display { margin: 0; }
+
+.deck blockquote {
+  font-size: 21px;
+  line-height: 1.42;
+  font-weight: 500;
+  color: var(--primary);
+  border-left: 3px solid var(--accent);
+  padding-left: 24px;
+  max-width: 1000px;
+  letter-spacing: -0.01em;
+  margin-top: 20px;
+}
+.deck blockquote cite { display: block; margin-top: 12px; font-size: 13px; font-style: normal; color: var(--text-muted); font-weight: 600; letter-spacing: 0.04em; }
+
+.chart-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 0; }
+.chart-wrap img {
+  max-height: 100%;
+  min-height: 0;
+  max-width: 82%;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 6px 14px rgba(0,0,0,0.10), 0 20px 42px rgba(0,0,0,0.16);
+}
+.chart-wrap.full img { max-width: 96%; }
+.chart-cap { font-size: 13px; color: var(--text-muted); text-align: center; max-width: 920px; line-height: 1.45; }
+.split .chart-wrap { max-height: 100%; min-height: 0; align-self: stretch; }
+.split .chart-wrap img { max-width: 100%; max-height: 100%; }
+
+.source-note { margin-top: auto; padding-top: 12px; font-size: 12px; color: var(--text-faint); line-height: 1.4; }
+
+.footer {
+  position: absolute;
+  bottom: 30px;
+  left: 72px;
+  right: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* ---- cover (light) ---- */
+.slide.cover {
+  background: rgba(255,255,255,0.7);
+  color: var(--text);
+  padding: 72px 88px;
+  justify-content: space-between;
+}
+.slide.cover .topbar { border-color: var(--rule); color: var(--text-muted); }
+.slide.cover .topbar .brand { color: var(--primary); }
+.slide.cover .eyebrow { color: var(--accent); }
+.slide.cover h1 { color: var(--primary); font-size: 46px; line-height: 1.1; letter-spacing: -0.015em; }
+.slide.cover .lead { color: var(--text-muted); margin-top: 20px; font-size: 18px; max-width: 940px; }
+.slide.cover .lead strong { color: var(--accent) !important; }
+.cover-meta {
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.cover-meta .label-row { font-weight: 600; color: var(--accent); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px; }
+.cover-meta .value-row { color: var(--text); font-size: 14px; line-height: 1.4; }
+.cover-stats { display: flex; gap: 54px; margin-top: 8px; }
+.cover-stats .cs .n { font-size: 40px; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; line-height: 1; }
+.cover-stats .cs .l { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; max-width: 200px; line-height: 1.4; }
+
+/* ---- section divider (light) ---- */
+.slide.section { background: rgba(255,255,255,0.7); color: var(--text); justify-content: center; padding: 72px 88px; }
+.slide.section .topbar { border-color: var(--rule); color: var(--text-muted); position: absolute; top: 48px; left: 88px; right: 88px; }
+.slide.section .topbar .brand { color: var(--primary); }
+.slide.section .eyebrow { color: var(--accent); }
+.slide.section h1 { color: var(--primary); font-size: 60px; }
+.slide.section p { color: var(--text-muted); font-size: 19px; max-width: 880px; margin-top: 6px; }
+.slide.section .secrule { width: 80px; height: 5px; background: var(--accent); border-radius: 3px; margin: 22px 0; }
+
+/* ---- CIMMYT closing panel ---- */
+.slide.closing { padding: 0; }
+.slide.closing::after { display: none; }
+/* panel width matches the collage's aspect ratio (1147x1500) so nothing is cropped */
+.closing-photo { position: absolute; left: 0; top: 0; width: 43.02%; height: 100%; object-fit: fill; }
+.closing-right {
+  position: absolute; left: 43.02%; right: 0; top: 0; bottom: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 56px 60px 150px; gap: 20px; text-align: center;
+}
+.closing-right .eyebrow { margin-bottom: 0; }
+.deck p.closing-thanks { font-size: 42px; line-height: 1.16; font-weight: 700; letter-spacing: -0.015em; color: var(--primary); }
+.deck p.closing-meta { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+.closing-meta .mono { color: var(--primary); }
+.closing-logo { position: absolute; right: 64px; bottom: 44px; width: 240px; }
+
+.nav {
+  position: fixed;
+  bottom: 14px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  color: white;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  z-index: 1000;
+}
+.nav button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.nav button:hover { background: rgba(255,255,255,0.1); }
+.progress { position: absolute; left: 0; top: 0; height: 3px; background: var(--accent); transition: width 0.3s ease; z-index: 10; }
+
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0; }
+  html, body { background: white !important; height: auto !important; overflow: visible !important; }
+  body { display: block !important; padding: 0 !important; }
+  .nav, .progress { display: none !important; }
+  .deck { width: 13.333in !important; max-height: none !important; aspect-ratio: auto !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
+  .slide {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: 13.333in;
+    height: 7.5in;
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+  <div class="progress" id="progress" style="width: 0;"></div>
+
+  <!-- ============ 1 · COVER ============ -->
+  <section class="slide cover active">
+    <div class="topbar">
+      <span class="brand">CIMMYT &#183; Enhanced Rock Weathering</span>
+      <span class="section">Update for FCDO &#183; September 2026</span>
+    </div>
+    <div>
+      <div class="eyebrow">Modelling update &#183; work in progress</div>
+      <h1>Modelling Enhanced Rock Weathering<br>in Sub-Saharan Africa</h1>
+      <p class="lead" style="margin-top:12px;">An evolving, spatially explicit model of where spreading crushed basalt on acid cropland might pay farmers, the climate, or <strong>both together</strong>. Everything shown here is a draft: we keep revising the model as better data and evidence become available, and several elements still need research in geochemistry, yield response, and markets and economics.</p>
+    </div>
+    <div>
+      <div class="eyebrow" style="margin-bottom:8px;">In dialogue with</div>
+      <div class="three-col" style="gap:16px;">
+        <div class="card" style="padding:11px 16px;"><span class="label-tag">Cascade Climate</span><p class="small">Geochemistry and yield-benefit modelling; comparison with their cost and MRV tools.</p></div>
+        <div class="card" style="padding:11px 16px;"><span class="label-tag">Yale University</span><p class="small">Weathering geochemistry and carbon accounting; assumptions checked against the Yale-led 2026 review.</p></div>
+        <div class="card" style="padding:11px 16px;"><span class="label-tag">Mati Carbon</span><p class="small">Yield-benefit modelling, drawing on their smallholder deployments.</p></div>
+      </div>
+    </div>
+    <div class="cover-meta">
+      <div><div class="label-row">Team</div><div class="value-row">B. H. Gebrekidan &#183; J. Chamberlin (CIMMYT)</div></div>
+      <div><div class="label-row">Funding to date</div><div class="value-row">Gates Foundation, through CIAT</div></div>
+      <div><div class="label-row">Status</div><div class="value-row">Working draft; model and paper under active revision</div></div>
+      <div><div class="label-row">Ask of this meeting</div><div class="value-row">Views on priorities for grounding the work</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · WHAT THE MODEL DOES AND WHAT IT SUGGESTS SO FAR ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">What the model does</span><span class="section">Early indications</span></div>
+    <div class="eyebrow">What the model does, and what it suggests so far</div>
+    <h2>Early indications: the two benefits rarely pay alone, but often pay together.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-typology.png" alt="Draft map classifying Sub-Saharan African cropland by which return covers the cost of basalt"></div>
+      <div>
+        <p class="lead">Crushed basalt acts like agricultural lime, raising yields on acid soils, and it also removes carbon dioxide that could be sold as a credit. For every patch of cropland the model asks which of these benefits would cover the full cost of the rock, using public soil, crop, climate, geology, road and price data.</p>
+        <div class="card" style="margin-top:14px;"><span class="label-tag">Preliminary pattern</span><p class="small">In the current draft, land where yield alone pays is larger than land where carbon alone pays, and a substantial area appears viable only when the two are combined. If this holds up, carbon finance would be acting as a cost-share that unlocks a yield investment smallholders cannot otherwise afford, with the yield gain staying on the farm.</p></div>
+        <div class="card" style="margin-top:12px;"><p class="small"><strong>How to read it.</strong> The pattern is more trustworthy than any number on the map. The absolute areas move every time we update an input, and several inputs are still uncertain (next slides).</p></div>
+        <p class="small dim" style="margin-top:10px;">Green: yield pays alone &#183; blue: carbon pays alone &#183; purple: both &#183; gold: only together &#183; grey: neither. Draft, subject to revision.</p>
+      </div>
+    </div>
+    <div class="footer"><span>ERW modelling update &#183; FCDO &#183; draft, work in progress</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 3 · HOW THE WORK HAS EVOLVED ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Progress</span><span class="section">An iterative build</span></div>
+    <div class="eyebrow">How the work has evolved since May 2026</div>
+    <h2>An iterative build: each round replaces an assumption with better evidence.</h2>
+    <div class="phases">
+      <div class="phase"><div class="phase-label">May &#183; first version</div><div class="phase-title">A working map</div><div class="phase-body">Public data layers (soils, crops, rock geology, roads, climate, prices) brought into one model covering 44 countries and 23 crops. Many placeholders and first-guess constants.</div></div>
+      <div class="phase"><div class="phase-label">July &#183; carbon accounting</div><div class="phase-title">More conservative carbon</div><div class="phase-body">We stopped counting carbon that is used up neutralizing soil acidity, a step most global models skip. This reduced early-year carbon sharply and changed how the carbon case should be read.</div></div>
+      <div class="phase"><div class="phase-label">September &#183; evidence check</div><div class="phase-title">Assumptions re-examined</div><div class="phase-body">Key assumptions compared against the 2026 systematic review of the field and revised where the evidence pointed elsewhere (temperature response, soil-pH response, yield bounds). Model re-run; numbers moved.</div></div>
+      <div class="phase"><div class="phase-label">Now</div><div class="phase-title">Ongoing revision</div><div class="phase-body">Draft paper in preparation. Sensitivity runs show which inputs matter most, which sets the research agenda. We expect further rounds as trial data and partner input arrive.</div></div>
+    </div>
+    <div class="two-col" style="margin-top:16px; gap:18px;">
+      <div class="card"><span class="label-tag">What we are trying to do</span><p class="small">Use the best available data at each step and be explicit about what is assumed. Every constant in the model is catalogued with its source, and every result carries a range rather than a point.</p></div>
+      <div class="card"><span class="label-tag">What that means for the numbers</span><p class="small">They have moved with every revision and will move again. The qualitative ordering (yield case larger than carbon case; a meaningful combined-only area) has been stable so far, but we present it as a hypothesis to test, not a finding.</p></div>
+    </div>
+    <div class="footer"><span>ERW modelling update &#183; FCDO &#183; draft, work in progress</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 4 · WHAT STILL NEEDS RESEARCH ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Open questions</span><span class="section">What still needs research</span></div>
+    <div class="eyebrow">What still needs research and exploration</div>
+    <h2>Open questions in three areas.</h2>
+    <div class="three-col">
+      <div class="card"><span class="label-tag">Geochemistry</span><h3 style="font-size:15px;">How much carbon a tonne of rock really removes</h3>
+        <ul class="clean small" style="margin-top:6px;">
+          <li>Removal rates in tropical smallholder soils are largely unmeasured; ours are scaled from temperate evidence.</li>
+          <li>How much carbon is lost or delayed in the soil, in rivers and at the ocean, and over what timescales.</li>
+          <li>How much re-precipitates in drier soils; today a rule of thumb by aridity band.</li>
+          <li>Which rock chemistry and grind size to assume, given weak reporting in the literature.</li>
+        </ul></div>
+      <div class="card"><span class="label-tag">Yield response</span><h3 style="font-size:15px;">How much harvest farmers actually gain</h3>
+        <ul class="clean small" style="margin-top:6px;">
+          <li>The evidence base is roughly a dozen trials, few of them in Africa and few longer than a season or two.</li>
+          <li>The crop response is currently a suitability curve; a trial-anchored statistical model is built but not yet run.</li>
+          <li>Whether too much rock can depress yields, and by how much, is not quantified anywhere.</li>
+          <li>Responses in the new Ghana and Kenya trials still need to be folded in.</li>
+        </ul></div>
+      <div class="card"><span class="label-tag">Markets and economics</span><h3 style="font-size:15px;">Whether and how it could be financed</h3>
+        <ul class="clean small" style="margin-top:6px;">
+          <li>Carbon price and monitoring cost are assumptions; the credit market is small and buyers and suppliers disagree on price.</li>
+          <li>Delivered cost is modelled from a quarry price and trucking rate, not from quotes on the ground.</li>
+          <li>Who finances the first dose (tenure, credit, cost-sharing) is not represented at all.</li>
+          <li>How registries would treat additionality and baselines for smallholder deployments.</li>
+        </ul></div>
+    </div>
+    <p class="source-note">Sensitivity runs so far suggest the carbon-removal rate per tonne is the input the results are most sensitive to, and the yield response the least; both remain open.</p>
+    <div class="footer"><span>ERW modelling update &#183; FCDO &#183; draft, work in progress</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 5 · WHERE WE ARE HEADING AND WHAT WOULD HELP ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Direction</span><span class="section">Where we are heading and what would help</span></div>
+    <div class="eyebrow">Where we are heading, and what would make the modelling more grounded</div>
+    <h2>Keep improving the model, and start testing it in the field.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-core.png" alt="Draft map of areas that stay viable across most model assumptions"></div>
+      <div>
+        <div class="card" style="margin-bottom:10px;"><span class="label-tag">Next on the modelling side</span><p class="small">Fold in new trial data and partner input; run the trial-anchored yield model; align the carbon accounting with what credit registries require; keep the model, code and maps open so others can reproduce and challenge them; and complete the draft paper.</p></div>
+        <div class="card" style="margin-bottom:10px;"><span class="label-tag">Ground truth that would help most</span><p class="small">Multi-year field measurements of carbon removal in tropical smallholder soils; real quarry, grinding and trucking costs near candidate rock sources; and farm-level evidence on yield, adoption and who can pay. The map (red and orange, mainly the Cameroon and Guinea highlands) suggests where such measurements would be most informative, though that suggestion is itself a draft.</p></div>
+        <div class="card"><span class="label-tag">Partnerships that would help</span><p class="small">National soil and agricultural research institutes in the candidate countries; a credit registry to co-design accounting; project developers and buyers willing to share deployment and monitoring data; and rock suppliers near the candidate sources.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW modelling update &#183; FCDO &#183; draft, work in progress</span><span class="pageno"></span></div>
+  </section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">&#8249;</button>
+  <span id="counter">1 / 1</span>
+  <button id="next" aria-label="Next slide">&#8250;</button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const total = slides.length;
+  let idx = 0;
+  slides.forEach((s, k) => { const p = s.querySelector('.pageno'); if (p) p.textContent = String(k + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0'); });
+  slides.forEach(s => {
+    if (s.classList.contains('closing')) return;
+    const l = document.createElement('div');
+    l.className = 'cimmyt-foot-logo';
+    l.innerHTML = '<img src="figures/cimmyt_logo_horizontal.svg" alt="CIMMYT – CGIAR">';
+    s.appendChild(l);
+  });
+  function go(n) {
+    idx = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+    counter.textContent = (idx + 1) + ' / ' + total;
+    progress.style.width = ((idx + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
+  }
+  document.getElementById('next').onclick = () => go(idx + 1);
+  document.getElementById('prev').onclick = () => go(idx - 1);
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(idx - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(total - 1);
+    else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+    else if (e.key.toLowerCase() === 'p') window.print();
+  });
+  const h = parseInt(location.hash.slice(1), 10);
+  go(isNaN(h) ? 0 : h - 1);
+
+  // Typeset equations once KaTeX (deferred) has loaded.
+  function typeset() {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    document.addEventListener('DOMContentLoaded', typeset);
+    window.addEventListener('load', typeset);
+  } else {
+    document.addEventListener('DOMContentLoaded', typeset);
+  }
+</script>
+</body>
+</html>

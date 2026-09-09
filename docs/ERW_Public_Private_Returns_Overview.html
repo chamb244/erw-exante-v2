@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERW · Public &amp; Private Returns in SSA · Plain-language overview</title>
+<link rel="preconnect" href="https://api.fontshare.com">
+<link rel="preconnect" href="https://cdn.fontshare.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=ranade@400,500,600,700&display=swap" rel="stylesheet">
+<!-- KaTeX for properly typeset equations -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<style>
+:root {
+  --primary: #1B3A2F;
+  --primary-soft: #2D5544;
+  --primary-pale: #E8EFEB;
+  --accent: #B8862A;
+  --accent-soft: #D9A93D;
+  --accent-pale: #F5E9CB;
+  --bg: #FAF7F0;
+  --bg-deep: #0F1A14;
+  --text: #1A1A1A;
+  --text-muted: #5A5A5A;
+  --text-faint: #8A8A8A;
+  --neg: #A93B2A;
+  --rule: rgba(27, 58, 47, 0.18);
+  --rule-strong: rgba(27, 58, 47, 0.34);
+  --shadow: 0 1px 2px rgba(0,0,0,0.05), 0 8px 24px rgba(0,0,0,0.07);
+  /* CIMMYT brand strips (segment colors/proportions from cimmyt-templete.pptx master) */
+  --strip-top: linear-gradient(to right, #6BC32F 0 13.4%, #356270 13.4% 27.4%, #90C6CA 27.4% 41%, #68441B 41% 48%, #F9B737 48% 54.9%, #6BC32F 54.9% 100%);
+  --strip-bottom: linear-gradient(to right, #6BC32F 0 10%, #356270 10% 19.9%, #90C6CA 19.9% 29.5%, #68441B 29.5% 34.4%, #F9B737 34.4% 39.3%, #6BC32F 39.3% 100%);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  background: #2a2a26;
+  font-family: "Ranade", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  letter-spacing: -0.005em;
+}
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 24px;
+}
+.deck {
+  position: relative;
+  width: min(100%, 1280px);
+  aspect-ratio: 16 / 9;
+  max-height: calc(100vh - 48px);
+  background: var(--bg);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+  overflow: hidden;
+  border-radius: 4px;
+}
+.slide {
+  position: absolute;
+  inset: 0;
+  padding: 48px 72px 60px;
+  display: none;
+  flex-direction: column;
+  background: rgba(255,255,255,0.7); /* soft white over the cream deck base */
+  overflow: hidden;
+}
+.slide.active { display: flex; }
+
+/* CIMMYT header strip (top right) and footer strip (full width), as in the slide master */
+.slide::before {
+  content: "";
+  position: absolute;
+  top: 0; right: 0;
+  width: 39.5%;
+  height: 17px;
+  background: var(--strip-top);
+  z-index: 5;
+}
+.slide::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 12px;
+  height: 10px;
+  background: var(--strip-bottom);
+  z-index: 5;
+}
+/* White box interrupting the bottom strip, logo centered on the strip line (as in the master) */
+.cimmyt-foot-logo {
+  position: absolute;
+  right: 100px;
+  bottom: 0;
+  z-index: 6;
+  background: #fff;
+  padding: 5px 18px;
+}
+.cimmyt-foot-logo img { height: 28px; display: block; }
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 22px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.topbar .brand { color: var(--primary); }
+.topbar .section { color: var(--text-faint); }
+
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.deck h1 {
+  font-size: 54px;
+  line-height: 1.06;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--primary);
+  margin-bottom: 18px;
+}
+.deck h2 {
+  font-size: 32px;
+  line-height: 1.14;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--primary);
+  margin-bottom: 18px;
+  max-width: 1040px;
+}
+.deck h3 {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.deck p, .deck li {
+  font-size: 16px;
+  line-height: 1.52;
+  color: var(--text);
+}
+.deck p.lead { font-size: 16px; line-height: 1.5; max-width: 980px; }
+.deck p.dim { color: var(--text-muted); }
+.deck p.small, .deck li.small { font-size: 13.5px; line-height: 1.46; }
+.deck strong { font-weight: 700; color: var(--primary); }
+.deck em { font-style: italic; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--primary-pale);
+  color: var(--primary);
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+ul.clean, ol.clean { list-style: none; }
+ul.clean li, ol.clean li { position: relative; padding-left: 22px; margin-bottom: 10px; }
+ul.clean li::before {
+  content: "";
+  position: absolute;
+  left: 0; top: 9px;
+  width: 8px; height: 8px;
+  background: var(--accent);
+  border-radius: 50%;
+}
+ol.clean { counter-reset: step; }
+ol.clean li::before {
+  counter-increment: step;
+  content: counter(step);
+  position: absolute;
+  left: 0; top: 2px;
+  width: 18px; height: 18px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+ul.clean.small li, ol.clean.small li { font-size: 13.3px; line-height: 1.44; margin-bottom: 8px; padding-left: 20px; }
+ul.clean.small li::before { width: 6px; height: 6px; top: 8px; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 30px;
+  margin-top: 8px;
+}
+.stat { border-top: 3px solid var(--primary); padding-top: 14px; }
+.stat .num { font-size: 44px; line-height: 1; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; }
+.stat .num .unit { font-size: 22px; font-weight: 600; color: var(--accent); margin-left: 3px; }
+.stat .label { margin-top: 10px; font-size: 13px; color: var(--text-muted); line-height: 1.42; max-width: 250px; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.split { display: grid; gap: 40px; flex: 1; min-height: 0; align-items: center; grid-template-rows: minmax(0, 1fr); }
+.split > * { min-width: 0; min-height: 0; }
+.split.s60 { grid-template-columns: 1.5fr 1fr; }
+.split.s55 { grid-template-columns: 1.2fr 1fr; }
+.split.s40 { grid-template-columns: 1fr 1.5fr; }
+
+.card {
+  background: white;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 6px 6px;
+  padding: 18px 20px;
+  box-shadow: var(--shadow);
+}
+.card.hl { background: var(--accent-pale); border-top-color: var(--accent); }
+.card .label-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.ask {
+  padding: 16px 20px;
+  background: white;
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--primary);
+  border-radius: 0 0 6px 6px;
+  box-shadow: var(--shadow);
+}
+.ask.hl { background: var(--accent-pale); border-top-color: var(--accent); }
+.ask h3 { font-size: 15px; margin-bottom: 6px; }
+.ask p { font-size: 13.5px; color: var(--text-muted); line-height: 1.5; }
+
+.deck table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.deck table th {
+  text-align: right;
+  font-weight: 700;
+  color: var(--primary);
+  border-bottom: 2px solid var(--primary);
+  padding: 9px 12px 9px 0;
+  font-size: 11.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.deck table th:first-child, .deck table td:first-child { text-align: left; }
+.deck table td {
+  padding: 9px 12px 9px 0;
+  border-bottom: 1px solid var(--rule);
+  vertical-align: middle;
+  line-height: 1.45;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.deck table td.lead { font-weight: 600; color: var(--primary); text-align: left; }
+.deck table tr.hl td { background: var(--accent-pale); font-weight: 600; }
+.deck table .neg { color: var(--neg); }
+.deck table.compact td, .deck table.compact th { padding-top: 6.5px; padding-bottom: 6.5px; font-size: 13.5px; }
+.deck table.dense td, .deck table.dense th { padding-top: 4px; padding-bottom: 4px; font-size: 12.5px; }
+
+.phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.phases.three { grid-template-columns: repeat(3, 1fr); }
+.phase {
+  padding: 16px 18px;
+  border-top: 3px solid var(--primary);
+  background: white;
+  box-shadow: var(--shadow);
+  border-radius: 0 0 6px 6px;
+}
+.phase.active { border-top-color: var(--accent); background: var(--accent-pale); }
+.phase .phase-label { font-size: 10px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px; }
+.phase .phase-title { font-size: 15px; font-weight: 700; color: var(--primary); margin-bottom: 6px; line-height: 1.25; }
+.phase .phase-body { font-size: 12.5px; color: var(--text-muted); line-height: 1.42; }
+
+.eq {
+  background: white;
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0;
+  padding: 16px 22px;
+  margin: 14px 0;
+  font-family: "Ranade", serif;
+  font-size: 23px;
+  text-align: center;
+  color: var(--primary);
+  box-shadow: var(--shadow);
+}
+.eq .rm { color: var(--text-muted); font-weight: 500; }
+.eq sub, .eq sup { font-size: 0.62em; }
+.eq.small { font-size: 18px; padding: 12px 18px; }
+/* KaTeX rendering: route math through the house palette and control sizes */
+.deck .katex { color: var(--primary); font-size: 1.06em; }
+.eq .katex { font-size: 1.5em; }
+.eq.small .katex { font-size: 1.2em; }
+.eq .katex-display { margin: 0; }
+
+.deck blockquote {
+  font-size: 21px;
+  line-height: 1.42;
+  font-weight: 500;
+  color: var(--primary);
+  border-left: 3px solid var(--accent);
+  padding-left: 24px;
+  max-width: 1000px;
+  letter-spacing: -0.01em;
+  margin-top: 20px;
+}
+.deck blockquote cite { display: block; margin-top: 12px; font-size: 13px; font-style: normal; color: var(--text-muted); font-weight: 600; letter-spacing: 0.04em; }
+
+.chart-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; min-height: 0; }
+.chart-wrap img {
+  max-height: 100%;
+  min-height: 0;
+  max-width: 82%;
+  object-fit: contain;
+  background: white;
+  border-radius: 4px;
+  padding: 12px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.08), 0 6px 14px rgba(0,0,0,0.10), 0 20px 42px rgba(0,0,0,0.16);
+}
+.chart-wrap.full img { max-width: 96%; }
+.chart-cap { font-size: 13px; color: var(--text-muted); text-align: center; max-width: 920px; line-height: 1.45; }
+.split .chart-wrap { max-height: 100%; min-height: 0; align-self: stretch; }
+.split .chart-wrap img { max-width: 100%; max-height: 100%; }
+
+.source-note { margin-top: auto; padding-top: 12px; font-size: 12px; color: var(--text-faint); line-height: 1.4; }
+
+.footer {
+  position: absolute;
+  bottom: 30px;
+  left: 72px;
+  right: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-top: 10px;
+  border-top: 1px solid var(--rule);
+}
+
+/* ---- cover (light) ---- */
+.slide.cover {
+  background: rgba(255,255,255,0.7);
+  color: var(--text);
+  padding: 72px 88px;
+  justify-content: space-between;
+}
+.slide.cover .topbar { border-color: var(--rule); color: var(--text-muted); }
+.slide.cover .topbar .brand { color: var(--primary); }
+.slide.cover .eyebrow { color: var(--accent); }
+.slide.cover h1 { color: var(--primary); font-size: 46px; line-height: 1.1; letter-spacing: -0.015em; }
+.slide.cover .lead { color: var(--text-muted); margin-top: 20px; font-size: 18px; max-width: 940px; }
+.slide.cover .lead strong { color: var(--accent) !important; }
+.cover-meta {
+  border-top: 1px solid var(--rule-strong);
+  padding-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+.cover-meta .label-row { font-weight: 600; color: var(--accent); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 4px; }
+.cover-meta .value-row { color: var(--text); font-size: 14px; line-height: 1.4; }
+.cover-stats { display: flex; gap: 54px; margin-top: 8px; }
+.cover-stats .cs .n { font-size: 40px; font-weight: 700; color: var(--primary); letter-spacing: -0.02em; line-height: 1; }
+.cover-stats .cs .l { font-size: 12.5px; color: var(--text-muted); margin-top: 8px; max-width: 200px; line-height: 1.4; }
+
+/* ---- section divider (light) ---- */
+.slide.section { background: rgba(255,255,255,0.7); color: var(--text); justify-content: center; padding: 72px 88px; }
+.slide.section .topbar { border-color: var(--rule); color: var(--text-muted); position: absolute; top: 48px; left: 88px; right: 88px; }
+.slide.section .topbar .brand { color: var(--primary); }
+.slide.section .eyebrow { color: var(--accent); }
+.slide.section h1 { color: var(--primary); font-size: 60px; }
+.slide.section p { color: var(--text-muted); font-size: 19px; max-width: 880px; margin-top: 6px; }
+.slide.section .secrule { width: 80px; height: 5px; background: var(--accent); border-radius: 3px; margin: 22px 0; }
+
+/* ---- CIMMYT closing panel ---- */
+.slide.closing { padding: 0; }
+.slide.closing::after { display: none; }
+/* panel width matches the collage's aspect ratio (1147x1500) so nothing is cropped */
+.closing-photo { position: absolute; left: 0; top: 0; width: 43.02%; height: 100%; object-fit: fill; }
+.closing-right {
+  position: absolute; left: 43.02%; right: 0; top: 0; bottom: 0;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+  padding: 56px 60px 150px; gap: 20px; text-align: center;
+}
+.closing-right .eyebrow { margin-bottom: 0; }
+.deck p.closing-thanks { font-size: 42px; line-height: 1.16; font-weight: 700; letter-spacing: -0.015em; color: var(--primary); }
+.deck p.closing-meta { font-size: 13px; color: var(--text-muted); line-height: 1.7; }
+.closing-meta .mono { color: var(--primary); }
+.closing-logo { position: absolute; right: 64px; bottom: 44px; width: 240px; }
+
+.nav {
+  position: fixed;
+  bottom: 14px;
+  right: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(8px);
+  color: white;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  z-index: 1000;
+}
+.nav button {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.nav button:hover { background: rgba(255,255,255,0.1); }
+.progress { position: absolute; left: 0; top: 0; height: 3px; background: var(--accent); transition: width 0.3s ease; z-index: 10; }
+
+@media print {
+  @page { size: 13.333in 7.5in; margin: 0; }
+  html, body { background: white !important; height: auto !important; overflow: visible !important; }
+  body { display: block !important; padding: 0 !important; }
+  .nav, .progress { display: none !important; }
+  .deck { width: 13.333in !important; max-height: none !important; aspect-ratio: auto !important; box-shadow: none !important; border-radius: 0 !important; overflow: visible !important; }
+  .slide {
+    position: relative !important;
+    inset: auto !important;
+    display: flex !important;
+    width: 13.333in;
+    height: 7.5in;
+    page-break-after: always;
+    break-after: page;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+  <div class="progress" id="progress" style="width: 0;"></div>
+
+  <!-- ============ 1 · COVER ============ -->
+  <section class="slide cover active">
+    <div class="topbar">
+      <span class="brand">ERW ex ante analysis</span>
+      <span class="section">Plain-language overview &#183; progress report</span>
+    </div>
+    <div>
+      <div class="eyebrow">Non-technical overview &#183; September 2026</div>
+      <h1>Rock dust for farmers and for the climate:<br>where it pays in Sub-Saharan Africa</h1>
+      <p class="lead">A map-based study of where spreading crushed basalt on cropland would pay for itself through better yields,
+      through carbon removal, or <strong>only when the two are added together</strong>, and how the model behind it has matured.</p>
+    </div>
+    <div class="cover-stats">
+      <div class="cs"><div class="n">44</div><div class="l">countries mapped, patch by patch</div></div>
+      <div class="cs"><div class="n">23</div><div class="l">crops, weighted by where they are grown</div></div>
+      <div class="cs"><div class="n">~9 km</div><div class="l">size of each patch in the map</div></div>
+      <div class="cs"><div class="n">2.7 Mha</div><div class="l">cropland that pays only when yield and carbon are combined</div></div>
+    </div>
+    <div class="cover-meta">
+      <div><div class="label-row">Authors</div><div class="value-row">B. H. Gebrekidan (CIMMYT-Ethiopia) &#183; J. Chamberlin (CIMMYT-Kenya)</div></div>
+      <div><div class="label-row">What this is</div><div class="value-row">Companion to the technical walkthrough, without the equations</div></div>
+      <div><div class="label-row">Basis</div><div class="value-row">Model run of 1 September 2026</div></div>
+      <div><div class="label-row">Status</div><div class="value-row">Working draft &#183; manuscript in preparation</div></div>
+    </div>
+  </section>
+
+  <!-- ============ 2 · THE IDEA ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">The idea</span><span class="section">One practice, two benefits</span></div>
+    <div class="eyebrow">The idea</div>
+    <h2>One field practice, two benefits.</h2>
+    <div class="split s55">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">What is done</span><p class="small">Basalt, a common volcanic rock, is crushed to a fine dust and spread on fields with the same equipment used for agricultural lime.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Benefit to the farmer</span><p class="small">As the dust dissolves it neutralizes soil acidity, exactly as lime does. Acid soils are a major reason yields stay low, so treating them raises harvests.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Benefit to the climate</span><p class="small">The same reaction pulls carbon dioxide out of the air and turns it into dissolved bicarbonate, which drains to rivers and the ocean and stays there for thousands of years.</p></div>
+        <div class="card"><span class="label-tag">Why it is different</span><p class="small">Lime also fixes acidity but releases its own carbon. Basalt fixes acidity and removes carbon. That second benefit can be sold to carbon-credit buyers.</p></div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-scene.png" alt="Illustration: basalt dust spread on a field, weathering in the soil, bicarbonate draining to water"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 3 · WHY SSA ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Why Sub-Saharan Africa</span><span class="section">Acid soils, warm climates, thin finance</span></div>
+    <div class="eyebrow">Why Sub-Saharan Africa</div>
+    <h2>Acid soils are widespread, and rarely treated.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-soil-ph.png" alt="Map of topsoil pH across Sub-Saharan African cropland; blue and green are acid soils"></div>
+      <div>
+        <p class="lead">Blue and green on the map are acid soils. They cover the humid belt from West Africa through Central Africa to the highlands of the east.</p>
+        <div class="stats" style="margin-top:16px; gap:22px;">
+          <div class="stat"><div class="num">~23<span class="unit">%</span></div><div class="label">of cropland is acid enough to depress yields (about 33 million hectares)</div></div>
+          <div class="stat"><div class="num">~$6<span class="unit">B</span></div><div class="label">yearly value of harvest lost to soil acidity, by recent estimates</div></div>
+        </div>
+        <div class="card" style="margin-top:16px;"><p class="small">Liming is rare because the upfront cost is large and smallholders cannot easily borrow against a benefit that arrives over several seasons. Warm, wet conditions also make basalt dissolve faster here than in temperate regions.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 4 · THE QUESTION ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">The question</span><span class="section">Where would it pay, and who would pay</span></div>
+    <div class="eyebrow">The question</div>
+    <h2>Where would it pay, and who would pay for it?</h2>
+    <p class="lead">For every 9 km patch of cropland we ask the same three questions, each against the full cost of buying, grinding, hauling and spreading the rock.</p>
+    <div class="three-col" style="margin-top:18px;">
+      <div class="card"><span class="label-tag">The farmer&#8217;s case</span><h3 style="font-size:16px;">Does the extra harvest alone cover the cost?</h3><p class="small">If yes, farmers or input dealers could fund it themselves and no carbon money is needed.</p></div>
+      <div class="card"><span class="label-tag">The carbon buyer&#8217;s case</span><h3 style="font-size:16px;">Does the carbon removed alone cover the cost?</h3><p class="small">If yes, a carbon-credit buyer could fund it purely as climate action, with the yield gain as a bonus.</p></div>
+      <div class="card"><span class="label-tag">The combined case</span><h3 style="font-size:16px;">Does it pay only when both are added?</h3><p class="small">If yes, carbon money is the missing piece that turns an unaffordable farm investment into a viable one.</p></div>
+    </div>
+    <div class="card" style="margin-top:18px;"><p class="small"><strong>Why the split matters.</strong> The three answers point to three different financing routes: private input markets, carbon-credit purchases, and a blend where the credit acts like a cost-share. The map tells us which route fits which place.</p></div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 5 · HOW THE MODEL WORKS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">How the model works</span><span class="section">Three streams, one balance</span></div>
+    <div class="eyebrow">How the model works</div>
+    <h2>Three streams add up to one balance per patch.</h2>
+    <div class="eq small" style="margin:6px 0 10px;">Return per hectare &nbsp;=&nbsp; value of extra harvest &nbsp;+&nbsp; value of carbon removed &nbsp;&minus;&nbsp; delivered cost of rock</div>
+    <div class="three-col" style="margin-top:8px;">
+      <div class="card"><span class="label-tag">Harvest stream</span><p class="small">How acid is the soil, which crops grow there, how much each crop responds to acidity relief, and what the crop sells for locally.</p></div>
+      <div class="card"><span class="label-tag">Carbon stream</span><p class="small">How much carbon a tonne of rock removes in that climate and soil, minus carbon that never leaves the field, valued at a carbon price net of monitoring cost.</p></div>
+      <div class="card"><span class="label-tag">Cost stream</span><p class="small">Rock at the quarry, electricity to grind it, truck time from the nearest basalt source over real roads, and spreading on the field.</p></div>
+    </div>
+    <div class="two-col" style="margin-top:10px; gap:18px;">
+      <div class="card"><span class="label-tag">Two ways to dose</span><p class="small"><strong>Targeted:</strong> just enough rock to fix each soil&#8217;s acidity, like a lime recommendation. <strong>Uniform:</strong> a flat 10, 20 or 50 tonnes per hectare everywhere, the convention in the carbon literature.</p></div>
+      <div class="card"><span class="label-tag">Two moments in time</span><p class="small"><strong>First application:</strong> a big one-off dose. <strong>Steady state:</strong> a small yearly top-up once soils are fixed. Headline results use the steady state, where both benefits recur every year.</p></div>
+    </div>
+    <div class="card" style="margin-top:10px; padding:12px 20px;"><span class="label-tag">What comes out</span><p class="small">A map of the balance for every patch under four doses and three timings, a ranking of the best patches under yearly rock-supply limits, and a 180-run stress test over prices, costs, yields and carbon rates.</p></div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 6 · WHAT GOES IN ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">What goes in</span><span class="section">All public data</span></div>
+    <div class="eyebrow">What goes in</div>
+    <h2>Every input is a public dataset.</h2>
+    <table class="compact">
+      <tr><th style="text-align:left;">We need to know</th><th style="text-align:left;">Where it comes from</th><th style="text-align:left;">In plain terms</th></tr>
+      <tr><td class="lead">How acid the soil is</td><td style="text-align:left;">SoilGrids</td><td style="text-align:left;">Global soil maps: pH, acidity held on soil particles, texture</td></tr>
+      <tr><td class="lead">What grows where</td><td style="text-align:left;">SPAM</td><td style="text-align:left;">Maps of 23 crops: area, production and yield</td></tr>
+      <tr><td class="lead">How crops respond to pH</td><td style="text-align:left;">EcoCrop</td><td style="text-align:left;">Each crop&#8217;s comfortable pH range and how yield falls outside it</td></tr>
+      <tr><td class="lead">Where basalt rock is</td><td style="text-align:left;">GLiM geology map</td><td style="text-align:left;">Volcanic rock outcrops that could supply quarries</td></tr>
+      <tr><td class="lead">How long a truck takes</td><td style="text-align:left;">Malaria Atlas friction surface</td><td style="text-align:left;">Travel time over the actual road network from rock to field</td></tr>
+      <tr><td class="lead">How fast rock dissolves</td><td style="text-align:left;">WorldClim</td><td style="text-align:left;">Temperature and rainfall, which speed up or slow down weathering</td></tr>
+      <tr><td class="lead">What crops are worth</td><td style="text-align:left;">FAOSTAT</td><td style="text-align:left;">Farm-gate prices, 2016 to 2020 medians</td></tr>
+      <tr><td class="lead">How much rock each soil needs</td><td style="text-align:left;">LiTAS lime calculator</td><td style="text-align:left;">The lime-equivalent dose, translated to basalt</td></tr>
+    </table>
+    <p class="source-note">Everything is reproducible from the project repository; large input maps are shared on request. Constants such as the quarry price, the trucking rate and the carbon price are all adjustable.</p>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 7 · COST ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Cost</span><span class="section">Getting rock to the field</span></div>
+    <div class="eyebrow">Cost</div>
+    <h2>The truck, not the quarry, sets the price.</h2>
+    <div class="split s55">
+      <div>
+        <div class="stats" style="gap:22px; grid-template-columns:repeat(3,1fr);">
+          <div class="stat"><div class="num">$10<span class="unit">/t</span></div><div class="label">rock at the quarry gate</div></div>
+          <div class="stat"><div class="num">~$41<span class="unit">/t</span></div><div class="label">average delivered to the field, before grinding and spreading</div></div>
+          <div class="stat"><div class="num">~55<span class="unit">%</span></div><div class="label">share of delivered cost that is transport, on average</div></div>
+        </div>
+        <div class="card" style="margin-top:18px; margin-bottom:12px;"><span class="label-tag">Reading the map</span><p class="small">Pale areas sit near basalt sources and get rock cheaply. Dark red areas are far from any source: even with excellent soils and crops, rock there costs too much to move.</p></div>
+        <div class="card"><span class="label-tag">Why this matters</span><p class="small">Transport is the one cost that varies from place to place, so it decides <em>where</em> the practice is possible. Cheaper haulage, for example electrified trucking, is a real lever.</p></div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-delivered-cost.png" alt="Map of delivered basalt cost per tonne across Sub-Saharan Africa"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 8 · HOW MUCH CARBON ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Carbon</span><span class="section">How much a tonne of rock really removes</span></div>
+    <div class="eyebrow">Carbon</div>
+    <h2>A tonne of rock removes far less than the textbook number.</h2>
+    <div class="split s55">
+      <div class="chart-wrap full"><img src="figures/fig-cdr-cascade.png" alt="Bar chart: 310 kg CO2 per tonne of basalt in theory falls to about 80 kg once realistic dissolution, grinding and emissions are counted"></div>
+      <div>
+        <p class="lead">In theory a tonne of basalt can lock up about 310 kg of carbon dioxide. In a real field, only part of the rock dissolves within a useful time, and hauling and grinding emit some carbon of their own.</p>
+        <div class="card" style="margin-top:14px;"><span class="label-tag">What we use</span><p class="small">Roughly <strong>80 to 90 kg</strong> per tonne in a warm, humid, well-connected place, scaled up or down by local temperature, rainfall and soil acidity. Dry areas lose more because carbon can re-precipitate in the soil.</p></div>
+        <div class="card" style="margin-top:12px;"><span class="label-tag">The biggest unknown</span><p class="small">This number is the least-measured quantity in the whole field, especially for tropical smallholder soils. Every result about carbon should be read with that in mind.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 9 · NET-EXPORT RULE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Carbon</span><span class="section">Counting only what leaves the field</span></div>
+    <div class="eyebrow">Carbon &#183; an accounting rule we added this year</div>
+    <h2>Fixing acidity uses up carbon before any is stored.</h2>
+    <div class="split s55">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">The mechanism</span><p class="small">The alkalinity that basalt releases can either neutralize soil acidity or drain away as stored carbon. It cannot do both. The part that neutralizes acidity gives its carbon back to the air, exactly as lime does.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">The rule</span><p class="small">We credit only the carbon that is left over after the soil&#8217;s acidity has been paid down. Most global models skip this step; the 2026 systematic review of the field notes it is &#8220;not considered in all global and regional model estimates.&#8221;</p></div>
+        <div class="card"><span class="label-tag">Two consequences</span><p class="small">First, the dose that is best for the farmer (just enough to fix the soil) removes almost no carbon. Second, durable removal is mostly a steady-state story: at first application under a third survives, in steady state most of it does.</p></div>
+      </div>
+      <div>
+        <div class="stats" style="gap:22px;">
+          <div class="stat"><div class="num">~70<span class="unit">%</span></div><div class="label">of credited carbon disappears at first application once acidity is netted out</div></div>
+          <div class="stat"><div class="num">77&#8211;90<span class="unit">%</span></div><div class="label">survives in steady state, when the yearly top-up only offsets fresh acidity</div></div>
+        </div>
+        <div class="card" style="margin-top:18px;"><p class="small"><strong>What it means for buyers.</strong> The first application is, in carbon terms, mostly liming. The carbon case belongs to programs that keep fields treated year after year.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 10 · DIVIDER ============ -->
+  <section class="slide section">
+    <div class="topbar"><span class="brand">Part I</span><span class="section">What we found</span></div>
+    <div class="eyebrow">Part I</div>
+    <h1>What we found</h1>
+    <div class="secrule"></div>
+    <p>Where yield alone pays, where carbon alone pays, where only the combination does, and where to start.</p>
+  </section>
+
+  <!-- ============ 11 · FIVE TYPES ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results</span><span class="section">Five kinds of cropland</span></div>
+    <div class="eyebrow">Results &#183; the map</div>
+    <h2>Every patch of cropland falls into one of five types.</h2>
+    <div class="split s60">
+      <div class="chart-wrap full"><img src="figures/fig-typology.png" alt="Map classifying cropland by which return covers the cost"></div>
+      <div style="display:flex; flex-direction:column; gap:14px; align-self:center;">
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#2E7D32; margin-top:3px;"></span><p class="small"><strong>Yield pays on its own</strong> &#183; farmers could fund it</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#1E5FA8; margin-top:3px;"></span><p class="small"><strong>Carbon pays on its own</strong> &#183; a credit buyer could fund it</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#7B2D8E; margin-top:3px;"></span><p class="small"><strong>Both pay on their own</strong> &#183; doubly justified, but the credit adds least</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#D9A93D; margin-top:3px;"></span><p class="small"><strong>Only together</strong> &#183; neither alone, but the sum covers cost</p></div>
+        <div style="display:flex; gap:11px; align-items:flex-start;"><span style="flex:none; width:15px; height:15px; border-radius:3px; background:#9E9E9E; margin-top:3px;"></span><p class="small"><strong>Neither</strong> &#183; not worth it at today&#8217;s prices and costs</p></div>
+        <p class="small dim" style="margin-top:6px;">Targeted dose, steady state, $150 per tonne of CO&#8322; net of $20 monitoring.</p>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 12 · YIELD ALONE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results</span><span class="section">Where yield alone pays</span></div>
+    <div class="eyebrow">Results &#183; the farmer&#8217;s case</div>
+    <h2>Yield alone pays on about four million hectares.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-private.png" alt="Map of cropland where the yield gain alone covers the delivered cost"></div>
+      <div>
+        <p class="lead">Land where the extra harvest covers the full cost of the rock with no carbon payment at all.</p>
+        <div class="stats" style="margin-top:18px; gap:22px;">
+          <div class="stat"><div class="num">4.3<span class="unit">Mha</span></div><div class="label">cropland where yield alone pays</div></div>
+          <div class="stat"><div class="num">~2:1</div><div class="label">value of extra harvest to cost of rock per steady-state cycle ($3.5 B against $1.7 B)</div></div>
+        </div>
+        <div class="card" style="margin-top:18px;"><p class="small">This is the largest single group, and it barely changes under any carbon assumption. But it is a minority of acid cropland: most viable land needs more than yield to pay.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 13 · CARBON ALONE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results</span><span class="section">Where carbon alone pays</span></div>
+    <div class="eyebrow">Results &#183; the carbon buyer&#8217;s case</div>
+    <h2>Carbon alone pays on less land, and depends on the price.</h2>
+    <div class="split s55">
+      <div>
+        <p class="lead">At today&#8217;s conservative price of $150 per tonne, durable carbon covers the cost on about <strong>2 million hectares</strong> with the targeted dose, and about <strong>4 million</strong> with a flat 20 t/ha dose that leaves more alkalinity free to drain away.</p>
+        <div class="card" style="margin-top:14px;"><span class="label-tag">The price ladder</span><p class="small">Carbon-only viability is steeply price-dependent. Between $250 and $350 a large share of treated cropland tips over the line. Current buyers describe $271 as expensive, and suppliers say they need about $349 to be profitable.</p></div>
+        <div class="card" style="margin-top:12px;"><span class="label-tag">What it costs to remove a tonne</span><p class="small">Across treated land the typical cost of one durably removed tonne is about <strong>$276</strong> with the flat dose and $330 with the targeted dose, against a net price of $130 after monitoring. Only the cheapest patches clear today.</p></div>
+      </div>
+      <div>
+        <p class="small dim" style="margin-bottom:6px;">Carbon pays on its own &#183; flat 20 t/ha dose, steady state</p>
+        <table class="compact">
+          <tr><th style="text-align:left;">Carbon price</th><th>Area (Mha)</th><th>Share of treated land</th><th>CO&#8322; (Mt)</th></tr>
+          <tr><td class="lead">$100</td><td>1.4</td><td>4%</td><td>7.8</td></tr>
+          <tr><td class="lead">$150</td><td>4.0</td><td>12%</td><td>20.4</td></tr>
+          <tr><td class="lead">$250</td><td>7.0</td><td>22%</td><td>33.3</td></tr>
+          <tr><td class="lead">$350</td><td>23.1</td><td>71%</td><td>100.6</td></tr>
+          <tr><td class="lead">$500</td><td>28.0</td><td>86%</td><td>115.6</td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 14 · THE HEADLINE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results</span><span class="section">The headline</span></div>
+    <div class="eyebrow">Results &#183; the headline</div>
+    <h2>The largest opportunity is land where only the combination pays.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-intersection.png" alt="Map of land where both returns hold"></div>
+      <div>
+        <div class="stats" style="gap:14px; grid-template-columns:repeat(3,1fr);">
+          <div class="stat"><div class="num">4.3</div><div class="label">Mha where yield alone pays</div></div>
+          <div class="stat"><div class="num">2.0</div><div class="label">Mha where carbon alone pays</div></div>
+          <div class="stat"><div class="num">7.6</div><div class="label">Mha where the combination pays</div></div>
+        </div>
+        <div class="card" style="margin-top:16px;"><span class="label-tag">2.7 million hectares</span><p class="small">Neither the harvest nor the carbon covers the cost on its own, yet together they do. That is more than either single-benefit group.</p></div>
+        <div class="card" style="margin-top:12px;"><p class="small"><strong>In one sentence:</strong> carbon payments are not a bonus on a practice that already pays; on most viable land they are the missing margin that makes a yield-improving investment affordable. That also makes the credit clearly additional: without it, the practice does not happen.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 15 · WHERE TO START ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results</span><span class="section">Where to start</span></div>
+    <div class="eyebrow">Results &#183; where to start</div>
+    <h2>A small core stays attractive under most assumptions.</h2>
+    <div class="split s40">
+      <div class="chart-wrap"><img src="figures/fig-core.png" alt="Map of core and candidate priority areas"></div>
+      <div>
+        <p class="lead">We re-ran the map 180 times with different costs, prices, yield responses and carbon rates, and kept the land that stays viable in most of them.</p>
+        <div class="stats" style="margin-top:16px; gap:14px; grid-template-columns:repeat(3,1fr);">
+          <div class="stat"><div class="num">0.65<span class="unit">Mha</span></div><div class="label">robust core (viable in at least half the runs); candidate tier 1.22 Mha</div></div>
+          <div class="stat"><div class="num">0.38<span class="unit">M</span></div><div class="label">farms in the core, order of magnitude</div></div>
+          <div class="stat"><div class="num">~$0.6<span class="unit">B</span></div><div class="label">crop value at stake in the core</div></div>
+        </div>
+        <div class="card" style="margin-top:16px;"><p class="small">The core sits in the <strong>Cameroon highlands</strong> and the <strong>Guinea highlands</strong>, with thinner extensions into Ethiopia, Tanzania and Sierra Leone: acid soils, warm wet weather, basalt nearby, and crops worth selling, all in one place. This is where pilots belong.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 16 · LEVERS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Results</span><span class="section">What would change the picture</span></div>
+    <div class="eyebrow">Results &#183; what would change the picture</div>
+    <h2>Two levers move the carbon case; one moves the farmer&#8217;s.</h2>
+    <div class="split s55">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">1 &#183; Carbon removed per tonne of rock</span><p class="small">The strongest lever. If a tonne of rock verifiably removed twice as much carbon, the land where carbon alone pays would grow about <strong>six-fold</strong>. Better measurement raises this number as much as better rock does.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">2 &#183; Carbon price relative to delivered cost</span><p class="small">Price, monitoring cost and delivered cost act as one lever, through their ratio. A higher price or cheaper rock both help, but less than lever 1 for large moves.</p></div>
+        <div class="card"><span class="label-tag">3 &#183; Cheaper haulage</span><p class="small">Cutting transport cost by a quarter, for instance with solar-electric trucking, expands the farmer&#8217;s case from 4.3 to 5.1 Mha but barely moves the carbon case. Logistics helps farmers; price and measurement help buyers.</p></div>
+      </div>
+      <div class="chart-wrap"><img src="figures/fig-supply-curve.png" alt="Land where carbon alone pays, rising with the carbon price"></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 17 · DIVIDER ============ -->
+  <section class="slide section">
+    <div class="topbar"><span class="brand">Part II</span><span class="section">Progress and next steps</span></div>
+    <div class="eyebrow">Part II</div>
+    <h1>Progress and next steps</h1>
+    <div class="secrule"></div>
+    <p>How the model has matured since May 2026, how the numbers moved as it did, what it still leaves out, and what comes next.</p>
+  </section>
+
+  <!-- ============ 18 · TIMELINE ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Progress</span><span class="section">Four stages in four months</span></div>
+    <div class="eyebrow">Progress &#183; how the model matured</div>
+    <h2>From framework to a fully re-anchored model in four months.</h2>
+    <div class="phases">
+      <div class="phase"><div class="phase-label">May 2026 &#183; build</div><div class="phase-title">Framework and first full run</div><div class="phase-body">Conceptual framework and pipeline figures (14 May). Road-network logistics wired in (15 May). First end-to-end profitability run across 44 countries and 23 crops (19 May). Conservatism review re-anchored five defaults (26 May).</div></div>
+      <div class="phase"><div class="phase-label">July 2026 &#183; accounting</div><div class="phase-title">Net-export carbon rule</div><div class="phase-body">Credit only carbon that leaves the field after acidity is paid down. Carbon case re-led on the flat 20 t/ha dose. Layered sensitivity harness, public-envelope sensitivity, comparison with Cascade Climate&#8217;s cost tool. Manuscript drafted; coauthor deck.</div></div>
+      <div class="phase"><div class="phase-label">1 Sept 2026 &#183; evidence</div><div class="phase-title">Literature audit and re-run</div><div class="phase-body">Every load-bearing citation checked against the published record, anchored to the 2026 systematic review of the field. Temperature response moved to the literature-standard form; soil-pH optimum moved from 5 to 6; yield sweep capped at field-trial evidence. All 276 output maps regenerated.</div></div>
+      <div class="phase"><div class="phase-label">2 Sept 2026 &#183; now</div><div class="phase-title">Manuscript re-anchored</div><div class="phase-body">Results, tables and figures updated to the new basis. Section-level citations to the anchor review added throughout. Draft marked not for circulation. Technical walkthrough deck rebuilt; this overview added.</div></div>
+    </div>
+    <p class="small dim" style="margin-top:18px; margin-bottom:8px;">The nine building blocks of the model and where each stands</p>
+    <div style="display:grid; grid-template-columns:repeat(9,1fr); gap:8px;">
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 1</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Grid</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">live</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 2</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Dose</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">live</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 3</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Carbon</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">re-anchored 1 Sept</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 4</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Logistics</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">live</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 5</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Energy</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">live</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 6</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Crop response</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">live; trial-fitted variant not yet run</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 7</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Profitability</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">re-run 1 Sept</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 8</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Supply ranking</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">re-run 1 Sept</div></div>
+      <div class="card" style="padding:10px 10px;"><span class="label-tag" style="margin-bottom:3px;">Block 9</span><div style="font-size:13px; font-weight:700; color:var(--primary); line-height:1.2;">Sensitivity</div><div style="font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.3;">re-run 1 Sept</div></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 19 · HOW NUMBERS MOVED ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Progress</span><span class="section">How the numbers moved</span></div>
+    <div class="eyebrow">Progress &#183; how the numbers moved</div>
+    <h2>The carbon numbers moved; the yield numbers did not.</h2>
+    <table class="compact">
+      <tr><th style="text-align:left;">Quantity</th><th>July draft</th><th>September basis</th><th style="text-align:left;">Why it moved</th></tr>
+      <tr><td class="lead">Land where yield alone pays</td><td>4.3 Mha</td><td>4.3 Mha</td><td style="text-align:left;">Unchanged: the farmer&#8217;s case does not depend on carbon assumptions</td></tr>
+      <tr><td class="lead">Land where carbon alone pays</td><td>1.7 Mha</td><td>2.0 Mha (4.0 at flat 20 t/ha)</td><td style="text-align:left;">Warmer-climate weathering response; carbon case re-led on the flat dose</td></tr>
+      <tr><td class="lead">Land where only the combination pays</td><td>2.1 Mha</td><td>2.7 Mha</td><td style="text-align:left;">Same reasons; combined area 6.9 to 7.6 Mha</td></tr>
+      <tr><td class="lead">Cost of removing a tonne of CO&#8322; (median)</td><td>$446</td><td>$276 (flat dose) / $330 (targeted)</td><td style="text-align:left;">Now area-weighted; more carbon removed per tonne of rock</td></tr>
+      <tr><td class="lead">Robust core for pilots</td><td>0.8 Mha &#183; 0.5 M farms</td><td>0.65 Mha &#183; 0.38 M farms</td><td style="text-align:left;">Robustness now tested on the same basis as the headline, a stricter test</td></tr>
+      <tr><td class="lead">Carbon credited at first application</td><td>full weathering</td><td>about 30% of it</td><td style="text-align:left;">Net-export rule: acidity is paid down first</td></tr>
+    </table>
+    <p class="source-note">Our median removal cost now sits at the upper edge of the published range ($137 to $276 per tonne across 25 costing studies). The gap is accounting stringency: we credit only carbon that durably leaves the field, where most studies credit gross removal.</p>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 20 · WHAT THE LITERATURE SAYS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Progress</span><span class="section">Where the field stands</span></div>
+    <div class="eyebrow">Progress &#183; what the 2026 systematic review tells us</div>
+    <h2>The field agrees on the question we are asking.</h2>
+    <div class="two-col" style="gap:18px;">
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Not whether, but where</span><p class="small">The review of 241 studies concludes that the question is no longer whether rock weathering works, but &#8220;where, when, and how it can be made to work most effectively.&#8221; That is exactly what a map answers.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Yield benefits are real</span><p class="small">Across 166 agronomic studies, 129 report gains and 11 losses. Field trials in maize show 10 to 70% more harvest, and the response depends on relieving a soil constraint, not on piling on more rock.</p></div>
+        <div class="card"><span class="label-tag">Carbon numbers are wide</span><p class="small">Measured removal rates span several orders of magnitude, with a median of 0.84 tonnes per hectare per year, and tend to sit below what global projections assume.</p></div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">The market is small</span><p class="small">About 0.8 million tonnes of rock-weathering credits have been sold, 1 to 2% of all durable removal credits, mostly to two buyers. Few tonnes have been delivered yet.</p></div>
+        <div class="card" style="margin-bottom:12px;"><span class="label-tag">Policy points the same way</span><p class="small">The review calls for subsidies &#8220;where on-farm benefits do not fully cover the cost&#8221; and for folding rock dust into existing liming subsidies. Our combined-only band is the map of where that condition holds.</p></div>
+        <div class="card"><span class="label-tag">Africa is under-studied</span><p class="small">Research is led from the UK, US and Germany; large parts of Africa are &#8220;sparsely represented,&#8221; even though the highest potential is in the tropics. Our model runs on the least-measured region.</p></div>
+      </div>
+    </div>
+    <p class="source-note">Suhrhoff et al. (2026), An Ecosystem of Carbon Dioxide Removal Reviews, Part 3: Enhanced Weathering. CDRXIV preprint 417, submitted to Energy &amp; Environmental Science, not yet peer reviewed.</p>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 21 · NOT YET IN THE MODEL ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Caveats</span><span class="section">What the model leaves out</span></div>
+    <div class="eyebrow">Caveats</div>
+    <h2>What the model does not yet do.</h2>
+    <div class="three-col" style="row-gap:14px;">
+      <div class="ask"><h3>Who pays upfront</h3><p>We map where returns cover costs, not who can finance the first dose. Tenure, credit and cost-sharing are not modelled.</p></div>
+      <div class="ask"><h3>Thin yield evidence</h3><p>The crop response rests on a dozen or so trials plus a crop-suitability model. Reassuringly, the map is least sensitive to this input.</p></div>
+      <div class="ask"><h3>Carbon lost downstream</h3><p>Some stored carbon escapes in rivers and at the ocean surface, roughly 15 to 20% in published estimates. We do not deduct it, so carbon results lean slightly high.</p></div>
+      <div class="ask"><h3>Carbon that arrives late</h3><p>Soils can hold weathered material for years before it drains. We treat that as a conservative deduction; some of it will eventually count.</p></div>
+      <div class="ask"><h3>Other greenhouse gases</h3><p>Most studies find rock dust reduces nitrous oxide from fields. We leave this out, which works against the practice, not for it.</p></div>
+      <div class="ask"><h3>Farm counts</h3><p>Derived from national average holding sizes, so they are order-of-magnitude indications, not enumerations.</p></div>
+    </div>
+    <div class="card" style="margin-top:14px;"><span class="label-tag">How to read the results</span><p class="small">The ordering of the findings is robust: yield pays on more land than carbon, the combined-only band is the largest opportunity, and the core geography holds across the stress test. The absolute carbon numbers move with the removal rate per tonne, the input we most need to measure.</p></div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 22 · NEXT STEPS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Next steps</span><span class="section">Data, accounting, pilots, paper</span></div>
+    <div class="eyebrow">Next steps</div>
+    <h2>Measure the carbon, pilot the core, publish the map.</h2>
+    <div class="two-col" style="gap:18px;">
+      <div>
+        <h3 style="color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Field data, in order of value</h3>
+        <div class="ask" style="margin-top:10px;"><h3>1 &#183; Carbon removed per tonne, in tropical smallholder soils</h3><p>The single input that most moves both the carbon case and the priority map. Needs multi-year trials, not one-season ones.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>2 &#183; Carbon re-precipitation in semi-arid zones</h3><p>Today a rule of thumb by aridity band; a measured fraction would tighten the drier half of the map.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>3 &#183; Delivered cost near candidate basalt sources</h3><p>Real quarry and trucking quotes in the Cameroon and Guinea highlands.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>4 &#183; Yield response on African trials</h3><p>Lowest leverage, since the map changes least with this input; new Ghana and Kenya trials feed straight in.</p></div>
+      </div>
+      <div>
+        <h3 style="color:var(--accent); font-size:12px; letter-spacing:0.14em; text-transform:uppercase;">Model and outputs</h3>
+        <div class="ask" style="margin-top:10px;"><h3>Registry-grade accounting</h3><p>Align our carbon rule with the counterfactual and additionality tests that credit registries actually apply.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>Run the trial-anchored yield model</h3><p>Replace the crop-suitability fallback with the Bayesian fit on field trials, and widen the trial set as new African results appear.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>Pilot design in the core</h3><p>Put the first pilots where a measurement is most likely to change a decision, and monitor them for more than one season.</p></div>
+        <div class="ask" style="margin-top:10px;"><h3>Manuscript and tools</h3><p>Submit to Agricultural Economics. The interactive explorer already lets anyone move every lever of the analysis in a browser.</p></div>
+      </div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 23 · TAKEAWAYS ============ -->
+  <section class="slide">
+    <div class="topbar"><span class="brand">Takeaways</span><span class="section">Four things to remember</span></div>
+    <div class="eyebrow">Takeaways</div>
+    <h2>Four things to remember.</h2>
+    <div class="two-col" style="row-gap:16px;">
+      <div class="card"><span class="label-tag">1</span><h3 style="font-size:15px;">The two benefits rarely pay on their own</h3><p class="small">But together they make about 2.7 million hectares of acid cropland worth treating that neither would alone.</p></div>
+      <div class="card"><span class="label-tag">2</span><h3 style="font-size:15px;">Carbon money is the missing margin, not a bonus</h3><p class="small">On most viable land the credit is what makes a yield-improving investment affordable. That is a cost-share for farmers, and a clearly additional credit for buyers.</p></div>
+      <div class="card"><span class="label-tag">3</span><h3 style="font-size:15px;">The carbon case hinges on one number</h3><p class="small">How much CO&#8322; a tonne of rock verifiably removes. It is the least-measured quantity in the field and the first thing to go and measure.</p></div>
+      <div class="card"><span class="label-tag">4</span><h3 style="font-size:15px;">There is a place to start</h3><p class="small">The Cameroon and Guinea highlands stay attractive under most assumptions. Pilots there would test the model where a result is most likely to change a decision.</p></div>
+    </div>
+    <div class="footer"><span>ERW public &amp; private returns &#183; plain-language overview</span><span class="pageno"></span></div>
+  </section>
+
+  <!-- ============ 24 · CLOSING ============ -->
+  <section class="slide closing">
+    <img class="closing-photo" src="figures/cimmyt_collage.jpg" alt="CIMMYT field photo collage">
+    <div class="closing-right">
+      <div class="eyebrow">Discussion</div>
+      <p class="closing-thanks">Thank you for<br>your interest!</p>
+      <p class="closing-meta">
+        Rock dust for farmers and for the climate:<br>where it pays in Sub-Saharan Africa<br><br>
+        <span class="mono">B. H. Gebrekidan &#183; J. Chamberlin</span><br>
+        CIMMYT &#183; plain-language overview &#183; working draft, September 2026
+      </p>
+    </div>
+    <img class="closing-logo" src="figures/cimmyt_logo_stacked.svg" alt="CIMMYT &#8211; CGIAR">
+  </section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">&#8249;</button>
+  <span id="counter">1 / 1</span>
+  <button id="next" aria-label="Next slide">&#8250;</button>
+</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const counter = document.getElementById('counter');
+  const progress = document.getElementById('progress');
+  const total = slides.length;
+  let idx = 0;
+  slides.forEach((s, k) => { const p = s.querySelector('.pageno'); if (p) p.textContent = String(k + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0'); });
+  slides.forEach(s => {
+    if (s.classList.contains('closing')) return;
+    const l = document.createElement('div');
+    l.className = 'cimmyt-foot-logo';
+    l.innerHTML = '<img src="figures/cimmyt_logo_horizontal.svg" alt="CIMMYT – CGIAR">';
+    s.appendChild(l);
+  });
+  function go(n) {
+    idx = Math.max(0, Math.min(total - 1, n));
+    slides.forEach((s, k) => s.classList.toggle('active', k === idx));
+    counter.textContent = (idx + 1) + ' / ' + total;
+    progress.style.width = ((idx + 1) / total * 100) + '%';
+    if (location.hash !== '#' + (idx + 1)) history.replaceState(null, '', '#' + (idx + 1));
+  }
+  document.getElementById('next').onclick = () => go(idx + 1);
+  document.getElementById('prev').onclick = () => go(idx - 1);
+  document.addEventListener('keydown', e => {
+    if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(idx + 1); }
+    else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(idx - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(total - 1);
+    else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen(); }
+    else if (e.key.toLowerCase() === 'p') window.print();
+  });
+  const h = parseInt(location.hash.slice(1), 10);
+  go(isNaN(h) ? 0 : h - 1);
+
+  // Typeset equations once KaTeX (deferred) has loaded.
+  function typeset() {
+    if (window.renderMathInElement) {
+      renderMathInElement(document.body, {
+        delimiters: [
+          { left: '\\[', right: '\\]', display: true },
+          { left: '\\(', right: '\\)', display: false }
+        ],
+        throwOnError: false
+      });
+    }
+  }
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    document.addEventListener('DOMContentLoaded', typeset);
+    window.addEventListener('load', typeset);
+  } else {
+    document.addEventListener('DOMContentLoaded', typeset);
+  }
+</script>
+</body>
+</html>
