@@ -40,3 +40,11 @@ datageosurvey_processed.tif
 # --- Office temp/owner lock files ---
 ~$*
 **/~$*
+
+# --- Python virtualenvs + Jupyter run artifacts ---
+.venv/
+venv/
+**/.ipynb_checkpoints/
+
+# --- pre-net-export raster backup (local only; delete when confirmed) ---
+data/economics_erw_pre_netexport/

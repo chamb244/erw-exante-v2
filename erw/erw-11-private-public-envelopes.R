@@ -42,6 +42,9 @@
 #
 # Outputs:
 #   docs/maps/envelopes/*.png            envelope, typology, robustness, core maps
+#     (the public/VCM figures carry the allocation suffix: mac_{PUBLIC_ALLOC}.png,
+#      cdr_rate_sensitivity_panel_{PUBLIC_ALLOC}.png. Their unsuffixed ancestors from
+#      before that rename live in docs/maps/envelopes/orphan/ -- superseded, do not cite.)
 #   docs/tables/output-envelope-summary.csv          ha/farms/value/CDR per envelope
 #   docs/tables/output-envelope-country-summary.csv
 #   docs/tables/output-core-priority-summary.csv
@@ -118,19 +121,23 @@ F_REEXPORT <- get_fs("CDR_eff_kg_per_t_ref") / (get_fs("effective_NV") * 1000)
 GRIND_KWH  <- get_fs("grinding_kWh_per_t")
 
 sink_file <- if (REGIME %in% c("year1","npv")) "caco3_kamprath.tif" else "caco3_merlos_maintenance.tif"
-S_raw  <- aggregate(rast(file.path(DATA, sink_file))[[1]], 10, mean, na.rm=TRUE)
-ci_raw <- rast(file.path(DATA, "grid_CI_kg_per_kWh.tif"))
-km_raw <- rast(file.path(DATA, "basalt_transport_km.tif"))
+S_raw     <- aggregate(rast(file.path(DATA, sink_file))[[1]], 10, mean, na.rm=TRUE)
+ci_raw    <- rast(file.path(DATA, "grid_CI_kg_per_kWh.tif"))
+km_raw    <- rast(file.path(DATA, "basalt_transport_km.tif"))
+# transport-only $/t, so the solar cost lever (Sec.5) can cut just that component
+trans_raw <- if (file.exists(file.path(DATA, "basalt_transport_cost_usd_t.tif")))
+               rast(file.path(DATA, "basalt_transport_cost_usd_t.tif")) else NULL
 
 # Build the area-weighted per-pixel primitives (+ weight, value-of-production, CDR-t)
 build_primitives <- function(alloc) {
   ref <- rast(econ_path(alloc, CROPS[1]))[[1]]
   lca_kg_per_t <- GRIND_KWH * resample(ci_raw, ref) + resample(km_raw, ref) * 0.12 + 0.5
   S <- resample(S_raw, ref); S <- ifel(is.na(S), 0, S)
+  trans_t <- if (!is.null(trans_raw)) resample(trans_raw, ref) else ref*0
 
   z <- ref * 0
   num_agro <- z; num_bas <- z; num_cdrn <- z; num_gross <- z; num_lca <- z
-  wsum <- z; vop <- z; cdrt <- z
+  num_trans <- z; wsum <- z; vop <- z; cdrt <- z
   for (cp in CROPS) {
     r     <- rast(econ_path(alloc, cp))
     ha    <- r[[paste0(cp, "_ha")]]
@@ -148,6 +155,7 @@ build_primitives <- function(alloc) {
     num_cdrn  <- num_cdrn  + ifel(defined, nz(cdrn)  * w, 0)
     num_gross <- num_gross + ifel(defined, nz(gross) * w, 0)
     num_lca   <- num_lca   + ifel(defined, nz(btha * lca_kg_per_t / 1000) * w, 0)
+    num_trans <- num_trans + ifel(defined, nz(btha * trans_t) * w, 0)  # transport $/ha
     wsum      <- wsum + w
     cdrt      <- cdrt + ifel(defined, nz(cdrn) * w, 0)
     pr <- prod_stack[[which(CROPS == cp)]]
@@ -160,6 +168,7 @@ build_primitives <- function(alloc) {
        GROSS = ifel(ok, num_gross / wsum, NA),
        LCA   = ifel(ok, num_lca   / wsum, NA),
        S     = ifel(ok, S, NA),
+       TRANS = ifel(ok, num_trans / wsum, NA),   # transport $/ha (for the solar lever)
        WSUM  = ifel(ok, wsum, NA), VOP = ifel(ok, vop, NA),
        CDRT  = ifel(ok, cdrt, NA), ok = ok)
 }
@@ -282,31 +291,70 @@ print(do.call(rbind, summary_rows))
 # =============================================================================
 # 2) targeting robustness sweep (primary allocation: targeted)
 # =============================================================================
-CMULT <- c(0.5,0.75,1.0,1.5,2.0)   # delivered basalt cost
-CPRICE<- c(50,100,150,250)         # VCM carbon price
-YMULT <- c(0.5,1.0,1.5,2.0)        # yield-benefit
-RMULT <- c(0.5,1.0,1.5)            # CDR-rate
+# The intersection test is homogeneous of degree zero in the delivered cost. Divide
+# both envelope conditions by the cost multiplier c:
+#
+#     private : AGRO * (ymult/c)        > BAS
+#     public  : cdr_net(r,lambda) * ((carbon - MRV)/c) > BAS
+#
+# so the intersection depends on the five economic parameters ONLY through four
+# effective knobs: the yield/cost ratio y/c, the net-price/cost ratio (p-m)/c, the
+# CDR-rate multiplier r, and the net-export partition lambda. Verified exactly:
+# (y,c,p) = (1,1,150), (2,2,280), (0.5,0.5,85) all give 1.2002 Mha.
+#
+# This is why the delivered cost looked like the dominant lever in earlier drafts:
+# it is the ONLY parameter that moves BOTH ratios at once. Its 2.36 Mha swing
+# decomposes into a public channel (1.66 Mha, holding y/c fixed) and a private
+# channel (0.76 Mha, holding (p-m)/c fixed) -- and that 0.76 is exactly the yield
+# swing, as it must be, since yield moves y/c and nothing else. Cost is not a
+# separate mechanism; it is the two ratios moving together.
+#
+# Everything below is on the HEADLINE basis (equilibrium, net-export), matching the
+# regime on which the carbon case is led. Earlier drafts computed this section on
+# the NPV/gross grid -- a regime mismatch.
+YC  <- c(0.5, 0.75, 1.0, 1.5, 2.0)   # yield / delivered-cost ratio
+PC  <- c(30, 80, 130, 230)           # (carbon - MRV) / delivered-cost ratio
+RM  <- c(0.5, 1.0, 1.5)              # CDR-rate multiplier (scales GROSS)
+LAM <- c(0.0, 0.5, 1.0)              # net-export partition
+
 P <- PRIMS[["targeted"]]; ok <- P$ok
-grid <- expand.grid(c=CMULT, cp=CPRICE, y=YMULT, r=RMULT)
+
+# vectorise over live cells: 180 combos of raster algebra would be needlessly slow
+cells <- which(!is.na(values(P$WSUM)) & values(P$WSUM) > 0)
+Av <- values(P$AGRO)[cells];  Bv <- values(P$BAS)[cells]
+Gv <- values(P$GROSS)[cells]; Lv <- values(P$LCA)[cells]
+Sv <- values(P$S)[cells];     Wv <- values(P$WSUM)[cells]
+posv <- function(x) pmax(x, 0)
+cdrv <- function(r, lam) posv(posv(r*Gv - lam*F_REEXPORT*Sv) - Lv)
+
+grid <- expand.grid(yc=YC, pc=PC, r=RM, lam=LAM)
 N <- nrow(grid)
-freq_i <- ref0*0; freq_c <- ref0*0
+freq_i <- numeric(length(cells)); freq_c <- numeric(length(cells))
 for (i in seq_len(N)) {
-  g <- grid[i,]; e <- envelopes(P, g$cp, g$y, g$c, g$r)
-  freq_i <- freq_i + ifel((e$priv & e$publ) & ok, 1, 0)
-  freq_c <- freq_c + ifel(e$comb & ok, 1, 0)
+  g  <- grid[i, ]; cd <- cdrv(g$r, g$lam)
+  pr <- Av*g$yc > Bv
+  pu <- cd*g$pc > Bv
+  freq_i <- freq_i + (pr & pu)
+  freq_c <- freq_c + (Av*g$yc + cd*g$pc > Bv)
 }
-robust_i <- mask(freq_i/N, ok, maskvalue=FALSE)
-robust_c <- mask(freq_c/N, ok, maskvalue=FALSE)
+cat(sprintf("\nrobustness sweep: %d combos over (y/c, (p-m)/c, r, lambda)\n", N))
+
+mkrast <- function(v) { r <- ref0; values(r) <- NA_real_; r[cells] <- v; r }
+robust_i <- mkrast(freq_i/N); robust_c <- mkrast(freq_c/N)
 plot_cont(robust_i, "robustness_intersection.png",
-  sprintf("Robustness of the intersection (%d combos)", N), hcl.colors(20,"Inferno"),"frac")
+  sprintf("Robustness of the intersection (%d combos, equilibrium net-export)", N),
+  hcl.colors(20,"Inferno"), "frac")
 plot_cont(robust_c, "robustness_combined.png",
-  sprintf("Robustness of profitability (%d combos)", N), hcl.colors(20,"Viridis"),"frac")
+  sprintf("Robustness of profitability (%d combos, equilibrium net-export)", N),
+  hcl.colors(20,"Viridis"), "frac")
 
 core <- robust_i >= 0.50; cand <- robust_i >= 0.33
 plot_cat(ifel(core,1,ifel(cand,2,0)), "core_priority.png",
-  "Core targeting tiers (full-grid robustness)",
+  "Core targeting tiers (equilibrium, net-export)",
   c(0,2,1), c("grey85","#f4a259","#b30000"),
   c("outside","candidate >=33%","core >=50%"))
+cat(sprintf("max per-pixel robustness score: %.2f\n",
+    max(freq_i)/N))
 
 core_summary <- rbind(
   cbind(tier="core_>=50%",  summarize_mask(P, core & ok)),
@@ -322,31 +370,37 @@ core_country <- core_country[order(-core_country$core_Mha),]
 write.csv(core_country, file.path(TBL_OUT,"output-core-priority-by-country.csv"), row.names=FALSE)
 
 # =============================================================================
-# 3) one-at-a-time tornado: total intersection ha vs each parameter
+# 3) one-at-a-time tornado: total intersection ha vs each EFFECTIVE knob
 # =============================================================================
-inter_ha <- function(carbon, ymult, cmult, rmult) {
-  e <- envelopes(P, carbon, ymult, cmult, rmult)
-  as.numeric(global(ifel((e$priv & e$publ) & ok, P$WSUM, 0), "sum", na.rm=TRUE))/1e6
-}
-base_ha <- inter_ha(CARBON_BASE, 1, 1, 1)
-axes <- list(carbon_price=list("carbon",CPRICE), yield_mult=list("ymult",YMULT),
-             cost_mult=list("cmult",CMULT), cdr_rate_mult=list("rmult",RMULT))
-tor <- list()
-for (nm in names(axes)) {
-  key <- axes[[nm]][[1]]; vals <- axes[[nm]][[2]]; hh <- numeric(length(vals))
-  for (j in seq_along(vals)) {
-    args <- list(CARBON_BASE,1,1,1)
-    names(args) <- c("carbon","ymult","cmult","rmult")
-    args[[c(carbon="carbon",ymult="ymult",cmult="cmult",rmult="rmult")[key]]] <- vals[j]
-    hh[j] <- do.call(inter_ha, args)
-  }
-  tor[[nm]] <- data.frame(parameter=nm, min_inter_Mha=round(min(hh),2),
-                          max_inter_Mha=round(max(hh),2), swing_Mha=round(max(hh)-min(hh),2))
-}
-tor_df <- do.call(rbind, tor); tor_df <- tor_df[order(-tor_df$swing_Mha),]
+# Reported on the four knobs the intersection actually depends on. The raw
+# delivered-cost lever is reported too, but decomposed: it is not a fifth
+# mechanism, it is y/c and (p-m)/c moving together.
+inter_v <- function(yc=1, pc=RATIO0, r=1, lam=1)
+  sum(Wv[(Av*yc > Bv) & (cdrv(r,lam)*pc > Bv)]) / 1e6
+RATIO0 <- CARBON_BASE - MRV          # = 130, the central net price per unit cost
+base_ha <- inter_v()
+
+sweep1 <- function(vals, f) { h <- sapply(vals, f); c(min(h), max(h)) }
+rows <- list(
+  c("yield/cost ratio y/c (x0.5-2.0)",        sweep1(YC,  function(x) inter_v(yc=x)),        "private"),
+  c("net-price/cost ratio (p-m)/c (30-230)",  sweep1(PC,  function(x) inter_v(pc=x)),        "public"),
+  c("CDR rate r (x0.5-1.5)",                  sweep1(RM,  function(x) inter_v(r=x)),         "public"),
+  c("net-export lambda (0-1)",                sweep1(LAM, function(x) inter_v(lam=x)),       "public"),
+  c("[delivered cost c (x0.5-2.0)]",          sweep1(c(0.5,0.75,1,1.5,2),
+       function(x) inter_v(yc=1/x, pc=RATIO0/x)),                                            "both"),
+  c("  -- its public channel only",           sweep1(c(0.5,0.75,1,1.5,2),
+       function(x) inter_v(yc=1, pc=RATIO0/x)),                                              "public"),
+  c("  -- its private channel only",          sweep1(c(0.5,0.75,1,1.5,2),
+       function(x) inter_v(yc=1/x, pc=RATIO0)),                                              "private")
+)
+tor_df <- do.call(rbind, lapply(rows, function(z) data.frame(
+  knob = z[1], min_inter_Mha = round(as.numeric(z[2]),2),
+  max_inter_Mha = round(as.numeric(z[3]),2),
+  swing_Mha = round(as.numeric(z[3]) - as.numeric(z[2]), 2), acts_on = z[4])))
 write.csv(tor_df, file.path(TBL_OUT,"output-sensitivity-tornado.csv"), row.names=FALSE)
 
-cat("\nbaseline intersection:", round(base_ha,2), "Mha\n"); print(tor_df)
+cat("\nbaseline intersection:", round(base_ha,2), "Mha (equilibrium, net-export)\n")
+print(tor_df, row.names=FALSE)
 
 # =============================================================================
 # 4) public/VCM envelope: marginal abatement cost + CDR-rate sensitivity panel
@@ -461,6 +515,53 @@ mac_med <- median(values(MAC), na.rm=TRUE)
 cat("\npublic-envelope MAC median ($/tCO2):", round(mac_med,0), "\n")
 cat("baseline public:", round(base_pub,2), "Mha;  2x CDR rate:",
     round(area_of("public", rmult=2),2), "Mha\n"); print(cdr_sens)
+
+# =============================================================================
+# 5) cost-side lever: at-scale solar/electric haulage (targeted; sec:solar)
+# =============================================================================
+# Solar displaces the fuel/energy portion of trucking cost -> a cut to the
+# TRANSPORT term of delivered cost only. Per pixel:
+#     BAS_solar = BAS - f * TRANS         (TRANS = transport $/ha, area-weighted)
+# The CDR side is left untouched: solar would also cut transport LCA emissions,
+# so holding LCA fixed makes the public-side gain a conservative lower bound.
+# Reported on the HEADLINE basis (equilibrium net-export), NOT the NPV/gross grid
+# the earlier draft used -- the point of the section is to compare against the
+# headline envelopes, so it must share their regime.
+Psol <- PRIMS[["targeted"]]; oks <- Psol$ok
+solar_env <- function(f = 0) {           # f = fraction off the transport term
+  BASs <- Psol$BAS - f * Psol$TRANS
+  cd   <- cdr_net(Psol)                  # rmult=1, lambda=1
+  net  <- CARBON_BASE - MRV
+  list(priv  = (Psol$AGRO - BASs) > 0,
+       publ  = (cd*net    - BASs) > 0,
+       inter = ((Psol$AGRO - BASs) > 0) & ((cd*net - BASs) > 0))
+}
+solar_Mha <- function(m) as.numeric(global(ifel(m & oks, Psol$WSUM, 0),"sum",na.rm=TRUE))/1e6
+
+# transport share of delivered cost. Report the AREA-weighted mean of the per-pixel
+# share (so "x% off delivered" = f * mean share is internally consistent), plus the
+# area-weighted median for the distribution.
+tsh <- Psol$TRANS / Psol$BAS
+tsh_mean <- as.numeric(global(ifel(oks, tsh * Psol$WSUM, 0),"sum",na.rm=TRUE)) /
+            as.numeric(global(ifel(oks, Psol$WSUM,       0),"sum",na.rm=TRUE))
+tsh_med  <- {
+  v <- values(tsh)[oks_v <- which(!is.na(values(tsh)) & !is.na(values(Psol$WSUM)))]
+  wv <- values(Psol$WSUM)[oks_v]; o <- order(v)
+  approx(cumsum(wv[o])/sum(wv), v[o], 0.5, ties="ordered")$y
+}
+
+solar <- do.call(rbind, lapply(c(0, 0.25, 0.40), function(f) {
+  e <- solar_env(f)
+  data.frame(transport_cut = f,
+             pct_off_delivered = round(100*f*tsh_mean, 0),
+             private_Mha = round(solar_Mha(e$priv), 2),
+             public_Mha  = round(solar_Mha(e$publ), 2),
+             inter_Mha   = round(solar_Mha(e$inter), 2))
+}))
+write.csv(solar, file.path(TBL_OUT,"output-solar-transport.csv"), row.names=FALSE)
+cat(sprintf("\nsolar haulage (targeted, equilibrium net-export); transport share of\n"))
+cat(sprintf("delivered cost: mean %.0f%%, median %.0f%%\n", 100*tsh_mean, 100*tsh_med))
+print(solar, row.names=FALSE)
 
 cat("\nmaps  ->", MAP_OUT, "\ntables ->", TBL_OUT, "\n")
 # ------------------------------------------------------------------------------

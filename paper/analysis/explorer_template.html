@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ERW public-envelope explorer</title>
+<style>
+  :root{
+    --bg:#ffffff; --fg:#1a1a1a; --muted:#666; --line:#e2e2e2; --panel:#f7f7f8;
+    --both:#7d1f8c; --priv:#1a7d3c; --pub:#2156a8; --comb:#e8a33d; --none:#e8e8e8;
+    --border:#33353b;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{ --bg:#16171a; --fg:#e9e9ea; --muted:#9a9aa0; --line:#2c2e33; --panel:#1e2024;
+           --none:#2a2c31; --border:#b9bcc4; }
+  }
+  :root[data-theme="light"]{ --bg:#fff; --fg:#1a1a1a; --muted:#666; --line:#e2e2e2; --panel:#f7f7f8; --none:#e8e8e8; --border:#33353b; }
+  :root[data-theme="dark"]{ --bg:#16171a; --fg:#e9e9ea; --muted:#9a9aa0; --line:#2c2e33; --panel:#1e2024; --none:#2a2c31; --border:#b9bcc4; }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:18px 22px 6px}
+  h1{font-size:19px;margin:0 0 3px}
+  .sub{color:var(--muted);font-size:12.5px;max-width:72ch}
+  .wrap{display:flex;flex-wrap:wrap;gap:18px;padding:14px 22px 30px;align-items:flex-start}
+  .mapcol{flex:1 1 520px;min-width:320px}
+  .panel{flex:0 0 340px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;padding:14px 16px}
+  .mapbox{position:relative;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--bg)}
+  canvas#map{display:block;width:100%;height:auto;image-rendering:pixelated}
+  canvas#bnd{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+  .legend{display:flex;flex-wrap:wrap;gap:9px 15px;margin:10px 2px 0;font-size:12px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sw{width:13px;height:13px;border-radius:3px;display:inline-block}
+  .seg{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:2px 0 4px}
+  .seg button{flex:1;border:none;border-right:1px solid var(--line);background:var(--bg);
+    color:var(--fg);padding:7px 4px;font-size:12.5px;cursor:pointer}
+  .seg button:last-child{border-right:none}
+  .seg button[aria-pressed="true"]{background:var(--pub);color:#fff;font-weight:600}
+  .ctl{margin:10px 0}
+  .ctl label{display:flex;justify-content:space-between;font-size:12.5px;margin-bottom:3px}
+  .ctl label b{font-weight:600}
+  .val{color:var(--pub);font-variant-numeric:tabular-nums}
+  input[type=range]{width:100%;accent-color:var(--pub)}
+  select{width:100%;padding:6px;border:1px solid var(--line);border-radius:7px;
+    background:var(--bg);color:var(--fg);font-size:13px}
+  .row{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12.5px;margin:9px 0}
+  .row input{accent-color:var(--pub)}
+  .ratio{margin-top:6px;padding:7px 9px;background:var(--bg);border:1px solid var(--line);
+    border-radius:7px;font-size:12px;color:var(--muted)}
+  .ratio b{color:var(--fg);font-variant-numeric:tabular-nums}
+  table.areas{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
+  table.areas td{padding:5px 4px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+  table.areas td:first-child{color:var(--muted)}
+  table.areas td:last-child{text-align:right;font-weight:600}
+  .bar{height:9px;border-radius:5px;margin-top:3px}
+  h2{font-size:13px;margin:16px 0 2px;letter-spacing:.02em;text-transform:uppercase;color:var(--muted)}
+  .tablewrap{max-height:260px;overflow-y:auto;border:1px solid var(--line);border-radius:8px;margin-top:6px}
+  table.countries{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.countries th{position:sticky;top:0;background:var(--panel);text-align:right;
+    padding:6px 8px;font-weight:600;border-bottom:1px solid var(--line);font-size:11.5px;color:var(--muted)}
+  table.countries th:first-child{text-align:left}
+  table.countries td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+  table.countries td:first-child{text-align:left}
+  table.countries tr.total td{font-weight:700;border-top:2px solid var(--line);border-bottom:none}
+  .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  button.preset,button#theme{font:inherit;font-size:12px;padding:6px 9px;border:1px solid var(--line);
+    background:var(--bg);color:var(--fg);border-radius:7px;cursor:pointer}
+  button.preset:hover,button#theme:hover{border-color:var(--pub)}
+  .note{font-size:11.5px;color:var(--muted);margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+  code{background:var(--bg);padding:1px 4px;border-radius:4px;font-size:11.5px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Enhanced Rock Weathering — public/private return-envelope explorer</h1>
+  <div class="sub">Move the sliders to see how the private (agronomic), public (durable-carbon),
+  and combined return envelopes remap across Sub-Saharan African cropland, on the equilibrium
+  net-export basis. Each move is a closed-form re-evaluation of five per-pixel primitives — no
+  model re-run. Self-contained: no network, no install.</div>
+</header>
+
+<div class="wrap">
+  <div class="mapcol">
+    <div class="mapbox">
+      <canvas id="map"></canvas>
+      <canvas id="bnd"></canvas>
+    </div>
+    <div class="legend" id="legend"></div>
+  </div>
+
+  <div class="panel">
+    <div class="ctl">
+      <label><b>Show</b></label>
+      <div class="seg" id="mode">
+        <button data-mode="private">Private</button>
+        <button data-mode="public">Public</button>
+        <button data-mode="both" aria-pressed="true">Both</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <label for="bndtog">National boundaries (GADM level&nbsp;0)</label>
+      <input type="checkbox" id="bndtog" checked>
+    </div>
+
+    <div class="ctl">
+      <label><b>Allocation rule</b></label>
+      <select id="alloc"></select>
+    </div>
+
+    <div class="ctl"><label>Carbon price <span class="val" id="v_carbon"></span></label>
+      <input type="range" id="carbon" min="50" max="500" step="10" value="150"></div>
+    <div class="ctl"><label>MRV cost <span class="val" id="v_mrv"></span></label>
+      <input type="range" id="mrv" min="0" max="60" step="5" value="20"></div>
+    <div class="ctl"><label>Delivered cost &times; <span class="val" id="v_cmult"></span></label>
+      <input type="range" id="cmult" min="0.5" max="2" step="0.05" value="1"></div>
+    <div class="ctl"><label>CDR rate &times; <span class="val" id="v_rmult"></span> <em style="color:var(--muted)">(gross)</em></label>
+      <input type="range" id="rmult" min="0.25" max="3" step="0.05" value="1"></div>
+    <div class="ctl"><label>Net-export &lambda; <span class="val" id="v_lam"></span></label>
+      <input type="range" id="lam" min="0" max="1" step="0.05" value="1"></div>
+    <div class="ctl"><label>Yield &times; <span class="val" id="v_ymult"></span></label>
+      <input type="range" id="ymult" min="0.5" max="2.5" step="0.05" value="1"></div>
+    <div class="ctl"><label>Solar haulage cut <span class="val" id="v_solar"></span></label>
+      <input type="range" id="solar" min="0" max="0.5" step="0.05" value="0"></div>
+
+    <div class="ratio">Public-envelope net price / cost ratio
+      <b>(p&minus;m)/c = <span id="ratio"></span></b><br>
+      <span style="font-size:11px">Move price, MRV and cost so this stays fixed — the public map won't change.</span>
+    </div>
+
+    <table class="areas" id="areas"></table>
+
+    <h2 id="tabhead">By country</h2>
+    <div class="tablewrap">
+      <table class="countries" id="countries">
+        <thead><tr><th>Country</th><th>Mha</th><th>Mt CO₂</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="btns">
+      <button class="preset" data-preset="central">Central</button>
+      <button class="preset" data-preset="conservative">Conservative</button>
+      <button class="preset" data-preset="optimistic">Optimistic</button>
+      <button class="preset" data-preset="cdr2">2&times; CDR rate</button>
+      <button id="theme">◐ theme</button>
+    </div>
+
+    <div class="note">
+      Displayed areas are on a 2&times;-aggregated grid for speed and file size;
+      they track the canonical <code>erw-12</code> values to ~2&ndash;3%. Central public
+      envelope, fine-resolution: <span id="canon"></span> Mha. The CDR-rate slider scales
+      <b>gross</b> removal before the acidity-sink deduction — durable removal is super-linear in it.
+      Mt&nbsp;CO₂ is durable net-export removal on the shown land.
+    </div>
+  </div>
+</div>
+
+<script>
+const META = __META__;
+const B64  = "__DATA__";
+
+function b64ToBuf(b64){
+  const bin=atob(b64), len=bin.length, u8=new Uint8Array(len);
+  for(let i=0;i<len;i++) u8[i]=bin.charCodeAt(i);
+  return u8.buffer;
+}
+const BUF=b64ToBuf(B64);
+const u16=(off,n)=>new Uint16Array(BUF,off,n);
+const u8f=(off,n)=>new Uint8Array(BUF,off,n);
+
+// per-allocation Float32 arrays (dequantised) + country id
+const DATA={};
+for(const [name,e] of Object.entries(META.allocs)){
+  const n=e.n, f=e.fields, d={n};
+  d.col=u16(f.col.off,n); d.row=u16(f.row.off,n); d.cid=u8f(f.cid.off,n);
+  for(const k of ["AGRO","BAS","GROSS","LCA","S","TRANS","WSUM"]){
+    const raw=u16(f[k].off,n), sc=f[k].max/65535, out=new Float32Array(n);
+    for(let i=0;i<n;i++) out[i]=raw[i]*sc;
+    d[k]=out;
+  }
+  DATA[name]=d;
+}
+// boundary polylines
+const BND={lens:u16(META.bounds.lens_off,META.bounds.n_poly),
+           coords:u16(META.bounds.coords_off,META.bounds.n_coord)};
+const CODES=META.codes;                       // idx -> {iso3,name}
+const F=META.F, H=META.H, W=META.W;
+
+const map=document.getElementById("map"), bnd=document.getElementById("bnd");
+map.width=W; map.height=H;
+const bScale=3; bnd.width=W*bScale; bnd.height=H*bScale;
+const ctx=map.getContext("2d"), img=ctx.createImageData(W,H);
+const bctx=bnd.getContext("2d");
+
+function rgb(varName){
+  const c=getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+  const m=c.match(/^#?([0-9a-f]{6})$/i);
+  if(m){const h=parseInt(m[1],16);return [h>>16&255,h>>8&255,h&255];}
+  const el=document.createElement("div");el.style.color=c;document.body.appendChild(el);
+  const rc=getComputedStyle(el).color;el.remove();
+  return rc.match(/\d+/g).slice(0,3).map(Number);
+}
+let COL, BORDER;
+function loadColors(){
+  COL={both:rgb("--both"),priv:rgb("--priv"),pub:rgb("--pub"),comb:rgb("--comb"),none:rgb("--none")};
+  BORDER=getComputedStyle(document.documentElement).getPropertyValue("--border").trim();
+}
+
+function drawBoundaries(){
+  bctx.clearRect(0,0,bnd.width,bnd.height);
+  if(!document.getElementById("bndtog").checked) return;
+  bctx.strokeStyle=BORDER; bctx.lineWidth=1.1; bctx.lineJoin="round"; bctx.globalAlpha=0.85;
+  const OW=bnd.width, OH=bnd.height; let p=0;
+  bctx.beginPath();
+  for(let k=0;k<BND.lens.length;k++){
+    const L=BND.lens[k];
+    for(let j=0;j<L;j++){
+      const qx=BND.coords[p++], qy=BND.coords[p++];
+      const x=qx/65535*OW, y=(1-qy/65535)*OH;
+      if(j===0) bctx.moveTo(x,y); else bctx.lineTo(x,y);
+    }
+  }
+  bctx.stroke(); bctx.globalAlpha=1;
+}
+
+const $=id=>document.getElementById(id);
+const IDS=["carbon","mrv","cmult","rmult","lam","ymult","solar"];
+let MODE="both";
+
+const MODES={
+  private:{legend:[["priv","private return covers cost"],["none","below cost"]],
+           head:"Private envelope by country"},
+  public:{legend:[["pub","carbon return covers cost"],["none","below cost"]],
+          head:"Public (carbon) envelope by country"},
+  both:{legend:[["both","both (intersection)"],["priv","private only"],["pub","public only"],
+                ["comb","combined only"],["none","neither"]],
+        head:"Combined envelope by country"},
+};
+
+function state(){
+  return {alloc:$("alloc").value,
+    carbon:+$("carbon").value,mrv:+$("mrv").value,cmult:+$("cmult").value,
+    rmult:+$("rmult").value,lam:+$("lam").value,ymult:+$("ymult").value,solar:+$("solar").value};
+}
+
+function render(){
+  const s=state(), d=DATA[s.alloc], n=d.n, net=s.carbon-s.mrv, px=img.data;
+  px.fill(0);
+  let aPriv=0,aPub=0,aInt=0,aComb=0;
+  const acA={}, acC={};                          // per-country area / CDR for the active mask
+  for(let i=0;i<n;i++){
+    const bas=(d.BAS[i]-s.solar*d.TRANS[i])*s.cmult;
+    let cd=s.rmult*d.GROSS[i]-s.lam*F*d.S[i]; if(cd<0)cd=0; cd-=d.LCA[i]; if(cd<0)cd=0;
+    const agro=d.AGRO[i]*s.ymult, w=d.WSUM[i];
+    const pr=(agro-bas)>0, pu=(cd*net-bas)>0, co=(agro+cd*net-bas)>0;
+    if(pr)aPriv+=w; if(pu)aPub+=w; if(pr&&pu)aInt+=w; if(co)aComb+=w;
+    let c=COL.none;
+    if(MODE==="private"){ if(pr)c=COL.priv; }
+    else if(MODE==="public"){ if(pu)c=COL.pub; }
+    else { if(pr&&pu)c=COL.both; else if(pr)c=COL.priv; else if(pu)c=COL.pub; else if(co)c=COL.comb; }
+    const off=(d.row[i]*W+d.col[i])*4;
+    px[off]=c[0]; px[off+1]=c[1]; px[off+2]=c[2]; px[off+3]=255;
+    const inMask = MODE==="private"?pr : MODE==="public"?pu : co;
+    if(inMask){ const id=d.cid[i]; acA[id]=(acA[id]||0)+w; acC[id]=(acC[id]||0)+cd*w; }
+  }
+  ctx.putImageData(img,0,0);
+
+  const A={private:aPriv/1e6,public:aPub/1e6,intersection:aInt/1e6,combined:aComb/1e6};
+  const rows=[["private",A.private,"var(--priv)"],["public",A.public,"var(--pub)"],
+              ["intersection",A.intersection,"var(--both)"],["combined",A.combined,"var(--comb)"]];
+  const mx=Math.max(6,...rows.map(r=>r[1]));
+  $("areas").innerHTML=rows.map(([k,v,c])=>
+    `<tr><td>${k}<div class="bar" style="width:${100*v/mx}%;background:${c}"></div></td>
+     <td>${v.toFixed(2)} Mha</td></tr>`).join("");
+
+  const list=Object.keys(acA).filter(id=>id!=="0"&&acA[id]>0)
+    .map(id=>({iso:(CODES[id]||{}).iso3||"—",name:(CODES[id]||{}).name||id,
+               mha:acA[id]/1e6, mt:acC[id]/1e6}))
+    .sort((a,b)=>b.mha-a.mha);
+  const TOPN=14, top=list.slice(0,TOPN), rest=list.slice(TOPN);
+  let body=top.map(r=>`<tr><td title="${r.name}">${r.iso}</td>
+     <td>${r.mha.toFixed(r.mha<0.1?3:2)}</td><td>${r.mt.toFixed(1)}</td></tr>`).join("");
+  if(rest.length){const ra=rest.reduce((s,r)=>s+r.mha,0),rc=rest.reduce((s,r)=>s+r.mt,0);
+    body+=`<tr><td>+${rest.length} more</td><td>${ra.toFixed(2)}</td><td>${rc.toFixed(1)}</td></tr>`;}
+  const tA=list.reduce((s,r)=>s+r.mha,0), tC=list.reduce((s,r)=>s+r.mt,0);
+  body+=`<tr class="total"><td>total</td><td>${tA.toFixed(2)}</td><td>${tC.toFixed(1)}</td></tr>`;
+  $("countries").querySelector("tbody").innerHTML=body ||
+     `<tr><td colspan="3" style="color:var(--muted)">no qualifying land</td></tr>`;
+
+  $("v_carbon").textContent="$"+s.carbon+"/tCO₂"; $("v_mrv").textContent="$"+s.mrv+"/tCO₂";
+  $("v_cmult").textContent="×"+s.cmult.toFixed(2); $("v_rmult").textContent="×"+s.rmult.toFixed(2);
+  $("v_lam").textContent=s.lam.toFixed(2); $("v_ymult").textContent="×"+s.ymult.toFixed(2);
+  $("v_solar").textContent=(s.solar*100).toFixed(0)+"%";
+  $("ratio").textContent=(net/s.cmult).toFixed(0);
+}
+
+function setLegend(){
+  $("legend").innerHTML=MODES[MODE].legend.map(([k,l])=>
+    `<span><i class="sw" style="background:var(--${k})"></i>${l}</span>`).join("");
+  $("tabhead").textContent=MODES[MODE].head;
+}
+
+const sel=$("alloc");
+for(const a of Object.keys(META.allocs)){
+  const o=document.createElement("option");o.value=a;o.textContent=a;sel.appendChild(o);}
+sel.value="targeted";
+$("canon").textContent=Object.entries(META.canon_public).map(([k,v])=>`${k} ${v}`).join(" · ");
+sel.addEventListener("input",render);
+IDS.forEach(id=>$(id).addEventListener("input",render));
+
+$("mode").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-mode]"); if(!b) return;
+  MODE=b.dataset.mode;
+  [...$("mode").children].forEach(x=>x.setAttribute("aria-pressed",x===b));
+  setLegend(); render();
+});
+$("bndtog").addEventListener("change",drawBoundaries);
+
+const PRESETS={
+  central:{carbon:150,mrv:20,cmult:1,rmult:1,lam:1,ymult:1,solar:0},
+  conservative:{carbon:100,mrv:40,cmult:1.5,rmult:0.5,lam:1,ymult:0.75,solar:0},
+  optimistic:{carbon:250,mrv:10,cmult:0.75,rmult:1.5,lam:1,ymult:1.5,solar:0},
+  cdr2:{carbon:150,mrv:20,cmult:1,rmult:2,lam:1,ymult:1,solar:0},
+};
+document.querySelectorAll("button.preset").forEach(b=>
+  b.addEventListener("click",()=>{const p=PRESETS[b.dataset.preset];
+    for(const k of IDS)$(k).value=p[k];render();}));
+
+$("theme").addEventListener("click",()=>{
+  const cur=document.documentElement.getAttribute("data-theme");
+  const next=cur==="dark"?"light":(cur==="light"?"dark":
+    (matchMedia("(prefers-color-scheme:dark)").matches?"light":"dark"));
+  document.documentElement.setAttribute("data-theme",next);
+  loadColors();drawBoundaries();render();
+});
+matchMedia("(prefers-color-scheme:dark)").addEventListener?.("change",()=>{loadColors();drawBoundaries();render();});
+
+loadColors(); setLegend(); drawBoundaries(); render();
+</script>
+</body>
+</html>
